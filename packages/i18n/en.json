@@ -332,5 +332,11 @@
     "go": "Start",
     "panel": "Test host (practice only)",
     "panelHint": "Pretend you said an answer: tap its rank, or Wrong."
+  },
+  "power": {
+    "wildTitle": "WILD ×5!",
+    "wildSub": "{{name}} played Wild — this answer counts five times",
+    "streakTitle": "STREAK!",
+    "streakSub": "{{name}} is on fire — one more answer"
   }
 }

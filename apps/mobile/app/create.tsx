@@ -105,7 +105,7 @@ export default function CreateGame() {
               <Pressable disabled={empty} onPress={() => toggle(c.id)} accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled: empty }} accessibilityLabel={L(c.name)}
                 style={({ pressed }) => [styles.tile, { borderColor: on ? st.tint : color.line, backgroundColor: on ? st.tint + '22' : color.surface, opacity: empty ? 0.4 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
                 <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <IconPlate icon={st.icon as IconName} tint={st.tint} size={40} solid={on} />
+                  <IconPlate icon={st.icon as IconName} img={c.id} tint={st.tint} size={48} solid={on} />
                   <View style={[styles.check, on ? { backgroundColor: st.tint, borderColor: st.tint } : null]}>
                     {on ? <Feather name="check" size={14} color={color.accentInk} /> : null}
                   </View>

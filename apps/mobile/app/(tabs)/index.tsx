@@ -7,12 +7,12 @@ import { useApp, useLocalized } from '@/app-context';
 import { catStyle, color, radius, rankColor, shadow, space } from '@/theme';
 import { Avatar, Card, FadeIn, Gap, Gradient, IconPlate, ltr, Row, Screen, SectionTitle, Txt, type IconName } from '@/ui';
 
-const HOW: { key: string; icon: IconName; tint: string }[] = [
+const HOW: { key: string; icon: IconName; tint: string; img?: string }[] = [
   { key: 's1', icon: 'list', tint: color.accent },
-  { key: 's2', icon: 'repeat', tint: color.streak },
-  { key: 's3', icon: 'trending-up', tint: color.gold },
-  { key: 's4', icon: 'cards-playing', tint: color.wild },
-  { key: 's5', icon: 'flag', tint: color.good },
+  { key: 's2', icon: 'repeat', tint: color.streak, img: 'microphone' },
+  { key: 's3', icon: 'trending-up', tint: color.gold, img: 'sparkles' },
+  { key: 's4', icon: 'cards-playing', tint: color.wild, img: 'wild' },
+  { key: 's5', icon: 'flag', tint: color.good, img: 'trophy' },
 ];
 
 export default function Home() {
@@ -155,7 +155,7 @@ export default function Home() {
                 style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.96 : 1 }] })}>
                 <Gradient from={st.tint + '40'} to={color.surface} radius={radius.lg} style={[styles.tile, { borderColor: st.tint + '55' }]}>
                   <View style={{ padding: space(3.5), flex: 1, justifyContent: 'space-between' }}>
-                    <IconPlate icon={st.icon as IconName} tint={st.tint} size={46} solid />
+                    <IconPlate icon={st.icon as IconName} img={c.id} tint={st.tint} size={56} solid />
                     <View>
                       <Txt v="h2" numberOfLines={2} style={{ fontSize: 16, lineHeight: locale === 'ar' ? 24 : 20 }}>{L(c.name)}</Txt>
                       <Txt v="small" dim>{t('home2.questionsN', { n: c.ready })}</Txt>
@@ -177,7 +177,7 @@ export default function Home() {
         {HOW.map((h, i) => (
           <Card key={h.key} style={{ width: cardW, minHeight: 150, borderColor: h.tint + '44' }}>
             <Row gap={3} style={{ alignItems: 'flex-start' }}>
-              <IconPlate icon={h.icon} tint={h.tint} />
+              <IconPlate icon={h.icon} img={h.img} tint={h.tint} size={52} />
               <View style={{ flex: 1 }}>
                 <Txt v="label" color={h.tint}>{`${i + 1} / ${HOW.length}`}</Txt>
                 <Txt v="h2">{t(`how.${h.key}t`)}</Txt>
@@ -197,12 +197,12 @@ export default function Home() {
       <SectionTitle title={t('home2.statsTitle')} action={t('home2.seeStats')} onAction={() => router.navigate('/stats')} />
       <Row gap={3}>
         {([
-          ['home2.games', stats?.gamesPlayed ?? 0, 'grid', color.streak],
-          ['home2.wins', stats?.gamesWon ?? 0, 'award', color.gold],
-          ['home2.best', stats?.highestScore ?? 0, 'trending-up', color.accent],
-        ] as [string, number, IconName, string][]).map(([k, n, icon, tint]) => (
+          ['home2.games', stats?.gamesPlayed ?? 0, 'grid', color.streak, 'party'],
+          ['home2.wins', stats?.gamesWon ?? 0, 'award', color.gold, 'trophy'],
+          ['home2.best', stats?.highestScore ?? 0, 'trending-up', color.accent, 'sparkles'],
+        ] as [string, number, IconName, string, string][]).map(([k, n, icon, tint, img]) => (
           <Card key={k} style={{ flex: 1, padding: space(3), alignItems: 'center' }}>
-            <IconPlate icon={icon} tint={tint} size={36} />
+            <IconPlate icon={icon} img={img} tint={tint} size={44} />
             <Gap h={2} />
             <Txt v="title" style={{ fontSize: 22 }}>{n}</Txt>
             <Txt v="small" dim>{t(k)}</Txt>

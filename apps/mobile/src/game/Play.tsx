@@ -10,6 +10,7 @@ import { Avatar, Banner, Button, Card, Gap, Gradient, IconButton, IconPlate, ltr
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
 import { CountdownBar, CountdownPill } from './Countdown';
+import { has3D, Icon3D } from '../icons3d';
 import { people, turnStates } from './helpers';
 import { LeaderStrip } from './Leaderboard';
 
@@ -81,7 +82,7 @@ function MyTurnBar({ view, top }: { view: LiveView; top: number }) {
   return (
     <Pulse active={!turn?.awaitingStreakDecision}>
       <View style={[styles.turnBar, { paddingTop: top + space(3) }]} accessibilityRole="alert" accessibilityLiveRegion="assertive">
-        <View style={styles.turnBarIcon}><Feather name="microphone" size={26} color={color.accent} /></View>
+        <View style={styles.turnBarIcon}><Icon3D name="microphone" size={38} /></View>
         <View style={{ flex: 1 }}>
           <Txt v="title" color="#FFFFFF" style={{ fontSize: 24 }}>{title}</Txt>
           {sub ? <Txt v="small" color="#FFFFFFE6">{sub}</Txt> : null}
@@ -129,7 +130,7 @@ export function QuestionHeader({ view, categoryName, onMenu }: { view: LiveView;
       <View style={{ padding: space(4) }}>
         <Row style={{ justifyContent: 'space-between' }}>
           <Row gap={2} style={{ flex: 1, flexWrap: 'wrap' }}>
-            <IconPlate icon={st.icon as never} tint={st.tint} size={34} solid />
+            <IconPlate icon={st.icon as never} img={r.categoryId} tint={st.tint} size={40} solid />
             <View style={[styles.tag, r.isTiebreak ? { backgroundColor: color.gold } : null]}>
               <Txt v="label" color={r.isTiebreak ? inkOn(color.gold) : color.text}>{r.isTiebreak ? t('game.tiebreak') : t('game.question', { n: r.number })}</Txt>
             </View>
@@ -288,11 +289,11 @@ function PlayerPanel({ view, run, busy }: { view: LiveView; run: (a: ActionInput
       <Gap h={3} />
       <Row gap={3}>
         <GameCard
-          title={t('cards.wild')} effect={t('cards.wildEffect')} tint={color.wild} icon="cards-playing" state={me.wild}
+          title={t('cards.wild')} effect={t('cards.wildEffect')} tint={color.wild} icon="wild" state={me.wild}
           canUse={me.canActivateWild} busy={busy} onUse={() => run({ type: 'activate_wild', turnSerial: view.turnSerial })}
         />
         <GameCard
-          title={t('cards.streak')} effect={t('cards.streakEffect')} tint={color.streak} icon="fire" state={me.streak}
+          title={t('cards.streak')} effect={t('cards.streakEffect')} tint={color.streak} icon="streak" state={me.streak}
           canUse={me.canActivateStreak} busy={busy} onUse={() => run({ type: 'activate_streak', turnSerial: view.turnSerial })}
         />
       </Row>
@@ -351,7 +352,7 @@ function GameCard({ title, effect, tint, icon, state, canUse, onUse, busy }: {
       accessibilityLabel={used ? `${title}: ${t('cards.used')}` : undefined}>
       <View style={{ flex: 1, opacity: used ? 0.35 : 1 }}>
       <Row style={{ justifyContent: 'space-between' }}>
-        <Feather name={icon} size={22} color={armed ? inkOn(tint) : tint} />
+        {has3D(icon) ? <Icon3D name={icon} size={40} /> : <Feather name={icon} size={22} color={armed ? inkOn(tint) : tint} />}
         <Txt v="label" color={armed ? inkOn(tint) : tint}>{used ? t('cards.used') : armed ? t('cards.armed') : t('cards.available')}</Txt>
       </Row>
       <Txt v="h2" color={armed ? inkOn(tint) : color.text} style={{ marginTop: space(2) }}>{title}</Txt>

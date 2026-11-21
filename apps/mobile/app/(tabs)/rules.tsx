@@ -37,11 +37,11 @@ export default function Rules() {
         <SectionTitle title={t('rules.cards')} />
         <Row gap={3} style={{ alignItems: 'stretch' }}>
           {[
-            { title: t('cards.wild'), body: t('cards.wildEffect'), tint: color.wild, icon: 'cards-playing' },
-            { title: t('cards.streak'), body: t('cards.streakEffect'), tint: color.streak, icon: 'fire' },
+            { title: t('cards.wild'), body: t('cards.wildEffect'), tint: color.wild, icon: 'cards-playing', img: 'wild' },
+            { title: t('cards.streak'), body: t('cards.streakEffect'), tint: color.streak, icon: 'fire', img: 'streak' },
           ].map((c) => (
             <Card key={c.title} style={{ flex: 1, borderColor: c.tint, backgroundColor: c.tint + '14' }}>
-              <IconPlate icon={c.icon} tint={c.tint} solid />
+              <IconPlate icon={c.icon} img={c.img} tint={c.tint} size={56} solid />
               <Gap h={3} />
               <Txt v="h2">{c.title}</Txt>
               <Txt v="small" dim>{c.body}</Txt>
@@ -72,7 +72,7 @@ export default function Rules() {
         <SectionTitle title={t('rules.end')} />
         <Card glow={color.gold}>
           <Row gap={3} style={{ alignItems: 'flex-start' }}>
-            <IconPlate icon="award" tint={color.gold} />
+            <IconPlate icon="award" img="trophy" tint={color.gold} size={52} />
             <View style={{ flex: 1, gap: space(2) }}>
               <Txt v="small">{t('rules.end1')}</Txt>
               <Txt v="small">{t('rules.end2')}</Txt>

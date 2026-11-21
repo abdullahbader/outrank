@@ -1,4 +1,5 @@
 import { Icon as Feather } from './icons';
+import { has3D, Icon3D } from './icons3d';
 import QRCode from 'qrcode';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
@@ -297,7 +298,15 @@ export function Gradient({ from, to, children, style, radius: r = radius.xl }: {
 }
 
 /** Round icon plate in a colour. */
-export function IconPlate({ icon, tint, size = 44, solid }: { icon: IconName; tint: string; size?: number; solid?: boolean }) {
+export function IconPlate({ icon, tint, size = 44, solid, img }: { icon: IconName; tint: string; size?: number; solid?: boolean; img?: string }) {
+  if (img && has3D(img)) {
+    // Full-colour 3D icon on a soft plate in the item's colour.
+    return (
+      <View style={{ width: size, height: size, borderRadius: size / 2, alignItems: 'center', justifyContent: 'center', backgroundColor: tint + (solid ? '40' : '22') }}>
+        <Icon3D name={img} size={size * 0.78} />
+      </View>
+    );
+  }
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, alignItems: 'center', justifyContent: 'center', backgroundColor: solid ? tint : tint + '26' }}>
       <Feather name={icon} size={size * 0.48} color={solid ? inkOn(tint) : tint} />

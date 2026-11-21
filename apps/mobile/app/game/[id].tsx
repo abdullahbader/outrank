@@ -10,6 +10,7 @@ import { people } from '@/game/helpers';
 import { Lobby } from '@/game/Lobby';
 import { buzz, Play } from '@/game/Play';
 import { Final, Results } from '@/game/Results';
+import { PowerUp, type Burst } from '@/game/PowerUp';
 import { Social } from '@/game/Social';
 import { color, inkOn, radius, space } from '@/theme';
 import { Button, Gap, Loading, ltr, Screen, Txt, useReducedMotion } from '@/ui';
@@ -24,6 +25,8 @@ export default function GameScreen() {
   const [cats, setCats] = useState<Category[]>([]);
   const [toast, setToast] = useState<{ id: number; text: string; tone: string } | null>(null);
   const toastId = useRef(0);
+  const [burst, setBurst] = useState<Burst | null>(null);
+  const burstKey = useRef(0);
 
   useEffect(() => { api<Category[]>('GET', '/categories').then(setCats).catch(() => {}); }, []);
 
@@ -33,6 +36,13 @@ export default function GameScreen() {
   // What just happened, for everyone (brief §8: who answered, answer, rank, points, multiplier).
   useEffect(() => {
     if (!view || !lastEvents.events.length) return;
+    // Wild or Streak played: the super-power burst on every phone (host included).
+    const played = lastEvents.events.find((e) => e.type === 'card_activated') as (GameEvent & { card?: string; playerId?: string }) | undefined;
+    if (played && (played.card === 'wild' || played.card === 'streak')) {
+      burstKey.current += 1;
+      setBurst({ key: burstKey.current, card: played.card, name: people(view).name(played.playerId) });
+      buzz('good');
+    }
     const msg = describe(lastEvents.events, view, t, L);
     if (msg) {
       show(msg.text, msg.tone);
@@ -68,6 +78,7 @@ export default function GameScreen() {
       {view.paused && view.phase !== 'finished' ? <PausedOverlay view={view} onResume={() => act({ type: 'resume' }).then((r) => { if (!r.ok) onError(r.error); })} /> : null}
       {!connected ? <Offline text={t('common.offline')} /> : null}
       {toast ? <Toast key={toast.id} text={toast.text} tone={toast.tone} onDone={() => setToast(null)} /> : null}
+      {burst ? <PowerUp key={burst.key} burst={burst} onDone={() => setBurst(null)} /> : null}
     </View>
   );
 }
@@ -94,8 +105,7 @@ function describe(events: GameEvent[], view: LiveView, t: (k: string, v?: Record
   if (timeUp) return { text: t('feed.timeUp', { name: p.name(timeUp.playerId) }), tone: color.bad };
   const skipped = ev('turn_skipped');
   if (skipped) return { text: t('feed.skipped', { name: p.name(skipped.playerId) }), tone: color.textDim };
-  const card = ev('card_activated');
-  if (card) return { text: t('cards.activated', { name: p.name(card.playerId), card: t(`cards.${card.card}`) }), tone: card.card === 'wild' ? color.wild : color.streak };
+  if (ev('card_activated')) return null; // shown as the full-screen power-up instead
   if (ev('attempt_voided')) return { text: t('feed.voided'), tone: color.warn };
   return null;
 }

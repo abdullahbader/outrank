@@ -8,6 +8,7 @@ import { Avatar, Banner, Button, Card, Confetti, FadeIn, Gap, ltr, Pop, Row, Txt
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
 import { CountdownPill } from './Countdown';
+import { Icon3D } from '../icons3d';
 import { people } from './helpers';
 import { LeaderTable } from './Leaderboard';
 import { AnswerFeed, QuestionHeader } from './Play';
@@ -111,6 +112,8 @@ export function Final({ view }: { view: LiveView }) {
           {winners.length ? (
             <Pop trigger={winners.map((w) => w.id).join()}>
               <Card glow={color.gold} style={{ alignItems: 'center', paddingVertical: space(6) }}>
+                <Icon3D name="trophy" size={72} />
+                <Gap h={2} />
                 <Txt v="label" color={color.gold}>{shared ? t('final.sharedWin') : t('final.winner')}</Txt>
                 <Gap h={3} />
                 <Row gap={3} style={{ justifyContent: 'center' }}>
