@@ -16,20 +16,31 @@ const HOW: { key: string; icon: IconName; tint: string }[] = [
 ];
 
 export default function Home() {
-  const { t, locale, setLocale, profile } = useApp();
+  const { t, locale, setLocale, profile, rtl } = useApp();
   const L = useLocalized();
   const router = useRouter();
   const [active, setActive] = useState<ActiveGame[]>([]);
   const [cats, setCats] = useState<Category[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [page, setPage] = useState(0);
+  const [devTools, setDevTools] = useState(false);
+  const [practising, setPractising] = useState(false);
   const cardW = Math.min(Dimensions.get('window').width, 560) - space(8) - 24;
 
   useFocusEffect(useCallback(() => {
     api<ActiveGame[]>('GET', '/devices/me/active-games').then(setActive).catch(() => setActive([]));
     api<Category[]>('GET', '/categories').then(setCats).catch(() => {});
     api<Stats>('GET', '/devices/me/stats').then(setStats).catch(() => {});
+    api<{ devTools: boolean }>('GET', '/health').then((h) => setDevTools(!!h.devTools)).catch(() => {});
   }, []));
+
+  const practise = async () => {
+    setPractising(true);
+    try {
+      const g = await api<{ gameId: string }>('POST', '/dev/practice');
+      router.push(`/game/${g.gameId}`);
+    } catch {} finally { setPractising(false); }
+  };
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => setPage(Math.round(Math.abs(e.nativeEvent.contentOffset.x) / (cardW + space(3))));
 
@@ -64,22 +75,45 @@ export default function Home() {
             <Txt v="title" color="#fff">{t('home2.heroTitle')}</Txt>
             <Txt v="small" color="#ffffffcc">{t('home2.heroSub')}</Txt>
             <Gap h={5} />
-            <Row gap={2}>
-              <Pressable onPress={() => router.push('/create')} accessibilityRole="button" style={({ pressed }) => [styles.heroBtn, { backgroundColor: '#FFFFFF', flex: 1.7, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-                <Feather name="zap" size={18} color={color.accent} />
-                <Txt color={color.accent} numberOfLines={1} style={{ flexShrink: 1 }}>{t('home2.host')}</Txt>
+            {/* the main action: a big Join block */}
+            <Pressable onPress={() => router.push('/join')} accessibilityRole="button" accessibilityLabel={t('home.join')}
+              style={({ pressed }) => [styles.joinBlock, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+              <View style={styles.joinPlate}><Feather name="log-in" size={26} color="#FFFFFF" /></View>
+              <View style={{ flex: 1 }}>
+                <Txt v="h2" color={color.text} style={{ fontSize: 20 }}>{t('home.join')}</Txt>
+                <Txt v="small" dim>{t('home.joinHint')}</Txt>
+              </View>
+              <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} hitSlop={6}
+                style={({ pressed }) => [styles.scanBtn, { transform: [{ scale: pressed ? 0.94 : 1 }] }]}>
+                <Feather name="maximize" size={20} color={color.accent} />
               </Pressable>
-              <Pressable onPress={() => router.push('/join')} accessibilityRole="button" style={({ pressed }) => [styles.heroBtn, { backgroundColor: '#ffffff26', flex: 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-                <Feather name="log-in" size={18} color="#fff" />
-                <Txt color="#fff" numberOfLines={1}>{t('home2.join')}</Txt>
-              </Pressable>
-              <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} style={({ pressed }) => [styles.heroIcon, { transform: [{ scale: pressed ? 0.95 : 1 }] }]}>
-                <Feather name="maximize" size={20} color="#fff" />
-              </Pressable>
-            </Row>
+            </Pressable>
+            <Gap h={3} />
+            <Pressable onPress={() => router.push('/create')} accessibilityRole="button" style={({ pressed }) => [styles.hostRow, { opacity: pressed ? 0.8 : 1 }]}>
+              <Feather name="zap" size={18} color="#FFFFFF" />
+              <Txt color="#FFFFFF" style={{ flex: 1 }}>{t('home2.host')}</Txt>
+              <Feather name={rtl ? 'chevron-left' : 'chevron-right'} size={20} color="#FFFFFFCC" />
+            </Pressable>
           </View>
         </Gradient>
       </FadeIn>
+
+      {devTools ? (
+        <FadeIn index={2}>
+          <Pressable onPress={practise} disabled={practising} accessibilityRole="button" style={({ pressed }) => ({ marginTop: space(4), opacity: practising ? 0.6 : pressed ? 0.85 : 1 })}>
+            <Card style={{ padding: space(3.5), borderStyle: 'dashed', borderColor: color.streak }}>
+              <Row gap={3}>
+                <IconPlate icon="user-check" tint={color.streak} />
+                <View style={{ flex: 1 }}>
+                  <Txt v="h2" style={{ fontSize: 16 }}>{t('practice.title')}</Txt>
+                  <Txt v="small" dim>{t('practice.hint')}</Txt>
+                </View>
+                <View style={[styles.openPill, { backgroundColor: color.streak }]}><Txt v="small" color="#FFFFFF">{t('practice.go')}</Txt></View>
+              </Row>
+            </Card>
+          </Pressable>
+        </FadeIn>
+      ) : null}
 
       {/* every game this phone is in */}
       {active.length ? (
@@ -190,8 +224,10 @@ function Ladder() {
 
 const styles = StyleSheet.create({
   lang: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, height: 38, borderRadius: radius.pill, borderWidth: 1, borderColor: color.line },
-  heroBtn: { height: 50, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 10 },
-  heroIcon: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#ffffff26', alignItems: 'center', justifyContent: 'center' },
+  joinBlock: { flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(4), borderRadius: radius.lg, backgroundColor: '#FFFFFF', minHeight: 84 },
+  joinPlate: { width: 52, height: 52, borderRadius: 26, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
+  scanBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: color.accent + '18', alignItems: 'center', justifyContent: 'center' },
+  hostRow: { flexDirection: 'row', alignItems: 'center', gap: space(2), height: 48, paddingHorizontal: space(4), borderRadius: radius.pill, backgroundColor: '#FFFFFF2E' },
   openPill: { paddingHorizontal: 14, height: 32, borderRadius: radius.pill, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   tile: { width: 148, height: 168, borderWidth: 1 },
 });

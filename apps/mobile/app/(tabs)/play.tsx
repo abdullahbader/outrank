@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 
-/** The centre tab button opens Create Game directly; this screen is never shown on its own. */
+/** The centre tab button opens Join Game directly; this screen is never shown on its own. */
 export default function Play() {
-  return <Redirect href="/create" />;
+  return <Redirect href="/join" />;
 }

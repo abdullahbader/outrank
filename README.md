@@ -27,3 +27,11 @@ npm run app:start           # Expo Go QR for your phone (same Wi-Fi; the app fin
 ```
 
 Checks: `npm test` (rules engine), `npm run smoke` (full multiplayer run on the isolated test database).
+
+## Testing alone
+
+- **As the host:** create a game, then "Add 9 test players" in the lobby (test builds only).
+- **As a player:** on Home tap "Practise as a player" (test builds only). Test players and an
+  automatic host play with you; on your turn a "Test host" panel lets you rule on your own answer
+  (tap a rank or Wrong), so you can try Wild, Streak and every player screen from one phone.
+- Both are switched off when `NODE_ENV=production` (the server refuses to start with them on).

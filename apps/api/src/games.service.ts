@@ -23,6 +23,8 @@ type Tx = Prisma.TransactionClient;
 export class GamesService {
   private readonly log = new Logger('Games');
   private joinAttempts = new Map<string, number[]>();
+  /** Dev-only practice games: the phone practising as a player, and the autopilot timer. */
+  private practice = new Map<string, { playerDeviceId: string; timer?: NodeJS.Timeout }>();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -146,7 +148,7 @@ export class GamesService {
     const ids = [...new Set(s.rounds.map((r) => r.questionId))];
     const questions = await this.content.load(ids);
     const presence = await this.realtime.presence(gameId);
-    return { gameId, code, version, ...buildView(s, questions, viewer), ...presence };
+    return { gameId, code, version, ...buildView(s, questions, viewer), ...presence, practice: this.practice.has(gameId) };
   }
 
   // ───────────── the one door every game action goes through
@@ -218,6 +220,7 @@ export class GamesService {
 
     if (outcome.result.ok && !('duplicate' in outcome && outcome.duplicate)) {
       await this.broadcast(gameId, outcome.events);
+      if (this.practice.has(gameId)) this.autopilot(gameId);
     }
     return outcome.result;
   }
@@ -318,6 +321,66 @@ export class GamesService {
     const v = await this.view(gameId, viewer);
     if (v.phase !== 'finished') throw new GameError('GAME_NOT_FINISHED');
     return v;
+  }
+
+  // ───────────── dev tools: practise as a player (one phone, automatic host and test players)
+
+  async startPractice(deviceId: string) {
+    const device = await this.prisma.device.findUnique({ where: { id: deviceId } });
+    const hostDevice = await this.prisma.device.create({ data: { tokenHash: hashToken(newToken()), displayName: 'Practice host' } });
+    const ready = await this.prisma.question.groupBy({ by: ['categoryId'], where: { status: 'active', verification: 'verified' } });
+    const { gameId } = await this.create(hostDevice.id, ready.map((r) => r.categoryId));
+    this.practice.set(gameId, { playerDeviceId: deviceId });
+    await this.addBots(gameId, 4);
+    await this.join(gameId, deviceId, device?.displayName?.trim() || 'Player');
+    const r = await this.runAction(gameId, { role: 'host' }, { type: 'start', questionIds: [] }, null);
+    if (!r.ok) { this.practice.delete(gameId); throw new GameError(r.error); }
+    return { gameId };
+  }
+
+  /** In a practice game the phone's owner may also act as the host (to rule on their own answers). */
+  async practiceHostAct(gameId: string, deviceId: string, action: Action) {
+    const p = this.practice.get(gameId);
+    if (!p || p.playerDeviceId !== deviceId) throw new GameError('NOT_HOST');
+    return this.runAction(gameId, { role: 'host' }, action, null);
+  }
+
+  /** Plays the test players' turns and moves between questions, at a friendly pace. */
+  private autopilot(gameId: string) {
+    const entry = this.practice.get(gameId);
+    if (!entry) return;
+    if (entry.timer) clearTimeout(entry.timer);
+    entry.timer = setTimeout(async () => {
+      try {
+        const game = await this.prisma.game.findUnique({ where: { id: gameId } });
+        if (!game) return;
+        const s = game.state as unknown as GameState;
+        if (s.phase === 'finished') { this.practice.delete(gameId); return; }
+        if (s.paused) return;
+        if (s.phase === 'results') {
+          entry.timer = setTimeout(() => this.runAction(gameId, { role: 'host' }, { type: 'next_question' }, null).catch(() => {}), 3500);
+          return;
+        }
+        const round = s.rounds[s.rounds.length - 1];
+        const turn = round?.turn;
+        if (!turn) return;
+        const bot = await this.prisma.gameParticipant.findFirst({ where: { gameId, playerId: turn.playerId, isBot: true } });
+        if (!bot) return; // the human's turn: they act themselves
+        if (turn.awaitingStreakDecision) {
+          await this.runAction(gameId, { role: 'host' }, { type: 'end_turn', turnSerial: s.turnSerial }, null);
+          return;
+        }
+        const open = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].filter((r) => !round.claimed[String(r)]);
+        const positive = open.filter((r) => r <= 10);
+        const roll = Math.random();
+        const action: Action = roll < 0.3 || !open.length
+          ? { type: 'reject', reason: 'incorrect', turnSerial: s.turnSerial }
+          : { type: 'confirm', rank: roll < 0.9 && positive.length ? positive[Math.floor(Math.random() * positive.length)] : open[Math.floor(Math.random() * open.length)], turnSerial: s.turnSerial };
+        await this.runAction(gameId, { role: 'host' }, action, null);
+      } catch (e) {
+        this.log.warn(`practice autopilot: ${String(e)}`);
+      }
+    }, 1800);
   }
 
   // ───────────── dev tools: bot players

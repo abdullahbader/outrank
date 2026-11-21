@@ -10,8 +10,8 @@ import { Txt, type IconName } from '@/ui';
 const ICONS: Record<string, IconName> = { index: 'home', rules: 'book-open', stats: 'bar-chart-2', profile: 'user' };
 
 /**
- * Floating bottom bar with a raised centre "Host" button: starting a game is one tap from
- * anywhere. Home · How to play · [Host] · Stats · Profile.
+ * Floating bottom bar with a raised centre "Join" button: joining a game (what most people do) is
+ * one tap from anywhere. Home · How to play · [Join] · Stats · Profile. Hosting starts from Home.
  */
 function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
@@ -26,13 +26,13 @@ function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             return (
               <View key={route.key} style={{ flex: 1, alignItems: 'center' }}>
                 <Pressable
-                  accessibilityRole="button" accessibilityLabel={title} onPress={() => router.push('/create')}
+                  accessibilityRole="button" accessibilityLabel={title} onPress={() => router.push('/join')}
                   style={({ pressed }) => [{
                     width: 64, height: 64, borderRadius: 32, marginTop: -34, backgroundColor: color.accent,
                     alignItems: 'center', justifyContent: 'center', borderWidth: 5, borderColor: color.bg,
                   }, shadow.glow(color.accent), pressed && { transform: [{ scale: 0.94 }] }]}
                 >
-                  <Feather name="zap" size={28} color={color.accentInk} />
+                  <Feather name="log-in" size={26} color={color.accentInk} />
                 </Pressable>
                 <Txt v="small" color={color.accent} style={{ fontSize: 11, lineHeight: 15, marginTop: 2 }}>{title}</Txt>
               </View>

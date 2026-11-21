@@ -249,7 +249,7 @@
   "nav": {
     "home": "Home",
     "rules": "How to play",
-    "play": "Host",
+    "play": "Join",
     "stats": "Stats",
     "profile": "Profile"
   },
@@ -312,5 +312,12 @@
     "whatsapp": "WhatsApp",
     "email": "Email",
     "version": "Version {{v}}"
+  },
+  "practice": {
+    "title": "Practise as a player",
+    "hint": "Test players and an automatic host play with you",
+    "go": "Start",
+    "panel": "Test host (practice only)",
+    "panelHint": "Pretend you said an answer: tap its rank, or Wrong."
   }
 }

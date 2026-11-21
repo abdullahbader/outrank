@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DirectionRoot, useApp, useLocalized } from '../app-context';
-import { catStyle, color, radius, space } from '../theme';
+import { catStyle, color, radius, rankColor as rankColorOf, space } from '../theme';
+import { api } from '../api';
 import { Avatar, Banner, Button, Card, Gap, Gradient, IconButton, IconPlate, ltr, Pulse, Row, Txt } from '../ui';
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
@@ -222,6 +223,7 @@ function PlayerPanel({ view, run, busy }: { view: LiveView; run: (a: ActionInput
           </Card>
         </Pulse>
       ) : null}
+      {mine && view.practice && !turn!.awaitingStreakDecision ? <PracticeHost view={view} /> : null}
       <Gap h={3} />
       <Row gap={3}>
         <GameCard
@@ -234,6 +236,43 @@ function PlayerPanel({ view, run, busy }: { view: LiveView; run: (a: ActionInput
         />
       </Row>
     </View>
+  );
+}
+
+/** Practice games only: you rule on your own answer, as the host would. */
+function PracticeHost({ view }: { view: LiveView }) {
+  const { t, errorText } = useApp();
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const r = view.round!;
+  const send = async (action: ActionInput) => {
+    setBusy(true);
+    setMsg(null);
+    try { const res = await api<{ ok: boolean; error?: string }>('POST', `/dev/games/${view.gameId}/host-act`, action); if (!res.ok && res.error) setMsg(errorText(res.error)); }
+    catch (e) { setMsg(errorText(e)); }
+    setBusy(false);
+  };
+  return (
+    <Card style={{ marginTop: space(3), borderStyle: 'dashed', borderColor: color.streak }}>
+      <Txt v="label" color={color.streak}>{t('practice.panel')}</Txt>
+      <Txt v="small" dim>{t('practice.panelHint')}</Txt>
+      <Gap h={3} />
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
+        {r.slots.map((s) => {
+          const taken = !!s.claimedBy;
+          return (
+            <Pressable key={s.rank} disabled={taken || busy} onPress={() => send({ type: 'confirm', rank: s.rank, turnSerial: view.turnSerial })}
+              accessibilityRole="button" accessibilityLabel={`#${s.rank}`}
+              style={({ pressed }) => ({ width: 46, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', backgroundColor: taken ? color.surface2 : rankColorOf(s.rank) + '22', borderWidth: 1, borderColor: taken ? color.line : rankColorOf(s.rank), opacity: taken ? 0.4 : pressed ? 0.7 : 1 })}>
+              <Txt v="number" style={{ fontSize: 15 }} color={taken ? color.textFaint : rankColorOf(s.rank)}>{s.rank}</Txt>
+            </Pressable>
+          );
+        })}
+      </View>
+      <Gap h={3} />
+      <Button label={t('game.wrong')} icon="x" kind="danger" size="sm" disabled={busy} onPress={() => send({ type: 'reject', reason: 'incorrect', turnSerial: view.turnSerial })} />
+      {msg ? <Txt v="small" color={color.bad} style={{ marginTop: space(2) }}>{msg}</Txt> : null}
+    </Card>
   );
 }
 

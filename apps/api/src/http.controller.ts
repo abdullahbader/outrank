@@ -130,6 +130,23 @@ export class HttpController {
     return this.games.addBots(id, parse(botsBody, body).count);
   }
 
+  /** Practise as a player: a game with an automatic host and test players. */
+  @Post('dev/practice')
+  @UseGuards(DeviceGuard)
+  @HttpCode(200)
+  practice(@CurrentDevice() dev: AuthedDevice) {
+    this.devOnly();
+    return this.games.startPractice(dev.id);
+  }
+
+  @Post('dev/games/:id/host-act')
+  @UseGuards(DeviceGuard)
+  @HttpCode(200)
+  practiceHost(@CurrentDevice() dev: AuthedDevice, @Param('id') id: string, @Body() body: unknown) {
+    this.devOnly();
+    return this.games.practiceHostAct(id, dev.id, parse(actionSchema, body) as never);
+  }
+
   @Post('dev/games/:id/bots/:playerId/act')
   @UseGuards(DeviceGuard)
   @HttpCode(200)

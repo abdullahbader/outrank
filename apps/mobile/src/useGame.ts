@@ -6,7 +6,7 @@ import { getApiToken } from './api';
 import { API_URL } from './config';
 
 /** What the server sends: the engine view for this phone, plus who is online. */
-export type LiveView = GameView & { gameId: string; code: string; version: number; hostOnline: boolean; online: Record<string, boolean> };
+export type LiveView = GameView & { gameId: string; code: string; version: number; hostOnline: boolean; online: Record<string, boolean>; practice?: boolean };
 
 export interface ChatMessage { id: number; role: 'host' | 'player'; playerId: string | null; name: string; text: string; at: string }
 export interface Reaction { key: number; emoji: string; name: string; playerId: string | null; role: 'host' | 'player' }
