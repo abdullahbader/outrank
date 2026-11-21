@@ -57,7 +57,7 @@ export function Lobby({ view, act, onError }: { view: LiveView; act: (a: ActionI
     )}>
       <TopBar title={t('lobby.title')} onBack={() => router.replace('/')} />
 
-      <Gradient from="#2A1F5C" to="#15112B" style={{ borderWidth: 1, borderColor: color.accent + '66' }}>
+      <Gradient from={color.accent + '1F'} to={color.surface} style={{ borderWidth: 1, borderColor: color.accent + '44' }}>
         <View style={{ alignItems: 'center', padding: space(5) }}>
           <Txt v="label" faint>{t('lobby.code')}</Txt>
           <Txt v="hero" style={{ letterSpacing: 6, fontFamily: 'Sora_700Bold' }}>{ltr(view.code)}</Txt>

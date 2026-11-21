@@ -2,24 +2,33 @@
 // Change the brand here; every screen reads these tokens.
 
 export const color = {
-  bg: '#0D0A1C',
-  bgRaised: '#15112B',
-  surface: '#1C1736',
-  surface2: '#262046',
-  line: '#332B5C',
-  text: '#F6F4FF',
-  textDim: '#ABA5CF',
-  textFaint: '#726B9A',
+  bg: '#F5F3FF',          // soft lavender-white page
+  bgRaised: '#FFFFFF',
+  surface: '#FFFFFF',     // cards
+  surface2: '#EFEBFC',    // quiet fills (secondary buttons, empty slots)
+  line: '#E4DEF7',
+  text: '#17122F',
+  textDim: '#5D5781',
+  textFaint: '#9690B6',
 
-  accent: '#C8FF3E',      // primary actions, current turn
-  accentInk: '#0D0A1C',   // text on accent
-  wild: '#FF4F9A',        // Wild card
-  streak: '#3ED8FF',      // Streak card
-  gold: '#FFC94A',        // rank 10, winner
-  good: '#3EF0A6',        // correct
-  bad: '#FF5C6C',         // wrong, negative ranks
-  warn: '#FFB23E',
+  accent: '#6C3BFF',      // primary actions, current turn
+  accentInk: '#FFFFFF',   // text on accent and other strong fills
+  wild: '#E83E8C',        // Wild card
+  streak: '#0EA5E9',      // Streak card
+  gold: '#F59E0B',        // rank 10, winner
+  good: '#12B76A',        // correct
+  bad: '#E5484D',         // wrong, negative ranks
+  warn: '#F79009',
 } as const;
+
+/** Readable text colour (dark or white) on a given fill. */
+export function inkOn(hex: string): string {
+  const m = /^#?([0-9a-f]{6})/i.exec(hex);
+  if (!m) return color.accentInk;
+  const n = parseInt(m[1], 16);
+  const lum = (0.299 * ((n >> 16) & 255) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return lum > 0.68 ? color.text : '#FFFFFF';
+}
 
 /** Colour of an answer slot by its rank: 1–9 climb, 10 is gold, 11–12 are danger. */
 export function rankColor(rank: number): string {
@@ -28,7 +37,7 @@ export function rankColor(rank: number): string {
   return color.accent;
 }
 
-export const avatarColors = ['#FF4F9A', '#3ED8FF', '#C8FF3E', '#FFC94A', '#B58CFF', '#FF8A3D', '#3EF0A6', '#FF5C6C', '#6C8CFF', '#F2E94E'];
+export const avatarColors = ['#E83E8C', '#0EA5E9', '#7C3AED', '#F59E0B', '#10B981', '#F97316', '#6366F1', '#EF4444', '#14B8A6', '#D946EF'];
 
 export function avatarColor(seed: string): string {
   let h = 0;
@@ -38,22 +47,22 @@ export function avatarColor(seed: string): string {
 
 /** Each category's colour and icon (Feather names). Unknown categories fall back to the accent. */
 export const categoryStyle: Record<string, { tint: string; icon: string }> = {
-  geography: { tint: '#3ED8FF', icon: 'globe' },
-  history: { tint: '#FFB23E', icon: 'book-open' },
-  sports: { tint: '#3EF0A6', icon: 'award' },
-  science: { tint: '#B58CFF', icon: 'aperture' },
-  technology: { tint: '#6C8CFF', icon: 'cpu' },
-  entertainment: { tint: '#FF4F9A', icon: 'film' },
-  food: { tint: '#FF8A3D', icon: 'coffee' },
-  business: { tint: '#F2E94E', icon: 'trending-up' },
-  nature: { tint: '#7BE36A', icon: 'feather' },
-  general: { tint: '#C8FF3E', icon: 'zap' },
+  geography: { tint: '#0EA5E9', icon: 'globe' },
+  history: { tint: '#F59E0B', icon: 'book-open' },
+  sports: { tint: '#10B981', icon: 'award' },
+  science: { tint: '#8B5CF6', icon: 'aperture' },
+  technology: { tint: '#6366F1', icon: 'cpu' },
+  entertainment: { tint: '#E83E8C', icon: 'film' },
+  food: { tint: '#F97316', icon: 'coffee' },
+  business: { tint: '#CA8A04', icon: 'trending-up' },
+  nature: { tint: '#16A34A', icon: 'feather' },
+  general: { tint: '#7C3AED', icon: 'zap' },
 };
 export const catStyle = (id: string) => categoryStyle[id] ?? { tint: color.accent, icon: 'star' };
 
 export const shadow = {
-  soft: { shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 5 },
-  glow: (c: string) => ({ shadowColor: c, shadowOpacity: 0.45, shadowRadius: 22, shadowOffset: { width: 0, height: 6 }, elevation: 8 }),
+  soft: { shadowColor: '#3B2A8C', shadowOpacity: 0.12, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 5 },
+  glow: (c: string) => ({ shadowColor: c, shadowOpacity: 0.3, shadowRadius: 22, shadowOffset: { width: 0, height: 6 }, elevation: 8 }),
 } as const;
 
 export const radius = { sm: 10, md: 16, lg: 22, xl: 28, pill: 999 } as const;

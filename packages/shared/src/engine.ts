@@ -384,6 +384,8 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
 
       const outcome: AttemptOutcome = action.type === 'skip_turn' ? 'skipped' : action.reason === 'already_claimed' ? 'already_claimed' : 'incorrect';
       if (action.type === 'reject' && action.reason !== 'incorrect' && action.reason !== 'already_claimed') return 'UNKNOWN_ACTION';
+      // "Already claimed" only makes sense once something has been claimed in this question.
+      if (outcome === 'already_claimed' && Object.keys(round.claimed).length === 0) return 'NOTHING_CLAIMED';
       const a = record(s, round, outcome, null, now);
       recomputeScores(s);
       events.push(attemptEvent(s, a));

@@ -11,7 +11,7 @@ import { ContentService } from './content.service';
 import { PrismaService } from './prisma.service';
 import { RealtimeService } from './realtime.service';
 
-const BOT_COLORS = ['#FF4F9A', '#3ED8FF', '#C8FF3E', '#FFC94A', '#B58CFF', '#FF8A3D', '#3EF0A6', '#FF5C6C', '#6C8CFF', '#F2E94E'];
+const BOT_COLORS = ['#E83E8C', '#0EA5E9', '#7C3AED', '#F59E0B', '#10B981', '#F97316', '#6366F1', '#EF4444', '#14B8A6', '#D946EF'];
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I
 const randomCode = (n: number) => Array.from({ length: n }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('');
 

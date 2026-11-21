@@ -155,7 +155,7 @@ export function Final({ view }: { view: LiveView }) {
 function Podium({ players, tint }: { players: { id: string; name: string; score: number; position: number }[]; tint: (id: string) => string }) {
   const order = [players[1], players[0], players[2]].filter(Boolean);
   const heights: Record<number, number> = { 1: 110, 2: 82, 3: 62 };
-  const medal: Record<number, string> = { 1: color.gold, 2: '#C9D1E8', 3: '#E39A5B' };
+  const medal: Record<number, string> = { 1: color.gold, 2: '#94A3B8', 3: '#C2703D' };
   return (
     <Row gap={2} style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
       {order.map((pl, i) => {

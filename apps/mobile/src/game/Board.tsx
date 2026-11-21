@@ -63,6 +63,6 @@ export function Board({ view, onPick, disabled }: { view: LiveView; onPick?: (ra
 }
 
 const styles = StyleSheet.create({
-  slot: { flexDirection: 'row', alignItems: 'center', gap: space(3), minHeight: 56, paddingHorizontal: space(3), paddingVertical: space(2), borderRadius: radius.md, backgroundColor: color.surface, borderWidth: 1, borderColor: color.surface },
+  slot: { flexDirection: 'row', alignItems: 'center', gap: space(3), minHeight: 56, paddingHorizontal: space(3), paddingVertical: space(2), borderRadius: radius.md, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
   rank: { width: 34, height: 34, borderRadius: 17, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
 });

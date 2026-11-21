@@ -65,9 +65,9 @@ export default function Home() {
             <Txt v="small" color="#ffffffcc">{t('home2.heroSub')}</Txt>
             <Gap h={5} />
             <Row gap={2}>
-              <Pressable onPress={() => router.push('/create')} accessibilityRole="button" style={({ pressed }) => [styles.heroBtn, { backgroundColor: color.accent, flex: 1.7, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-                <Feather name="zap" size={18} color={color.accentInk} />
-                <Txt color={color.accentInk} numberOfLines={1} style={{ flexShrink: 1 }}>{t('home2.host')}</Txt>
+              <Pressable onPress={() => router.push('/create')} accessibilityRole="button" style={({ pressed }) => [styles.heroBtn, { backgroundColor: '#FFFFFF', flex: 1.7, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+                <Feather name="zap" size={18} color={color.accent} />
+                <Txt color={color.accent} numberOfLines={1} style={{ flexShrink: 1 }}>{t('home2.host')}</Txt>
               </Pressable>
               <Pressable onPress={() => router.push('/join')} accessibilityRole="button" style={({ pressed }) => [styles.heroBtn, { backgroundColor: '#ffffff26', flex: 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
                 <Feather name="log-in" size={18} color="#fff" />

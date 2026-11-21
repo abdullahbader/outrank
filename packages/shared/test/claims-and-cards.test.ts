@@ -14,6 +14,14 @@ test('edge 6: an already-claimed answer cannot be awarded again', () => {
   assert.equal(g.state.attempts[1].outcome, 'already_claimed');
 });
 
+test('"already claimed" is refused while nothing has been claimed yet', () => {
+  const g = newGame(['A', 'B']);
+  g.fail(HOST, { type: 'reject', reason: 'already_claimed', turnSerial: g.serial }, 'NOTHING_CLAIMED');
+  g.answer(4);
+  g.claimedAgain(); // now there is something to repeat
+  assert.equal(g.state.attempts[1].outcome, 'already_claimed');
+});
+
 test('claims reset when a new question starts', () => {
   const g = newGame(['A', 'B']);
   g.answer(1); g.answer(2);

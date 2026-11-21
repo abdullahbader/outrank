@@ -169,7 +169,9 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
       <Gap h={2} />
       <Row gap={2}>
         <Button label={t('game.wrong')} icon="x" kind="danger" style={{ flex: 1 }} busy={busy} onPress={() => run({ type: 'reject', reason: 'incorrect', turnSerial: view.turnSerial })} />
-        <Button label={t('game.alreadyClaimed')} icon="copy" kind="secondary" style={{ flex: 1 }} disabled={busy} onPress={() => run({ type: 'reject', reason: 'already_claimed', turnSerial: view.turnSerial })} />
+        {view.round!.claimedCount > 0 ? (
+          <Button label={t('game.alreadyClaimed')} icon="copy" kind="secondary" style={{ flex: 1 }} disabled={busy} onPress={() => run({ type: 'reject', reason: 'already_claimed', turnSerial: view.turnSerial })} />
+        ) : null}
       </Row>
       <Gap h={2} />
       <EndQuestion run={run} busy={busy} />
@@ -362,6 +364,6 @@ const styles = StyleSheet.create({
   cardBtn: { marginTop: 'auto', height: 34, borderRadius: radius.pill, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   feedRow: { paddingVertical: space(2), borderBottomWidth: 1, borderBottomColor: color.line },
   undo: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: color.surface },
-  backdrop: { flex: 1, backgroundColor: '#000b', alignItems: 'center', justifyContent: 'center', padding: space(4) },
+  backdrop: { flex: 1, backgroundColor: '#17122F66', alignItems: 'center', justifyContent: 'center', padding: space(4) },
   dialog: { width: '100%', maxWidth: 420, backgroundColor: color.bgRaised, borderRadius: radius.xl, padding: space(5), borderWidth: 1, borderColor: color.line },
 });

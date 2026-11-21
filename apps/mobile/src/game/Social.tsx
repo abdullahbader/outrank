@@ -238,7 +238,7 @@ function Floater({ r }: { r: Reaction }) {
 
 const styles = StyleSheet.create({
   dock: { position: 'absolute', end: space(4), alignItems: 'flex-end', gap: space(2) },
-  fab: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 12, elevation: 6, borderWidth: 1, borderColor: color.line },
+  fab: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center', shadowColor: '#3B2A8C', shadowOpacity: 0.2, shadowRadius: 12, elevation: 6, borderWidth: 1, borderColor: color.line },
   badge: { position: 'absolute', top: -4, end: -4, minWidth: 20, height: 20, borderRadius: 10, paddingHorizontal: 4, backgroundColor: color.wild, alignItems: 'center', justifyContent: 'center' },
   badgeText: { color: color.accentInk, fontSize: 11, fontWeight: '800' },
   picker: { flexDirection: 'row', flexWrap: 'wrap', width: 220, justifyContent: 'center', gap: 4, padding: space(2), borderRadius: radius.lg, backgroundColor: color.bgRaised, borderWidth: 1, borderColor: color.line },
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 28 },
   emojiSmall: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
   preview: { maxWidth: 260, padding: space(3), borderRadius: radius.lg, borderBottomEndRadius: 4, backgroundColor: color.bgRaised, borderWidth: 1, borderColor: color.streak },
-  backdrop: { flex: 1, backgroundColor: '#000a' },
+  backdrop: { flex: 1, backgroundColor: '#17122F66' },
   sheet: { backgroundColor: color.bgRaised, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, padding: space(4), borderTopWidth: 1, borderColor: color.line },
   msgRow: { flexDirection: 'row', alignItems: 'flex-end', gap: space(2) },
   bubble: { maxWidth: '78%', paddingHorizontal: space(3), paddingVertical: space(2), borderRadius: radius.lg, borderBottomStartRadius: 4, backgroundColor: color.surface2 },
@@ -256,5 +256,5 @@ const styles = StyleSheet.create({
   send: { width: 48, height: 48, borderRadius: 24, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   menu: { width: '100%', maxWidth: 360, backgroundColor: color.bgRaised, borderRadius: radius.xl, padding: space(4), gap: space(1), borderWidth: 1, borderColor: color.line },
   menuItem: { flexDirection: 'row', alignItems: 'center', gap: space(3), paddingVertical: space(3) },
-  floaterName: { marginTop: 2, paddingHorizontal: 6, borderRadius: 6, backgroundColor: '#0D0A1CCC', maxWidth: 110 },
+  floaterName: { marginTop: 2, paddingHorizontal: 6, borderRadius: 6, backgroundColor: '#FFFFFFE6', maxWidth: 110 },
 });

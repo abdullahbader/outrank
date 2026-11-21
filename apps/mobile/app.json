@@ -5,8 +5,8 @@
     "scheme": "outrank",
     "version": "0.1.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
-    "backgroundColor": "#0D0A1C",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F5F3FF",
     "ios": {
       "bundleIdentifier": "com.outrank.app",
       "supportsTablet": false,
@@ -16,22 +16,34 @@
     },
     "android": {
       "package": "com.outrank.app",
-      "permissions": ["CAMERA"],
-      "blockedPermissions": ["android.permission.RECORD_AUDIO"]
+      "permissions": [
+        "CAMERA"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "single",
-      "themeColor": "#0D0A1C",
-      "backgroundColor": "#0D0A1C"
+      "themeColor": "#6C3BFF",
+      "backgroundColor": "#F5F3FF"
     },
     "plugins": [
       "expo-router",
       "expo-secure-store",
       "expo-localization",
       "expo-font",
-      ["expo-camera", { "cameraPermission": "The camera is used only to scan a game's QR code so you can join it.", "recordAudioAndroid": false }]
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "The camera is used only to scan a game's QR code so you can join it.",
+          "recordAudioAndroid": false
+        }
+      ]
     ],
-    "extra": { "supportsRTL": true }
+    "extra": {
+      "supportsRTL": true
+    }
   }
 }

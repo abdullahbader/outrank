@@ -230,7 +230,8 @@
     "CHAT_TOO_LONG": "الحد الأقصى للرسالة 200 حرف",
     "CHAT_TOO_FAST": "تمهّل قليلاً",
     "CHAT_MUTED": "قام المضيف بكتمك",
-    "UNKNOWN_MESSAGE": "هذه الرسالة لم تعد موجودة"
+    "UNKNOWN_MESSAGE": "هذه الرسالة لم تعد موجودة",
+    "NOTHING_CLAIMED": "لم تُؤخذ أي إجابة بعد"
   },
   "categories": {},
   "chat": {

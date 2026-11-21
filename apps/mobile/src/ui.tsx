@@ -8,7 +8,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useApp } from './app-context';
-import { color, font, radius, space } from './theme';
+import { color, font, inkOn, radius, space } from './theme';
 
 export type IconName = keyof typeof Feather.glyphMap;
 
@@ -144,7 +144,7 @@ export function Avatar({ name, tint, size = 36, ring, dim }: { name: string; tin
   const initials = name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: tint, alignItems: 'center', justifyContent: 'center', opacity: dim ? 0.45 : 1, borderWidth: ring ? 3 : 0, borderColor: ring }}>
-      <Text style={{ color: color.accentInk, fontFamily: font.display, fontSize: size * 0.38 }}>{initials}</Text>
+      <Text style={{ color: inkOn(tint), fontFamily: font.display, fontSize: size * 0.38 }}>{initials}</Text>
     </View>
   );
 }
@@ -174,7 +174,7 @@ export function QR({ value, size = 180 }: { value: string; size?: number }) {
   const total = cells.n + quiet * 2;
   const rects: ReactNode[] = [];
   for (let y = 0; y < cells.n; y++) for (let x = 0; x < cells.n; x++) {
-    if (cells.data[y * cells.n + x]) rects.push(<Rect key={`${x}-${y}`} x={x + quiet} y={y + quiet} width={1.02} height={1.02} fill={color.bg} />);
+    if (cells.data[y * cells.n + x]) rects.push(<Rect key={`${x}-${y}`} x={x + quiet} y={y + quiet} width={1.02} height={1.02} fill={color.text} />);
   }
   return (
     <View style={{ backgroundColor: '#fff', borderRadius: radius.md, padding: 6 }} accessibilityLabel="QR code">
@@ -300,7 +300,7 @@ export function Gradient({ from, to, children, style, radius: r = radius.xl }: {
 export function IconPlate({ icon, tint, size = 44, solid }: { icon: IconName; tint: string; size?: number; solid?: boolean }) {
   return (
     <View style={{ width: size, height: size, borderRadius: size / 2, alignItems: 'center', justifyContent: 'center', backgroundColor: solid ? tint : tint + '26' }}>
-      <Feather name={icon} size={size * 0.48} color={solid ? color.accentInk : tint} />
+      <Feather name={icon} size={size * 0.48} color={solid ? inkOn(tint) : tint} />
     </View>
   );
 }
@@ -329,8 +329,8 @@ export function FadeIn({ children, index = 0, style }: { children: ReactNode; in
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
   maxWidth: { width: '100%', maxWidth: 560, alignSelf: 'center' },
-  footer: { paddingHorizontal: space(4), paddingTop: space(3), backgroundColor: color.bgRaised, borderTopWidth: 1, borderTopColor: color.line },
-  card: { backgroundColor: color.surface, borderRadius: radius.lg, padding: space(4), borderWidth: 1, borderColor: color.line, shadowOffset: { width: 0, height: 6 }, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 16, elevation: 3 },
+  footer: { paddingHorizontal: space(4), paddingTop: space(3), backgroundColor: color.bgRaised, borderTopWidth: 1, borderTopColor: color.line, shadowColor: '#3B2A8C', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: -4 } },
+  card: { backgroundColor: color.surface, borderRadius: radius.lg, padding: space(4), borderWidth: 1, borderColor: color.line, shadowOffset: { width: 0, height: 6 }, shadowColor: '#3B2A8C', shadowOpacity: 0.08, shadowRadius: 16, elevation: 2 },
   btn: { borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space(5) },
   iconBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   chip: { flexDirection: 'row', alignItems: 'center', gap: space(1.5), paddingHorizontal: space(3.5), height: 40, borderRadius: radius.pill, borderWidth: 1, borderColor: color.line, backgroundColor: color.surface },

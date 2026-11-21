@@ -104,6 +104,6 @@ const styles = StyleSheet.create({
   track: { height: 6, borderRadius: 3, backgroundColor: color.surface2, overflow: 'hidden' },
   fill: { height: 6, borderRadius: 3 },
   dot: { paddingHorizontal: 8, borderRadius: radius.pill, borderWidth: 1 },
-  backdrop: { flex: 1, backgroundColor: '#000a' },
+  backdrop: { flex: 1, backgroundColor: '#17122F66' },
   sheet: { maxHeight: '80%', backgroundColor: color.bgRaised, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, padding: space(4), borderTopWidth: 1, borderColor: color.line },
 });

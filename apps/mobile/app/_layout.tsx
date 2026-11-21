@@ -17,7 +17,7 @@ export default function RootLayout() {
   });
   return (
     <SafeAreaProvider style={{ backgroundColor: color.bg }}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <AppProvider>
         {fontsLoaded ? <Root /> : <Loading />}
       </AppProvider>
