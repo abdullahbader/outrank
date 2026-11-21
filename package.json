@@ -1,0 +1,14 @@
+{
+  "name": "outrank",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
