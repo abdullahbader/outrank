@@ -7,7 +7,7 @@
 //             finished games still point at them). Use it when swapping the whole list.
 // --dry-run   validate and report what would change, write nothing.
 // --test-db   write to DATABASE_URL_TEST instead of DATABASE_URL.
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
@@ -24,7 +24,8 @@ const flag = (name) => args.includes(name);
 const file = resolve(opt('--file', join(root, 'content/test-questions.json')));
 const catFile = resolve(opt('--categories', join(root, 'content/categories.json')));
 
-const env = Object.fromEntries(readFileSync(join(root, '.env'), 'utf8').split(/\r?\n/).filter((l) => /^[A-Z_]+=/.test(l)).map((l) => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1)]));
+const envFile = join(root, '.env');
+const env = !existsSync(envFile) ? {} : Object.fromEntries(readFileSync(envFile, 'utf8').split(/\r?\n/).filter((l) => /^[A-Z_]+=/.test(l)).map((l) => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1)]));
 const url = flag('--test-db') ? env.DATABASE_URL_TEST : (process.env.DATABASE_URL ?? env.DATABASE_URL);
 
 const data = JSON.parse(readFileSync(file, 'utf8'));

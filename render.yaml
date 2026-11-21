@@ -1,0 +1,22 @@
+# Render blueprint: the Outrank game server (free plan) for testing with friends.
+# The database is on Neon; paste its connection string as DATABASE_URL when Render asks.
+services:
+  - type: web
+    name: outrank-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci -w @outrank/api -w @outrank/shared --include-workspace-root --include=dev && npm run render:build
+    startCommand: npm run render:start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      # "staging" keeps the test helpers (practice mode, test players) available.
+      # Use NODE_ENV=production with DEV_TOOLS=false for the real launch.
+      - key: NODE_ENV
+        value: staging
+      - key: DEV_TOOLS
+        value: "true"
+      - key: DATABASE_URL
+        sync: false
