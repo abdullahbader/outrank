@@ -85,8 +85,8 @@ test('voiding a failed Streak second attempt restores the first answer\'s points
 
 test('a correction can reopen a finished question before Continue', () => {
   const g = newGame(['A', 'B']);
-  g.answer(1);
-  g.answer(null); // last turn → results
+  for (const r of [1, 2, 3, 4, 5, 6, 7, 8, 9]) g.answer(r);
+  g.answer(10); // B claims the last positive answer → results
   assert.equal(g.state.phase, 'results');
   const rotationAfter = [...g.state.rotation];
   g.do(HOST, { type: 'void_attempt', attemptId: lastAttempt(g).id, replayTurn: true });
@@ -94,6 +94,8 @@ test('a correction can reopen a finished question before Continue', () => {
   assert.equal(g.turnPlayer, 'B');
   assert.notDeepEqual(g.state.rotation, rotationAfter);
   g.answer(12);
+  assert.equal(g.state.phase, 'question', 'rank 10 is open again, so play continues');
+  g.answer(10);
   assert.equal(g.state.phase, 'results');
   assert.deepEqual(g.state.rotation, rotationAfter);
 });
@@ -105,12 +107,14 @@ test('voiding the answer that reached the target un-triggers the endgame', () =>
   g.do(HOST, { type: 'void_attempt', attemptId: lastAttempt(g).id, replayTurn: false });
   assert.equal(g.state.endgame.triggered, false);
   g.answer(1);
+  g.endQ();
   assert.equal(g.state.nextStep, 'next_question');
 });
 
 test('voiding in results recomputes what comes next', () => {
   const g = newGame(['A', 'B'], { targetScore: 20 });
-  g.answer(1); g.answer(10); // B 20 → finished
+  g.answer(1); g.answer(10); // B 20
+  g.endQ();
   assert.equal(g.state.nextStep, 'finished');
   g.do(HOST, { type: 'void_attempt', attemptId: lastAttempt(g).id, replayTurn: false });
   assert.equal(g.state.nextStep, 'next_question');
@@ -126,6 +130,7 @@ test('corrections: host only, current question only, once', () => {
   g.fail(HOST, { type: 'void_attempt', attemptId: 'nope', replayTurn: false }, 'UNKNOWN_ATTEMPT');
   g.answer(2);
   const b = lastAttempt(g);
+  g.endQ();
   g.next();
   g.fail(HOST, { type: 'void_attempt', attemptId: b.id, replayTurn: false }, 'NOT_CURRENT_QUESTION');
 });

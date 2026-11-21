@@ -62,9 +62,15 @@ function player(s: GameState, id: string): Player | undefined {
   return s.players.find((p) => p.id === id);
 }
 
-function claimedCount(r: Round): number {
-  return Object.keys(r.claimed).length;
+/** Positive answers (ranks 1–10) nobody has claimed yet. The question runs until this is 0. */
+export function positivesLeft(r: Round): number {
+  let n = 0;
+  for (let rank = 1; rank <= 10; rank++) if (!r.claimed[String(rank)]) n++;
+  return n;
 }
+
+/** Whose turn a running turn index points at: turns keep cycling through the participants. */
+export const playerAt = (r: Round, turnIndex: number) => r.participants[turnIndex % r.participants.length];
 
 function newTurn(playerId: string): Turn {
   return { playerId, attemptNo: 1, awaitingStreakDecision: false, firstAttemptId: null };
@@ -160,11 +166,13 @@ function finishRound(s: GameState, events: GameEvent[]): void {
 function endTurn(s: GameState, events: GameEvent[]): void {
   const round = currentRound(s)!;
   round.turnIndex += 1;
-  if (round.turnIndex >= round.participants.length || claimedCount(round) >= 12) {
+  // The question keeps going round the table until every positive answer is claimed
+  // (or the host ends it). Ranks 11 and 12 may stay unclaimed.
+  if (positivesLeft(round) === 0) {
     finishRound(s, events);
     return;
   }
-  const pid = round.participants[round.turnIndex];
+  const pid = playerAt(round, round.turnIndex);
   round.turn = newTurn(pid);
   s.turnSerial += 1;
   events.push({ type: 'turn_started', roundIndex: round.index, playerId: pid, attemptNo: 1 });
@@ -363,7 +371,7 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
         events.push(attemptEvent(s, a));
         checkTrigger(s, a.id, events);
         const p = player(s, a.playerId)!;
-        if (attemptNo === 1 && p.streak === 'available' && claimedCount(round) < 12) {
+        if (attemptNo === 1 && p.streak === 'available' && positivesLeft(round) > 0) {
           round.turn.awaitingStreakDecision = true;
           round.turn.firstAttemptId = a.id;
           events.push({ type: 'streak_offered', playerId: p.id });
@@ -424,6 +432,23 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
 
     case 'void_attempt':
       return voidAttempt(s, actor, action.attemptId, !!action.replayTurn, events);
+
+    case 'end_question': {
+      // The host can end (skip) the current question at any time.
+      if (!isHost(actor)) return 'NOT_HOST';
+      if (s.phase !== 'question' || !round.turn) return 'WRONG_PHASE';
+      const t = round.turn;
+      const p = player(s, t.playerId);
+      if (p && p.wild === 'armed') { p.wild = 'available'; removeCardLog(s, p.id, 'wild', null); }
+      if (p && t.attemptNo === 2) {
+        // Streak was switched on but the extra answer never came: the card goes back, the first answer stands.
+        p.streak = 'available';
+        removeCardLog(s, p.id, 'streak', null);
+      }
+      events.push({ type: 'question_ended_by_host', roundIndex: round.index });
+      finishRound(s, events);
+      return null;
+    }
 
     case 'next_question': {
       if (!isHost(actor)) return 'NOT_HOST';

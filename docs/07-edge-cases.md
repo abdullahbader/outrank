@@ -14,7 +14,7 @@
 | 10 | Streak, second wrong | first answer's points cancelled, answer stays claimed | engine `cards` |
 | 11 | Card used twice | `CARD_USED` | engine `cards` + API race |
 | 12 | Two claims of the same answer at nearly the same time | One wins; the other is `STALE_TURN` / `ALREADY_CLAIMED` | engine + API race (parallel requests) |
-| 13 | Someone reaches 100 mid-question | "100 reached" event, question finishes, no new regular question | engine `endgame` |
+| 13 | Someone reaches 100 mid-question | "100 reached" event, the question carries on until ranks 1–10 are claimed or the host ends it, no new regular question | engine `endgame` |
 | 14 | Several reach 100 in one question | Highest final score wins | engine `endgame` |
 | 15 | Tie for the top after the final question | Tie-breaker with tied players only | engine `endgame` |
 | 16 | Tie-breaker still tied | Another tie-breaker; cards keep their state | engine `endgame` |

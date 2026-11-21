@@ -3,7 +3,7 @@
 
 import type { Attempt, GameState, Player, Round } from './types.ts';
 import { basePoints, RANKS } from './scoring.ts';
-import { currentRound } from './engine.ts';
+import { currentRound, playerAt, positivesLeft } from './engine.ts';
 
 export interface Localized { en: string; ar?: string }
 
@@ -144,6 +144,9 @@ export function buildView(s: GameState, questions: Record<string, QuestionConten
         turn,
         finished: round.finished,
         claimedCount: Object.keys(round.claimed).length,
+        positivesLeft: positivesLeft(round),
+        nextPlayerId: round.turn ? playerAt(round, round.turnIndex + 1) : null,
+        lap: Math.floor(round.turnIndex / round.participants.length) + 1,
         slots: slotsFor(round, q, s, viewer),
         attempts: attemptsFor(round, q, s, viewer),
       }

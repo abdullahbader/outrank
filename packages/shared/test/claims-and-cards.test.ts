@@ -17,6 +17,7 @@ test('edge 6: an already-claimed answer cannot be awarded again', () => {
 test('claims reset when a new question starts', () => {
   const g = newGame(['A', 'B']);
   g.answer(1); g.answer(2);
+  g.endQ();
   g.next();
   assert.deepEqual(g.round.claimed, {});
   g.answer(1);
@@ -76,6 +77,7 @@ test('edge 11: a card cannot be used twice', () => {
   g.fail(P('A'), { type: 'activate_wild', turnSerial: g.serial }, 'CARD_USED');
   g.answer(3);
   g.answer(1);
+  g.endQ();
   g.next(); // B starts, then A
   g.answer(2);
   g.fail(P('A'), { type: 'activate_wild', turnSerial: g.serial }, 'CARD_USED');
@@ -185,11 +187,10 @@ test('skipping a Streak second attempt counts as failing it', () => {
   assert.equal(g.score('A'), 0);
 });
 
-test('no Streak offer when the first answer claims the last remaining answer', () => {
-  const names = Array.from({ length: 12 }, (_, i) => `P${i}`);
-  const g = newGame(names);
-  for (let r = 1; r <= 11; r++) g.answer(r);
-  g.confirm(12);
+test('no Streak offer when the answer claims the last positive answer', () => {
+  const g = newGame(['A', 'B']);
+  for (const r of [1, 2, 3, 4, 5, 6, 7, 8, 9]) g.answer(r);
+  g.confirm(10); // whoever's turn it is still has Streak, but nothing positive is left
   assert.equal(g.state.phase, 'results');
 });
 

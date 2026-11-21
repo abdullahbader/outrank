@@ -15,6 +15,7 @@ export const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('activate_wild'), turnSerial: serial }),
   z.object({ type: z.literal('activate_streak'), turnSerial: serial }),
   z.object({ type: z.literal('void_attempt'), attemptId: z.string().min(1).max(64), replayTurn: z.boolean() }),
+  z.object({ type: z.literal('end_question') }),
   z.object({ type: z.literal('next_question') }),
   z.object({ type: z.literal('pause') }),
   z.object({ type: z.literal('resume') }),

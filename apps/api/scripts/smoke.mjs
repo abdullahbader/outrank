@@ -231,7 +231,11 @@ async function main() {
     check(sara.view.leaderboard.find((r) => r.id === pid(ali)).score === -55, 'Wild on a negative answer: −55');
     check((await ali.act(gameId, { type: 'end_turn', turnSerial: serial() })).ok, 'Ali declines Streak');
     await sync();
-    check(host.view.phase === 'results', 'question ends after everyone had a turn');
+    check(host.view.phase === 'question' && host.view.round.turn?.playerId === pid(ahmed), 'after one lap the turn comes back to Ahmed');
+    check((await ahmed.act(gameId, { type: 'end_question' })).error === 'NOT_HOST', 'only the host can end a question');
+    check((await host.act(gameId, { type: 'end_question' })).ok, 'host ends the question');
+    await sync();
+    check(host.view.phase === 'results', 'question is over');
     check(ahmed.view.round.slots.every((s) => s.text), 'full ranking revealed to players at the end');
     check(host.view.nextStarter === pid(omar), 'next question starts with Omar (rotation)');
 
@@ -254,6 +258,8 @@ async function main() {
 
     stage('7. Reconnecting');
     sara.socket.disconnect();
+    if (host.view.phase === 'question') await host.act(gameId, { type: 'end_question' });
+    await host.waitFor((v) => v.phase === 'results');
     await host.act(gameId, { type: 'next_question' });
     await sleep(200);
     const back = phone(sara.token, 'Sara-again');

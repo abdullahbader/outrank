@@ -3,7 +3,7 @@
 ## Phases
 
 ```
-lobby ──start──▶ question ──(everyone had a turn | 12 claimed)──▶ results ──next_question──┐
+lobby ──start──▶ question ──(ranks 1–10 all claimed | host ends it)──▶ results ──next_question──┐
                     ▲                                               │                       │
                     └───────────── next regular or tie-breaker ◀────┘                       ▼
                                                                                         finished
@@ -32,6 +32,12 @@ answer awaited (attempt 1)          player may switch on Wild
 | Points | +1 | +2 | +3 | +4 | +5 | +6 | +7 | +8 | +9 | **+20** | **−11** | **−12** |
 
 Wild multiplies by 5 (negative too: rank 11 → −55).
+
+## How long a question lasts
+
+Turns go round the table in order, lap after lap (A, B, C, A, B, C, …). The question ends when every
+positive answer (ranks 1–10) has been claimed, or when the host taps **End this question** (two taps,
+so it is not hit by accident). Ranks 11 and 12 can stay unclaimed.
 
 ## End of a question
 

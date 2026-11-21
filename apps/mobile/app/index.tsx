@@ -56,9 +56,9 @@ export default function Home() {
       <Gap h={8} />
       <Txt v="label" faint>{t('home.how')}</Txt>
       <Gap h={3} />
-      {(['how1', 'how2', 'how3', 'how4'] as const).map((k, i) => (
+      {(['how1', 'how2', 'how5', 'how3', 'how4'] as const).map((k, i) => (
         <Row key={k} gap={3} style={{ marginBottom: space(3), alignItems: 'flex-start' }}>
-          <View style={[styles.step, { borderColor: [color.accent, color.streak, color.gold, color.wild][i] }]}>
+          <View style={[styles.step, { borderColor: [color.accent, color.streak, color.good, color.gold, color.wild][i] }]}>
             <Txt v="number" style={{ fontSize: 14 }}>{i + 1}</Txt>
           </View>
           <View style={{ flex: 1 }}><Txt dim>{t(`home.${k}`)}</Txt></View>

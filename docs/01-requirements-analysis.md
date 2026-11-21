@@ -51,9 +51,12 @@ owner. The development go-ahead was given with these defaults, so they are what 
 Every one of them is a single, documented rule in `packages/shared/src/engine.ts` and can be
 changed without touching screens.
 
-1. **How long a question lasts.** ❓ Default: each participant gets **one turn** per question, in
-   turn order. The question ends when everyone has had a turn, or earlier if all 12 answers are
-   claimed. A Streak second attempt is part of the same turn.
+1. **How long a question lasts.** ✅ Owner's rule (2026-11-21): turns go **round the table again and
+   again** in turn order. The question ends when **every positive answer (ranks 1–10) is claimed** —
+   ranks 11 and 12 may stay unclaimed — or when the **host ends (skips) the question**, which the host
+   can do at any time. A Streak second attempt is part of the same turn. Ending a question while a
+   Streak extra answer is pending keeps the first answer and gives the Streak (and an unused Wild)
+   back.
 2. **Wild Card and a wrong answer.** ❓ Default: Wild is switched on during your own turn, before the
    host rules on your answer. If that answer is wrong (or already claimed), the card is **used up with
    no effect**. If the host skips your turn (no answer given), the card goes back to available.
@@ -62,13 +65,15 @@ changed without touching screens.
    −11 first answer therefore gives the 11 points back. The first answer stays claimed.
 4. **Wild + Streak in one turn.** ❓ Default: allowed. Wild applies to the attempt it was switched on
    for. If Streak fails, the first answer's *actual* points (including ×5) are cancelled.
-5. **Dropping back under 100 within the final question.** ❓ Default: the endgame **stays triggered**.
+5. **Reaching 100.** The current question carries on under rule 1 (until ranks 1–10 are claimed or
+   the host ends it); no new regular question starts after it.
+   **Dropping back under 100 within the final question.** ❓ Default: the endgame **stays triggered**.
 6. **Host corrections.** ❓ Default: the host can void any answer of the current question while the
    question or its results are on screen. Voiding removes the points and the claim, gives back any
    card that answer used, and is written to the audit log. The host can also choose **"give the turn
    back"** for the most recent answer, which replays that turn. Turns never rewind on their own.
 7. **Disconnected player on their turn.** ❓ Default: the host can **skip** the turn (zero points), or
-   wait. A skipped Streak second attempt counts as a failed second attempt.
+   wait. Play moves on to the next player round the table. A skipped Streak second attempt counts as a failed second attempt.
 8. **Not enough questions.** ❓ Default: the host must choose categories with at least 15 ready
    questions. If a game still runs out, it ends on current scores; if the top is tied and no question
    is left for a tie-breaker, the tied players share the win (and the host is told why).

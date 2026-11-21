@@ -65,6 +65,7 @@ test('player view shows only claimed answers until the question ends; host sees 
   assert.equal(v.round!.attempts[0].points, 4);
 
   g.answer(null); g.answer(7);
+  g.endQ();
   const done = buildView(g.state, qs, { role: 'player', playerId: 'B' });
   assert.equal(done.round!.finished, true);
   assert.equal(done.round!.slots.filter((s) => s.text).length, 12, 'full ranking revealed at the end');
@@ -107,10 +108,23 @@ test('never leaks across a whole game with cards and corrections', () => {
   }
 });
 
+test('view shows the lap and who is next, wrapping round the table', () => {
+  const g = newGame(['A', 'B', 'C']);
+  g.answer(1); g.answer(2);
+  let v = buildView(g.state, content(), { role: 'host' });
+  assert.equal(v.round!.nextPlayerId, 'A', 'after C comes A again');
+  assert.equal(v.round!.lap, 1);
+  g.answer(3);
+  v = buildView(g.state, content(), { role: 'host' });
+  assert.equal(v.round!.lap, 2);
+  assert.equal(v.round!.positivesLeft, 7);
+});
+
 test('leaderboard: positions with ties, last-question deltas, my cards', () => {
   const qs = content();
   const g = newGame(['A', 'B', 'C']);
   g.answer(5); g.answer(3); g.answer(null);
+  g.endQ();
   g.next(); // order B C A
   g.answer(2); // B 3+2 = 5
   const v = buildView(g.state, qs, { role: 'player', playerId: 'C' });
@@ -125,6 +139,7 @@ test('final summary has winner, positions and per-player stats', () => {
   const g = newGame(['A', 'B'], { targetScore: 20 });
   g.wild('A'); g.answer(10);  // A 100
   g.confirm(11); g.streak('B'); g.confirm(1); // B −11 + 1 = −10
+  g.endQ();
   g.next();
   const v = buildView(g.state, content(), { role: 'host' });
   assert.equal(v.summary!.winnerIds[0], 'A');

@@ -43,6 +43,8 @@ export class Game {
   wild(id: string) { return this.do(P(id), { type: 'activate_wild', turnSerial: this.serial }); }
   streak(id: string) { return this.do(P(id), { type: 'activate_streak', turnSerial: this.serial }); }
   next() { return this.do(HOST, { type: 'next_question' }); }
+  /** Host ends the current question now. */
+  endQ() { return this.do(HOST, { type: 'end_question' }); }
 
   /** Answer for whoever's turn it is; declines Streak automatically when offered. */
   answer(rank: number | null) {

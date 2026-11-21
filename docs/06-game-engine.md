@@ -24,8 +24,9 @@ Code: `packages/shared/src`. Tests: `packages/shared/test` (`npm test -w @outran
 - **Streak**: offered (`awaitingStreakDecision`) after a correct first answer while Streak is unused and
   answers remain. `activate_streak` → attempt 2. A failed attempt 2 (wrong, already claimed, skipped)
   sets `cancelledByStreak` on attempt 1.
-- **Question end**: everyone in `participants` had a turn, or 12 claimed. Rotation = rotate(rotation
-  at question start).
+- **Question end**: `positivesLeft(round) === 0` (ranks 1–10 all claimed) or the host's `end_question`.
+  Until then turns cycle: the player for turn index *i* is `participants[i % participants.length]`.
+  Rotation for the next question = rotate(rotation at question start).
 - **Endgame**: set once any score ≥ target (`endgame.byAttemptId` records the cause). Voiding that
   exact answer re-checks it.
 - **Next step** (`decide`): see docs/05 §"End of a question".

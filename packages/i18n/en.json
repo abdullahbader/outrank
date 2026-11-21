@@ -28,9 +28,10 @@
     "rejoinPlayer": "You're in game {{code}}",
     "how": "How it works",
     "how1": "Every question has 12 ranked answers.",
-    "how2": "Say an answer on your turn. The host taps it.",
+    "how2": "Take turns round the table saying answers. The host taps them.",
     "how3": "Ranks 1–9 score 1–9 points, rank 10 scores 20 — but 11 and 12 cost you.",
-    "how4": "First to 100 ends the game. Highest score wins."
+    "how4": "First to 100 ends the game. Highest score wins.",
+    "how5": "A question ends when all answers worth points (ranks 1–10) are found, or when the host ends it."
   },
   "create": {
     "title": "New game",
@@ -143,7 +144,11 @@
     "basis": "How it's ranked",
     "asOf": "As of {{date}}",
     "answerTitle": "{{name}}",
-    "notYourTurn": "Wait for your turn"
+    "notYourTurn": "Wait for your turn",
+    "endQuestion": "End this question",
+    "endQuestionSure": "Tap again to end the question",
+    "positivesLeft": "{{n}} positive answers left",
+    "lap": "Round {{n}}"
   },
   "cards": {
     "wild": "Wild",

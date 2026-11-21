@@ -96,12 +96,12 @@ function TurnStrip({ view }: { view: LiveView }) {
   const states = turnStates(view);
   const r = view.round!;
   const current = r.turn?.playerId ?? null;
-  const nextId = r.participants[r.turnIndex + 1] ?? null;
+  const nextId = r.nextPlayerId;
   return (
     <Card style={{ padding: space(3) }}>
       <Row style={{ justifyContent: 'space-between', marginBottom: space(2) }}>
         <Txt v="h2" numberOfLines={1} style={{ flex: 1 }}>{current ? (current === view.me?.playerId ? t('game.yourTurn') : t('game.turn', { name: p.name(current) })) : t('game.done')}</Txt>
-        <Txt v="small" faint>{t('game.claimed', { n: r.claimedCount })}</Txt>
+        <Txt v="small" faint>{t('game.positivesLeft', { n: r.positivesLeft })} · {t('game.lap', { n: r.lap })}</Txt>
       </Row>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space(2), paddingVertical: 2 }}>
         {states.map((s) => (
@@ -137,6 +137,8 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
         <Txt>{t('game.streakOffered', { name })}</Txt>
         <Gap h={3} />
         <Button label={t('game.nextPlayer')} icon="skip-forward" kind="streak" busy={busy} onPress={() => run({ type: 'end_turn', turnSerial: view.turnSerial })} />
+        <Gap h={2} />
+        <EndQuestion run={run} busy={busy} />
       </Card>
     );
   }
@@ -150,10 +152,26 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
         <Button label={t('game.wrong')} icon="x" kind="danger" style={{ flex: 1 }} busy={busy} onPress={() => run({ type: 'reject', reason: 'incorrect', turnSerial: view.turnSerial })} />
         <Button label={t('game.alreadyClaimed')} icon="copy" kind="secondary" style={{ flex: 1 }} disabled={busy} onPress={() => run({ type: 'reject', reason: 'already_claimed', turnSerial: view.turnSerial })} />
       </Row>
+      <Gap h={2} />
+      <EndQuestion run={run} busy={busy} />
       {view.online[turn.playerId] === false ? (
         <><Gap h={2} /><Button label={`${t('game.skip')} · ${name}`} icon="user-x" kind="ghost" size="sm" disabled={busy} onPress={() => run({ type: 'skip_turn', turnSerial: view.turnSerial })} /></>
       ) : null}
     </View>
+  );
+}
+
+/** The host can end (skip) the question at any time. Two taps, so it is never hit by accident. */
+function EndQuestion({ run, busy }: { run: (a: ActionInput) => void; busy: boolean }) {
+  const { t } = useApp();
+  const [sure, setSure] = useState(false);
+  useEffect(() => { if (!sure) return; const id = setTimeout(() => setSure(false), 4000); return () => clearTimeout(id); }, [sure]);
+  return (
+    <Button
+      label={sure ? t('game.endQuestionSure') : t('game.endQuestion')}
+      icon="fast-forward" kind={sure ? 'gold' : 'ghost'} size="sm" disabled={busy}
+      onPress={() => { if (sure) { setSure(false); run({ type: 'end_question' }); } else setSure(true); }}
+    />
   );
 }
 

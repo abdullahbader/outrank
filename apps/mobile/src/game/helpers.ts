@@ -16,10 +16,12 @@ export const isHost = (v: LiveView) => v.role === 'host';
 export function turnStates(view: LiveView) {
   const r = view.round;
   if (!r) return [];
-  return r.participants.map((id, i) => {
-    const mine = r.attempts.filter((a) => a.playerId === id && !a.voided);
-    const scored = mine.some((a) => a.outcome === 'correct' && !a.cancelledByStreak);
-    const status = r.finished || i < r.turnIndex ? (scored ? 'scored' : 'missed') : i === r.turnIndex ? 'current' : 'waiting';
-    return { id, status: status as 'scored' | 'missed' | 'current' | 'waiting' };
+  // Turns go round the table repeatedly; show each player's most recent result in this question.
+  return r.participants.map((id) => {
+    const last = [...r.attempts].reverse().find((a) => a.playerId === id && !a.voided);
+    const current = !r.finished && r.turn?.playerId === id;
+    const status = current ? 'current' : !last ? 'waiting' : last.outcome === 'correct' && !last.cancelledByStreak ? 'scored' : 'missed';
+    const points = r.attempts.filter((a) => a.playerId === id && !a.voided && a.outcome === 'correct' && !a.cancelledByStreak).reduce((n, a) => n + a.points, 0);
+    return { id, status: status as 'scored' | 'missed' | 'current' | 'waiting', points };
   });
 }

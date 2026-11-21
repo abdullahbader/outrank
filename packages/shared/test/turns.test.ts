@@ -6,24 +6,54 @@ test('turn order rotates after every completed question', () => {
   const g = newGame(['Ahmed', 'Omar', 'Sara', 'Ali']);
   assert.deepEqual(g.round.participants, ['Ahmed', 'Omar', 'Sara', 'Ali']);
   for (let i = 0; i < 4; i++) g.answer(null);
+  g.endQ();
   assert.equal(g.state.phase, 'results');
   g.next();
   assert.deepEqual(g.round.participants, ['Omar', 'Sara', 'Ali', 'Ahmed']);
   for (let i = 0; i < 4; i++) g.answer(null);
+  g.endQ();
   g.next();
   assert.deepEqual(g.round.participants, ['Sara', 'Ali', 'Ahmed', 'Omar']);
 });
 
-test('each player gets one turn per question, in order', () => {
+test('turns keep going round the table until ranks 1–10 are all claimed', () => {
   const g = newGame(['A', 'B', 'C']);
   assert.equal(g.turnPlayer, 'A');
   g.answer(3);
-  assert.equal(g.turnPlayer, 'B');
   g.answer(null);
-  assert.equal(g.turnPlayer, 'C');
   g.answer(4);
+  assert.equal(g.state.phase, 'question', 'one lap is not the end');
+  assert.equal(g.turnPlayer, 'A', 'back to the first player');
+  assert.equal(g.round.turnIndex, 3);
+  for (const r of [1, 2, 5, 6, 7, 8, 9]) g.answer(r);
+  assert.equal(g.state.phase, 'question', 'rank 10 still open');
+  g.answer(11); // a negative claim does not end it
+  assert.equal(g.state.phase, 'question');
+  g.answer(10);
+  assert.equal(g.state.phase, 'results', 'all positive answers claimed → question over');
+  assert.equal(g.round.claimed['12'], undefined, 'rank 12 may stay unclaimed');
+});
+
+test('the host can end (skip) a question at any time', () => {
+  const g = newGame(['A', 'B', 'C']);
+  g.answer(2);
+  g.fail(P('B'), { type: 'end_question' }, 'NOT_HOST');
+  g.endQ();
   assert.equal(g.state.phase, 'results');
-  assert.equal(g.round.finished, true);
+  assert.equal(g.score('A'), 2, 'points already won stay');
+  assert.deepEqual(g.state.rotation, ['B', 'C', 'A'], 'rotation still applies');
+  g.fail(HOST, { type: 'end_question' }, 'WRONG_PHASE');
+});
+
+test('ending a question mid-Streak keeps the first answer and returns the cards', () => {
+  const g = newGame(['A', 'B']);
+  g.confirm(6);
+  g.streak('A');
+  g.wild('A');
+  g.endQ();
+  assert.equal(g.score('A'), 6);
+  assert.deepEqual(g.card('A'), { wild: 'available', streak: 'available' });
+  assert.equal(g.state.cardLog.length, 0);
 });
 
 test('edge 5: answer outside the 12 → zero and the turn ends', () => {
@@ -33,10 +63,10 @@ test('edge 5: answer outside the 12 → zero and the turn ends', () => {
   assert.equal(g.turnPlayer, 'B');
 });
 
-test('the question ends early once all 12 answers are claimed', () => {
+test('a question with every answer claimed is over', () => {
   const names = Array.from({ length: 14 }, (_, i) => `P${i}`);
   const g = newGame(names);
-  for (let r = 1; r <= 12; r++) g.answer(r);
+  for (const r of [11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]) g.answer(r);
   assert.equal(g.state.phase, 'results');
   assert.equal(Object.keys(g.round.claimed).length, 12);
 });

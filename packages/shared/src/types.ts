@@ -107,6 +107,7 @@ export type Action =
   | { type: 'activate_wild'; turnSerial: number }
   | { type: 'activate_streak'; turnSerial: number }
   | { type: 'void_attempt'; attemptId: string; replayTurn: boolean }
+  | { type: 'end_question' }
   | { type: 'next_question' }
   | { type: 'pause' }
   | { type: 'resume' }

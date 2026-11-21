@@ -43,6 +43,7 @@ Server → client:
 | `activate_wild {turnSerial}` | current player | answer awaited, Wild available |
 | `activate_streak {turnSerial}` | current player | Streak decision pending, Streak available |
 | `void_attempt {attemptId, replayTurn}` | host | question or results phase |
+| `end_question` | host | question phase — ends (skips) the current question now |
 | `next_question` | host | results phase |
 | `pause` / `resume` | host | playing |
 | `end_game` | host | any time before finished |
