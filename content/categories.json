@@ -1,0 +1,12 @@
+[
+  { "id": "geography", "en": "Geography", "ar": "جغرافيا", "icon": "globe", "sort": 1 },
+  { "id": "history", "en": "History", "ar": "تاريخ", "icon": "landmark", "sort": 2 },
+  { "id": "sports", "en": "Sports", "ar": "رياضة", "icon": "trophy", "sort": 3 },
+  { "id": "science", "en": "Science", "ar": "علوم", "icon": "atom", "sort": 4 },
+  { "id": "technology", "en": "Technology", "ar": "تكنولوجيا", "icon": "cpu", "sort": 5 },
+  { "id": "entertainment", "en": "Entertainment", "ar": "ترفيه", "icon": "film", "sort": 6 },
+  { "id": "food", "en": "Food", "ar": "طعام", "icon": "utensils", "sort": 7 },
+  { "id": "business", "en": "Business and Economics", "ar": "أعمال واقتصاد", "icon": "briefcase", "sort": 8 },
+  { "id": "nature", "en": "Nature and Animals", "ar": "طبيعة وحيوانات", "icon": "leaf", "sort": 9 },
+  { "id": "general", "en": "General Knowledge", "ar": "معلومات عامة", "icon": "lightbulb", "sort": 10 }
+]

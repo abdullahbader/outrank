@@ -13,7 +13,9 @@
     "db:stop": "powershell -ExecutionPolicy Bypass -File scripts/db.ps1 stop",
     "db:deploy": "npm run db:deploy -w @outrank/api",
     "api:dev": "npm run dev -w @outrank/api",
-    "smoke": "npm run build && npm run smoke -w @outrank/api"
+    "smoke": "npm run build && npm run smoke -w @outrank/api",
+    "questions:check": "node content/validate.mjs",
+    "questions:import": "npm run questions:import -w @outrank/api --"
   },
   "engines": {
     "node": ">=24"

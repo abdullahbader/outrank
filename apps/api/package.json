@@ -11,7 +11,8 @@
     "db:migrate:diff": "dotenv -e ../../.env -- prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma --shadow-database-url %DATABASE_URL_TEST% --script",
     "db:deploy": "dotenv -e ../../.env -- prisma migrate deploy",
     "db:seed": "dotenv -e ../../.env -- tsx prisma/seed.ts",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "questions:import": "node scripts/import-questions.mjs"
   },
   "dependencies": {
     "@nestjs/common": "~11.1.6",
