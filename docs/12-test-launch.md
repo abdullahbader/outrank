@@ -4,8 +4,8 @@ Goal: friends anywhere can install an APK and play, with the game server on the 
 
 | Piece | Where | Cost |
 |---|---|---|
-| Game server (API + live updates) | Render web service `outrank-api`, Frankfurt, free plan | Free (sleeps after 15 min idle; first player waits ~1 min) |
-| Database | Neon PostgreSQL, AWS Frankfurt (eu-central-1) | Free |
+| Game server (API + live updates) | Render web service `outrank-game` (https://outrank-g6mn.onrender.com), Ohio, free plan | Free (sleeps after 15 min idle; first player waits ~1 min) |
+| Database | Neon PostgreSQL, AWS US East 2 (Ohio) | Free |
 | App | APK built by Expo (EAS), profile `preview` | Free plan |
 
 ## Files
@@ -26,7 +26,7 @@ Goal: friends anywhere can install an APK and play, with the game server on the 
    `postgresql://…@ep-….eu-central-1.aws.neon.tech/neondb?sslmode=require`. Keep it private.
 3. **Render**: sign in with GitHub → New → Blueprint → choose the repository → paste the Neon
    string into `DATABASE_URL` → Apply. First deploy ≈ 5–8 min. The address will be
-   `https://outrank-api.onrender.com` (or similar if taken). Check `…/health` shows `{"ok":true}`.
+   `https://outrank-g6mn.onrender.com` (or similar if taken). Check `…/health` shows `{"ok":true}`.
 4. **Expo**: sign in once with `npx eas-cli@latest login` in `apps/mobile`, then
    `npx eas-cli@latest build -p android --profile preview`. The build page gives a link and QR code
    to share; friends open it on Android and install (allow "install unknown apps").
