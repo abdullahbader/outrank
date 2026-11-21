@@ -88,6 +88,10 @@ function describe(events: GameEvent[], view: LiveView, t: (k: string, v?: Record
   }
   const bad = ev('answer_rejected');
   if (bad) return { text: t(bad.outcome === 'already_claimed' ? 'feed.claimed' : 'feed.wrong', { name: p.name(bad.playerId) }), tone: color.bad };
+  const passed = ev('turn_passed');
+  if (passed) return { text: t('feed.passed', { name: p.name(passed.playerId) }), tone: color.streak };
+  const timeUp = ev('time_up');
+  if (timeUp) return { text: t('feed.timeUp', { name: p.name(timeUp.playerId) }), tone: color.bad };
   const skipped = ev('turn_skipped');
   if (skipped) return { text: t('feed.skipped', { name: p.name(skipped.playerId) }), tone: color.textDim };
   const card = ev('card_activated');

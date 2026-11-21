@@ -19,6 +19,7 @@ export default function CreateGame() {
   const [picked, setPicked] = useState<string[]>([]);
   const [name, setName] = useState(profile.name);
   const [busy, setBusy] = useState(false);
+  const [seconds, setSeconds] = useState(30);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function CreateGame() {
     setError(null);
     try {
       if (name.trim() && name.trim() !== profile.name) await saveProfile({ name: name.trim() });
-      const g = await api<{ gameId: string; code: string; hostRecoveryCode: string }>('POST', '/games', { categories: picked });
+      const g = await api<{ gameId: string; code: string; hostRecoveryCode: string }>('POST', '/games', { categories: picked, answerSeconds: seconds });
       await storage.set(recoveryKey(g.gameId), g.hostRecoveryCode);
       router.replace(`/game/${g.gameId}`);
     } catch (e) {
@@ -78,6 +79,15 @@ export default function CreateGame() {
           </View>
         </Row>
       </FadeIn>
+
+      <Gap h={6} />
+      <SectionTitle title={t('create.timer')} />
+      <Txt v="small" dim style={{ marginTop: -space(2), marginBottom: space(3) }}>{t('create.timerHint')}</Txt>
+      <Row gap={2} wrap>
+        {[0, 15, 30, 45, 60].map((n) => (
+          <Chip key={n} label={n ? t('create.seconds', { n }) : t('create.noTimer')} icon={n ? 'timer-outline' : 'timer-off-outline'} selected={seconds === n} onPress={() => setSeconds(n)} />
+        ))}
+      </Row>
 
       <Gap h={6} />
       <SectionTitle title={t('create.categories')} />

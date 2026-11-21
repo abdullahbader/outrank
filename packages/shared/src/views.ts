@@ -173,6 +173,8 @@ export function buildView(s: GameState, questions: Record<string, QuestionConten
     nextStarter: s.phase === 'results' ? (s.nextStep === 'tiebreak' ? s.rotation.find((id) => s.tiedPlayerIds.includes(id)) ?? null : s.rotation[0] ?? null) : null,
     cardLog: s.cardLog.map((c) => ({ playerId: c.playerId, card: c.card, roundIndex: c.roundIndex, at: c.at })),
     outcome: s.outcome,
+    timer: s.timer ? { kind: s.timer.kind, deadline: s.timer.deadline, remainingMs: s.timer.remainingMs, totalMs: s.timer.totalMs } : null,
+    answerSeconds: s.config.answerSeconds,
     me: me
       ? {
           playerId: me.id,

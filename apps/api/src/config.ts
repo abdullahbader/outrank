@@ -14,6 +14,8 @@ export const config = {
   maxPlayers: num(process.env.GAME_MAX_PLAYERS, 16),
   targetScore: num(process.env.GAME_TARGET_SCORE, 100),
   joinAttemptsPerMinute: num(process.env.JOIN_ATTEMPTS_PER_MINUTE, 20),
+  /** Tests only: every countdown lasts this many seconds instead (ignored in production). */
+  timerTestSeconds: process.env.NODE_ENV === 'production' ? 0 : num(process.env.TIMER_TEST_SECONDS, 0),
 };
 
 export function assertSafeConfig() {

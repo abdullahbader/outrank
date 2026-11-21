@@ -43,7 +43,11 @@
     "totalReady": "{{n}} questions ready",
     "needMore": "Pick categories with at least {{n}} ready questions",
     "create": "Create room",
-    "rules": "Target {{target}} points · Wild ×{{wild}} · Streak"
+    "rules": "Target {{target}} points · Wild ×{{wild}} · Streak",
+    "timer": "Time to answer",
+    "timerHint": "Each player's turn counts down on every phone. At zero the turn ends with no points.",
+    "seconds": "{{n}} s",
+    "noTimer": "No timer"
   },
   "join": {
     "title": "Join a game",
@@ -101,7 +105,9 @@
     "leave": "Leave game",
     "youJoined": "You're in! Get ready.",
     "shareBtn": "Invite friends",
-    "shareText": "Join my Outrank game! Code: {{code}}\n{{link}}"
+    "shareText": "Join my Outrank game! Code: {{code}}\n{{link}}",
+    "timerChip": "{{n}} s per turn",
+    "noTimer": "No timer"
   },
   "game": {
     "question": "Question {{n}}",
@@ -152,7 +158,8 @@
     "positivesLeft": "{{n}} positive answers left",
     "lap": "Round {{n}}",
     "yourTurnBig": "Your turn!",
-    "yourTurnSub": "Say your answer out loud"
+    "yourTurnSub": "Say your answer out loud",
+    "pass": "Pass"
   },
   "cards": {
     "wild": "Wild",
@@ -174,7 +181,9 @@
     "skipped": "{{name}} · turn skipped",
     "streakLost": "{{name}} lost {{n}} from the first answer",
     "voided": "Host undid an answer",
-    "multiplier": "×{{n}}"
+    "multiplier": "×{{n}}",
+    "passed": "{{name}} · passed",
+    "timeUp": "{{name}} · time is up"
   },
   "results": {
     "title": "The full ranking",
@@ -186,7 +195,9 @@
     "toFinal": "Show final results",
     "tieNotice": "Tie between {{names}} — tie-breaker next!",
     "gameOver": "Game over!",
-    "waitHost": "Waiting for the host"
+    "waitHost": "Waiting for the host",
+    "nextIn": "Next question in",
+    "finalIn": "Final results in"
   },
   "final": {
     "title": "Final results",

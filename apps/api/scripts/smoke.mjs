@@ -112,7 +112,7 @@ async function leakScan(gameId, players) {
 async function main() {
   await resetAndSeed();
   const api = spawn(process.execPath, [join(here, '../dist/main.js')], {
-    env: { ...process.env, DATABASE_URL: DB, PORT: String(PORT), NODE_ENV: 'test', DEV_TOOLS: 'true', HOST_GRACE_MS: String(GRACE), GAME_MIN_QUESTIONS: '6', GAME_TARGET_SCORE: '40', JOIN_ATTEMPTS_PER_MINUTE: '200' },
+    env: { ...process.env, DATABASE_URL: DB, PORT: String(PORT), NODE_ENV: 'test', DEV_TOOLS: 'true', HOST_GRACE_MS: String(GRACE), TIMER_TEST_SECONDS: '2', GAME_MIN_QUESTIONS: '6', GAME_TARGET_SCORE: '40', JOIN_ATTEMPTS_PER_MINUTE: '200' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let apiLog = '';
@@ -129,7 +129,7 @@ async function main() {
     check(cats.find((c) => c.id === 'geography')?.ready === 12 && cats.find((c) => c.id === 'history')?.ready === 11, 'category counts only include verified, active questions');
 
     stage('2. Create room and lobby');
-    const created = (await http('POST', '/games', hostToken, { categories: ['geography', 'history'] })).body;
+    const created = (await http('POST', '/games', hostToken, { categories: ['geography', 'history'], answerSeconds: 0 })).body;
     check(/^[A-HJ-NP-Z2-9]{6}$/.test(created.code), `room code ${created.code} uses the unambiguous alphabet`);
     const gameId = created.gameId;
     const preview = (await http('GET', `/games/by-code/${created.code.toLowerCase()}`, hostToken)).body;
@@ -363,6 +363,28 @@ async function main() {
     check((await c1.emit('react', { gameId, emoji: '<script>' })).error === 'INVALID_INPUT', 'only the offered emoji are allowed');
     await sleep(150);
     check(H.reactions.some((r) => r.emoji === '🔥' && r.playerId === pid(c1)), 'everyone sees the reaction');
+
+    stage('14. Countdowns and Pass');
+    const tg = (await http('POST', '/games', hostToken, { categories: ['geography', 'history'], answerSeconds: 30 })).body;
+    check((await http('POST', '/games', hostToken, { categories: ['geography'], answerSeconds: 7 })).body.error === 'INVALID_INPUT', 'only 0/15/30/45/60 seconds are accepted');
+    const tPlayers = [];
+    for (const n of ['Tim', 'Tia']) { const tok = await device(); await http('POST', `/games/${tg.gameId}/join`, tok, { name: n }); const ph = phone(tok, n); await ph.ready; tPlayers.push(ph); }
+    const TH = phone(hostToken, 'timer-host'); await TH.ready; await TH.subscribe(tg.gameId);
+    for (const ph of tPlayers) await ph.subscribe(tg.gameId);
+    await TH.act(tg.gameId, { type: 'start' });
+    await TH.waitFor((v) => v.phase === 'question');
+    check(TH.view.timer?.kind === 'answer' && typeof TH.view.serverNow === 'number', 'every phone gets the countdown and the server clock');
+    const firstTurn = TH.view.round.turn.playerId;
+    check(await TH.waitFor((v) => v.round?.turn && v.round.turn.playerId !== firstTurn, 5000), 'when the answer timer runs out the turn moves on by itself');
+    const tState = (await prisma.game.findUnique({ where: { id: tg.gameId } })).state;
+    check(tState.attempts[0]?.outcome === 'timed_out', 'the missed turn is recorded as time up (zero points)');
+    check((await TH.act(tg.gameId, { type: 'reject', reason: 'pass', turnSerial: TH.view.turnSerial })).ok, 'host taps Pass for a player who passes');
+    await TH.waitFor((v) => v.round?.attempts?.some((a) => a.outcome === 'passed'));
+    check(TH.view.round.attempts.some((a) => a.outcome === 'passed'), 'the pass shows in the answer feed');
+    check((await tPlayers[0].act(tg.gameId, { type: 'timeout', turnSerial: TH.view.turnSerial })).error === 'INVALID_INPUT', 'phones cannot send "time up" themselves');
+    await TH.act(tg.gameId, { type: 'end_question' });
+    check(await TH.waitFor((v) => v.phase === 'question' && v.round.index === 1, 5000), 'after the results countdown the next question starts by itself');
+    for (const ph of [...tPlayers, TH]) ph.socket.disconnect();
 
     for (const p of [...players, H, outsider]) p.socket.disconnect();
   } catch (e) {

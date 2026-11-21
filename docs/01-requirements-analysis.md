@@ -110,4 +110,12 @@ in-app purchases.
   with the game; the host can delete any message and mute/unmute a player. Rate-limited.
 - **Quick reactions**: 8 one-tap emoji that float across every screen with the sender's name. Not
   stored. Rate-limited; muted players cannot react.
+- **Countdowns** (owner, 2026-11-21): the host picks the time to answer per turn when creating
+  the game (off, 15, 30, 45 or 60 s; default 30). At zero the turn ends with zero points, like a
+  wrong answer (a Wild switched on is used up; a Streak extra answer fails); the host can undo it.
+  The Streak choice has 10 s (at zero the turn moves on, points kept) and the results screen 10 s
+  before the next question starts by itself. The server keeps the clock; pause freezes it.
+- **Pass**: the host taps Pass when a player passes — zero points, turn moves on, a Wild switched
+  on is given back; passing on a Streak extra answer counts as failing it.
+- **Used cards** are crossed out with an X on the player's phone and in the leaderboard.
 - **Voice chat**: requested; needs an outside voice service — see docs/11 once chosen.

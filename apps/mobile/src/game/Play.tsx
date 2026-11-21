@@ -9,6 +9,7 @@ import { api } from '../api';
 import { Avatar, Banner, Button, Card, Gap, Gradient, IconButton, IconPlate, ltr, Pulse, Row, Txt, useReducedMotion } from '../ui';
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
+import { CountdownBar, CountdownPill } from './Countdown';
 import { people, turnStates } from './helpers';
 import { LeaderStrip } from './Leaderboard';
 
@@ -85,6 +86,7 @@ function MyTurnBar({ view, top }: { view: LiveView; top: number }) {
           <Txt v="title" color="#FFFFFF" style={{ fontSize: 24 }}>{title}</Txt>
           {sub ? <Txt v="small" color="#FFFFFFE6">{sub}</Txt> : null}
         </View>
+        <CountdownPill view={view} big light />
       </View>
     </Pulse>
   );
@@ -170,8 +172,11 @@ function TurnStrip({ view }: { view: LiveView }) {
     <Card style={{ padding: space(3) }}>
       <Row style={{ justifyContent: 'space-between', marginBottom: space(2) }}>
         <Txt v="h2" numberOfLines={1} style={{ flex: 1 }}>{current ? (current === view.me?.playerId ? t('game.yourTurn') : t('game.turn', { name: p.name(current) })) : t('game.done')}</Txt>
-        <Txt v="small" faint>{t('game.positivesLeft', { n: r.positivesLeft })} · {t('game.lap', { n: r.lap })}</Txt>
+        <CountdownPill view={view} />
       </Row>
+      <CountdownBar view={view} />
+      <Gap h={2} />
+      <Txt v="small" faint style={{ marginBottom: space(1) }}>{t('game.positivesLeft', { n: r.positivesLeft })} · {t('game.lap', { n: r.lap })}</Txt>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space(2), paddingVertical: 2 }}>
         {states.map((s) => (
           <View key={s.id} style={{ alignItems: 'center', width: 52 }}>
@@ -203,7 +208,10 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
   if (turn.awaitingStreakDecision) {
     return (
       <Card glow={color.streak}>
-        <Txt>{t('game.streakOffered', { name })}</Txt>
+        <Row style={{ justifyContent: 'space-between' }}>
+          <Txt style={{ flex: 1 }}>{t('game.streakOffered', { name })}</Txt>
+          <CountdownPill view={view} kind="streak" />
+        </Row>
         <Gap h={3} />
         <Button label={t('game.nextPlayer')} icon="skip-forward" kind="streak" busy={busy} onPress={() => run({ type: 'end_turn', turnSerial: view.turnSerial })} />
         <Gap h={2} />
@@ -219,10 +227,14 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
       <Gap h={2} />
       <Row gap={2}>
         <Button label={t('game.wrong')} icon="x" kind="danger" style={{ flex: 1 }} busy={busy} onPress={() => run({ type: 'reject', reason: 'incorrect', turnSerial: view.turnSerial })} />
-        {view.round!.claimedCount > 0 ? (
-          <Button label={t('game.alreadyClaimed')} icon="copy" kind="secondary" style={{ flex: 1 }} disabled={busy} onPress={() => run({ type: 'reject', reason: 'already_claimed', turnSerial: view.turnSerial })} />
-        ) : null}
+        <Button label={t('game.pass')} icon="skip-forward" kind="streak" style={{ flex: 1 }} disabled={busy} onPress={() => run({ type: 'reject', reason: 'pass', turnSerial: view.turnSerial })} />
       </Row>
+      {view.round!.claimedCount > 0 ? (
+        <>
+          <Gap h={2} />
+          <Button label={t('game.alreadyClaimed')} icon="copy" kind="secondary" size="sm" disabled={busy} onPress={() => run({ type: 'reject', reason: 'already_claimed', turnSerial: view.turnSerial })} />
+        </>
+      ) : null}
       <Gap h={2} />
       <EndQuestion run={run} busy={busy} />
       {view.online[turn.playerId] === false ? (
@@ -319,7 +331,10 @@ function PracticeHost({ view }: { view: LiveView }) {
         })}
       </View>
       <Gap h={3} />
-      <Button label={t('game.wrong')} icon="x" kind="danger" size="sm" disabled={busy} onPress={() => send({ type: 'reject', reason: 'incorrect', turnSerial: view.turnSerial })} />
+      <Row gap={2}>
+        <Button label={t('game.wrong')} icon="x" kind="danger" size="sm" style={{ flex: 1 }} disabled={busy} onPress={() => send({ type: 'reject', reason: 'incorrect', turnSerial: view.turnSerial })} />
+        <Button label={t('game.pass')} icon="skip-forward" kind="streak" size="sm" style={{ flex: 1 }} disabled={busy} onPress={() => send({ type: 'reject', reason: 'pass', turnSerial: view.turnSerial })} />
+      </Row>
       {msg ? <Txt v="small" color={color.bad} style={{ marginTop: space(2) }}>{msg}</Txt> : null}
     </Card>
   );
@@ -332,7 +347,9 @@ function GameCard({ title, effect, tint, icon, state, canUse, onUse, busy }: {
   const used = state === 'used';
   const armed = state === 'armed';
   return (
-    <View style={[styles.gameCard, { borderColor: tint, backgroundColor: armed ? tint : tint + '14', opacity: used ? 0.4 : 1 }]}>
+    <View style={[styles.gameCard, { borderColor: used ? color.line : tint, backgroundColor: armed ? tint : used ? color.surface : tint + '14' }]}
+      accessibilityLabel={used ? `${title}: ${t('cards.used')}` : undefined}>
+      <View style={{ flex: 1, opacity: used ? 0.35 : 1 }}>
       <Row style={{ justifyContent: 'space-between' }}>
         <Feather name={icon} size={22} color={armed ? inkOn(tint) : tint} />
         <Txt v="label" color={armed ? inkOn(tint) : tint}>{used ? t('cards.used') : armed ? t('cards.armed') : t('cards.available')}</Txt>
@@ -344,6 +361,13 @@ function GameCard({ title, effect, tint, icon, state, canUse, onUse, busy }: {
           style={({ pressed }) => [styles.cardBtn, { backgroundColor: canUse ? tint : 'transparent', borderColor: tint, opacity: pressed ? 0.8 : 1 }]}>
           <Txt v="small" color={canUse ? inkOn(tint) : color.textFaint}>{canUse ? t('cards.activate') : t('cards.onlyYourTurn')}</Txt>
         </Pressable>
+      ) : null}
+      </View>
+      {used ? (
+        // A used card is crossed out with a big X for the rest of the game.
+        <View pointerEvents="none" style={styles.usedX}>
+          <View style={styles.usedXCircle}><Feather name="close-thick" size={40} color="#FFFFFF" /></View>
+        </View>
       ) : null}
     </View>
   );
@@ -367,6 +391,8 @@ export function AnswerFeed({ view, run }: { view: LiveView; run: (a: ActionInput
         const label = a.outcome === 'correct'
           ? t('feed.correct', { name: p.name(a.playerId), rank: a.rank ?? '?', answer: a.text ? L(a.text) : '' })
           : a.outcome === 'skipped' ? t('feed.skipped', { name: p.name(a.playerId) })
+          : a.outcome === 'passed' ? t('feed.passed', { name: p.name(a.playerId) })
+          : a.outcome === 'timed_out' ? t('feed.timeUp', { name: p.name(a.playerId) })
           : a.outcome === 'already_claimed' ? t('feed.claimed', { name: p.name(a.playerId) })
           : t('feed.wrong', { name: p.name(a.playerId) });
         return (
@@ -453,6 +479,8 @@ const styles = StyleSheet.create({
   myScore: { alignItems: 'center', paddingHorizontal: 12, paddingVertical: 4, borderRadius: radius.md, backgroundColor: color.bg + 'AA', marginEnd: 4 },
   badge: { position: 'absolute', bottom: -2, right: -2, width: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   gameCard: { flex: 1, borderRadius: radius.lg, borderWidth: 1.5, padding: space(3), minHeight: 150 },
+  usedX: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  usedXCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: color.bad, alignItems: 'center', justifyContent: 'center', borderWidth: 4, borderColor: '#FFFFFF', shadowColor: '#294638', shadowOpacity: 0.2, shadowRadius: 10, elevation: 4 },
   cardBtn: { marginTop: 'auto', height: 34, borderRadius: radius.pill, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   feedRow: { paddingVertical: space(2), borderBottomWidth: 1, borderBottomColor: color.line },
   undo: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: color.surface },

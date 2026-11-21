@@ -7,6 +7,7 @@ import { color, space } from '../theme';
 import { Avatar, Banner, Button, Card, Confetti, FadeIn, Gap, ltr, Pop, Row, Txt } from '../ui';
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
+import { CountdownPill } from './Countdown';
 import { people } from './helpers';
 import { LeaderTable } from './Leaderboard';
 import { AnswerFeed, QuestionHeader } from './Play';
@@ -77,6 +78,12 @@ export function Results({ view, act, onError, categoryName }: { view: LiveView; 
         </View>
       </ScrollView>
       <View style={{ paddingHorizontal: space(4), paddingTop: space(3), paddingBottom: insets.bottom + space(3), backgroundColor: color.bgRaised, borderTopWidth: 1, borderTopColor: color.line }}>
+        {view.timer?.kind === 'next' ? (
+          <Row gap={2} style={{ justifyContent: 'center', marginBottom: space(2) }}>
+            <Txt v="small" dim>{view.nextStep === 'finished' ? t('results.finalIn') : t('results.nextIn')}</Txt>
+            <CountdownPill view={view} kind="next" />
+          </Row>
+        ) : null}
         {host
           ? <Button label={label} icon={view.nextStep === 'finished' ? 'award' : 'arrow-right'} size="lg" kind={view.nextStep === 'finished' ? 'gold' : 'primary'} busy={busy} disabled={view.paused} onPress={next} />
           : <Txt center dim>{t('results.waitHost')}</Txt>}

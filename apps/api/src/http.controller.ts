@@ -84,7 +84,8 @@ export class HttpController {
   @Post('games')
   @UseGuards(DeviceGuard)
   create(@CurrentDevice() dev: AuthedDevice, @Body() body: unknown) {
-    return this.games.create(dev.id, parse(createGameBody, body).categories ?? []);
+    const b = parse(createGameBody, body);
+    return this.games.create(dev.id, b.categories ?? [], b.answerSeconds);
   }
 
   @Get('games/by-code/:code')

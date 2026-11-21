@@ -6,7 +6,7 @@ import { getApiToken } from './api';
 import { API_URL } from './config';
 
 /** What the server sends: the engine view for this phone, plus who is online. */
-export type LiveView = GameView & { gameId: string; code: string; version: number; hostOnline: boolean; online: Record<string, boolean>; practice?: boolean };
+export type LiveView = GameView & { gameId: string; code: string; version: number; hostOnline: boolean; online: Record<string, boolean>; practice?: boolean; serverNow?: number; clockOffset?: number };
 
 export interface ChatMessage { id: number; role: 'host' | 'player'; playerId: string | null; name: string; text: string; at: string }
 export interface Reaction { key: number; emoji: string; name: string; playerId: string | null; role: 'host' | 'player' }
@@ -37,7 +37,7 @@ export function useGame(gameId: string | undefined) {
   const accept = useCallback((v: LiveView, events: GameEvent[] = []) => {
     if (v.version < versionRef.current) return; // older than what we show: ignore
     versionRef.current = v.version;
-    setView(v);
+    setView(v.serverNow ? { ...v, clockOffset: v.serverNow - Date.now() } : v);
     if (events.length) setLastEvents((old) => ({ id: old.id + 1, events }));
   }, []);
 

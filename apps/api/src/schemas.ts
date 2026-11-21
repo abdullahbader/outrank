@@ -9,7 +9,7 @@ export const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('set_categories'), categories: z.array(z.string().min(1).max(40)).min(1).max(30) }),
   z.object({ type: z.literal('start') }),
   z.object({ type: z.literal('confirm'), rank: z.number().int(), turnSerial: serial }),
-  z.object({ type: z.literal('reject'), reason: z.enum(['incorrect', 'already_claimed']), turnSerial: serial }),
+  z.object({ type: z.literal('reject'), reason: z.enum(['incorrect', 'already_claimed', 'pass']), turnSerial: serial }),
   z.object({ type: z.literal('skip_turn'), turnSerial: serial }),
   z.object({ type: z.literal('end_turn'), turnSerial: serial }),
   z.object({ type: z.literal('activate_wild'), turnSerial: serial }),
@@ -28,7 +28,11 @@ export const actionMessage = z.object({
   action: actionSchema,
 });
 
-export const createGameBody = z.object({ categories: z.array(z.string().min(1).max(40)).max(30).default([]) });
+export const ANSWER_SECONDS = [0, 15, 30, 45, 60] as const;
+export const createGameBody = z.object({
+  categories: z.array(z.string().min(1).max(40)).max(30).default([]),
+  answerSeconds: z.number().int().refine((n) => (ANSWER_SECONDS as readonly number[]).includes(n)).optional(),
+});
 export const joinBody = z.object({ name: z.string().min(1).max(40) });
 export const recoverBody = z.object({ recoveryCode: z.string().min(4).max(20) });
 export const deviceBody = z.object({

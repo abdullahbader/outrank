@@ -9,6 +9,9 @@ export interface GameConfig {
   minPlayers: number;       // 2
   maxPlayers: number;       // 16
   minQuestions: number;     // questions needed to start
+  answerSeconds: number;    // time to answer on a turn; 0 = no timers at all
+  streakSeconds: number;    // time to decide on Streak
+  nextSeconds: number;      // results screen before the next question starts
 }
 
 export interface Player {
@@ -20,7 +23,7 @@ export interface Player {
   streak: StreakState;
 }
 
-export type AttemptOutcome = 'correct' | 'incorrect' | 'already_claimed' | 'skipped';
+export type AttemptOutcome = 'correct' | 'incorrect' | 'already_claimed' | 'passed' | 'skipped' | 'timed_out';
 
 export interface Attempt {
   id: string;
@@ -91,7 +94,12 @@ export interface GameState {
   turnSerial: number;
   seq: number;
   createdAt: number;
+  /** The running countdown (server time). Frozen while paused (deadline null, remainingMs kept). */
+  timer?: GameTimer | null;
 }
+
+export type TimerKind = 'answer' | 'streak' | 'next';
+export interface GameTimer { key: string; kind: TimerKind; deadline: number | null; remainingMs: number | null; totalMs: number }
 
 export type Actor = { role: 'host' } | { role: 'player'; playerId: string } | { role: 'system' };
 
@@ -102,13 +110,14 @@ export type Action =
   | { type: 'set_categories'; categories: string[] }
   | { type: 'start'; questionIds: string[] }
   | { type: 'confirm'; rank: number; turnSerial: number }
-  | { type: 'reject'; reason: 'incorrect' | 'already_claimed'; turnSerial: number }
+  | { type: 'reject'; reason: 'incorrect' | 'already_claimed' | 'pass'; turnSerial: number }
   | { type: 'skip_turn'; turnSerial: number }
   | { type: 'end_turn'; turnSerial: number }
   | { type: 'activate_wild'; turnSerial: number }
   | { type: 'activate_streak'; turnSerial: number }
   | { type: 'void_attempt'; attemptId: string; replayTurn: boolean }
   | { type: 'end_question' }
+  | { type: 'timeout'; turnSerial: number }
   | { type: 'next_question' }
   | { type: 'pause' }
   | { type: 'resume' }
@@ -119,7 +128,7 @@ export type ErrorCode =
   | 'ALREADY_CLAIMED' | 'INVALID_RANK' | 'CARD_USED' | 'CARD_NOT_ALLOWED_NOW'
   | 'NAME_TAKEN' | 'NAME_INVALID' | 'GAME_FULL' | 'ALREADY_JOINED' | 'NOT_ENOUGH_PLAYERS'
   | 'NOT_ENOUGH_QUESTIONS' | 'NO_CATEGORIES' | 'UNKNOWN_PLAYER' | 'UNKNOWN_ATTEMPT'
-  | 'CANNOT_REPLAY' | 'NOTHING_CLAIMED' | 'ALREADY_VOIDED' | 'NOT_CURRENT_QUESTION' | 'GAME_FINISHED' | 'NOT_PAUSED' | 'UNKNOWN_ACTION';
+  | 'CANNOT_REPLAY' | 'TOO_EARLY' | 'NO_TIMER' | 'NOTHING_CLAIMED' | 'ALREADY_VOIDED' | 'NOT_CURRENT_QUESTION' | 'GAME_FINISHED' | 'NOT_PAUSED' | 'UNKNOWN_ACTION';
 
 export interface GameEvent {
   type: string;

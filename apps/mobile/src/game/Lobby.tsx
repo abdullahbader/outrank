@@ -73,6 +73,10 @@ export function Lobby({ view, act, onError }: { view: LiveView; act: (a: ActionI
 
       {!host ? <><Gap h={4} /><Banner tone="good" icon="check-circle" text={`${t('lobby.youJoined')} ${t('lobby.waitingHost')}`} /></> : null}
 
+      <Gap h={4} />
+      <Row gap={2}>
+        <Chip label={view.answerSeconds ? t('lobby.timerChip', { n: view.answerSeconds }) : t('lobby.noTimer')} icon={view.answerSeconds ? 'timer-outline' : 'timer-off-outline'} selected />
+      </Row>
       <Gap h={6} />
       <Row style={{ justifyContent: 'space-between' }}>
         <Txt v="label" faint>{t('lobby.categories')}</Txt>

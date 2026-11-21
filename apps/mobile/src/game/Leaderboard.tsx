@@ -72,8 +72,9 @@ export function LeaderTable({ view }: { view: LiveView }) {
 
 function CardDot({ label, tint, used, armed }: { label: string; tint: string; used: boolean; armed?: boolean }) {
   return (
-    <View style={[styles.dot, { borderColor: tint, backgroundColor: armed ? tint : 'transparent', opacity: used ? 0.35 : 1 }]}>
-      <Txt v="small" color={armed ? inkOn(tint) : tint} style={{ fontSize: 11, lineHeight: 14, textDecorationLine: used ? 'line-through' : 'none' }}>{label}</Txt>
+    <View style={[styles.dot, { flexDirection: 'row', alignItems: 'center', gap: 3, borderColor: used ? color.bad : tint, backgroundColor: armed ? tint : 'transparent' }]}>
+      {used ? <Feather name="close-thick" size={11} color={color.bad} /> : null}
+      <Txt v="small" color={armed ? inkOn(tint) : used ? color.textFaint : tint} style={{ fontSize: 11, lineHeight: 14, textDecorationLine: used ? 'line-through' : 'none' }}>{label}</Txt>
     </View>
   );
 }

@@ -13,6 +13,9 @@ export const DEFAULT_CONFIG: GameConfig = {
   minPlayers: 2,
   maxPlayers: 16,
   minQuestions: 15,
+  answerSeconds: 30,
+  streakSeconds: 10,
+  nextSeconds: 10,
 };
 
 export const MAX_NAME_LENGTH = 20;
@@ -46,7 +49,42 @@ export function apply(state: GameState, actor: Actor, action: Action, now: numbe
   const events: GameEvent[] = [];
   const error = handle(s, actor, action, now, events);
   if (error) return { ok: false, error };
+  syncTimer(s, now);
   return { ok: true, state: s, events };
+}
+
+// ───────────────────────────────────────────── timers
+
+/** What should be counting down right now, if anything. */
+function wantedTimer(s: GameState): { kind: 'answer' | 'streak' | 'next'; seconds: number } | null {
+  if (!s.config.answerSeconds) return null; // the host chose no timers
+  const round = currentRound(s);
+  if (s.phase === 'results') return { kind: 'next', seconds: s.config.nextSeconds };
+  if (s.phase !== 'question' || !round?.turn) return null;
+  if (round.turn.awaitingStreakDecision) return { kind: 'streak', seconds: s.config.streakSeconds };
+  return { kind: 'answer', seconds: s.config.answerSeconds };
+}
+
+/**
+ * Keeps the countdown in step with the game after every action: a new turn, a new attempt, the
+ * Streak choice or the results screen starts a fresh countdown; pausing freezes it; resuming
+ * carries on with the time that was left.
+ */
+export function syncTimer(s: GameState, now: number): void {
+  const want = wantedTimer(s);
+  if (!want) { s.timer = null; return; }
+  const key = `${want.kind}:${s.turnSerial}:${s.rounds.length}`;
+  if (!s.timer || s.timer.key !== key) {
+    const totalMs = want.seconds * 1000;
+    s.timer = { key, kind: want.kind, deadline: now + totalMs, remainingMs: null, totalMs };
+  }
+  if (s.paused && s.timer.deadline !== null) {
+    s.timer.remainingMs = Math.max(0, s.timer.deadline - now);
+    s.timer.deadline = null;
+  } else if (!s.paused && s.timer.deadline === null) {
+    s.timer.deadline = now + (s.timer.remainingMs ?? s.timer.totalMs);
+    s.timer.remainingMs = null;
+  }
 }
 
 // ───────────────────────────────────────────── helpers
@@ -203,8 +241,8 @@ function record(s: GameState, round: Round, outcome: AttemptOutcome, rank: numbe
     at: now,
   };
   if (wildArmed) {
-    if (outcome === 'skipped') {
-      // No answer was given: the card goes back.
+    if (outcome === 'skipped' || outcome === 'passed') {
+      // No answer was given (skipped by the host, or the player passed): the card goes back.
       p.wild = 'available';
       removeCardLog(s, p.id, 'wild', null);
     } else {
@@ -236,7 +274,7 @@ function removeCardLog(s: GameState, playerId: string, card: 'wild' | 'streak', 
 
 function attemptEvent(s: GameState, a: Attempt): GameEvent {
   return {
-    type: a.outcome === 'correct' ? 'answer_confirmed' : a.outcome === 'skipped' ? 'turn_skipped' : 'answer_rejected',
+    type: a.outcome === 'correct' ? 'answer_confirmed' : a.outcome === 'skipped' ? 'turn_skipped' : a.outcome === 'passed' ? 'turn_passed' : a.outcome === 'timed_out' ? 'time_up' : 'answer_rejected',
     attemptId: a.id,
     roundIndex: a.roundIndex,
     playerId: a.playerId,
@@ -382,8 +420,8 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
         return null;
       }
 
-      const outcome: AttemptOutcome = action.type === 'skip_turn' ? 'skipped' : action.reason === 'already_claimed' ? 'already_claimed' : 'incorrect';
-      if (action.type === 'reject' && action.reason !== 'incorrect' && action.reason !== 'already_claimed') return 'UNKNOWN_ACTION';
+      const outcome: AttemptOutcome = action.type === 'skip_turn' ? 'skipped' : action.reason === 'already_claimed' ? 'already_claimed' : action.reason === 'pass' ? 'passed' : 'incorrect';
+      if (action.type === 'reject' && action.reason !== 'incorrect' && action.reason !== 'already_claimed' && action.reason !== 'pass') return 'UNKNOWN_ACTION';
       // "Already claimed" only makes sense once something has been claimed in this question.
       if (outcome === 'already_claimed' && Object.keys(round.claimed).length === 0) return 'NOTHING_CLAIMED';
       const a = record(s, round, outcome, null, now);
@@ -435,6 +473,33 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
 
     case 'void_attempt':
       return voidAttempt(s, actor, action.attemptId, !!action.replayTurn, events);
+
+    case 'timeout': {
+      // Sent by the server's clock when a countdown runs out. Never accepted early.
+      if (actor.role !== 'system') return 'NOT_HOST';
+      const tm = s.timer;
+      if (!tm || tm.deadline === null) return 'NO_TIMER';
+      if (action.turnSerial !== s.turnSerial) return 'STALE_TURN';
+      if (now < tm.deadline - 250) return 'TOO_EARLY';
+      events.push({ type: 'timer_expired', kind: tm.kind });
+      if (tm.kind === 'next') return handle(s, { role: 'host' }, { type: 'next_question' }, now, events);
+      if (s.phase !== 'question' || !round.turn) return 'WRONG_PHASE';
+      if (tm.kind === 'streak') {
+        if (!round.turn.awaitingStreakDecision) return 'STALE_TURN';
+        events.push({ type: 'streak_declined', playerId: round.turn.playerId, by: 'timer' });
+        endTurn(s, events);
+        return null;
+      }
+      if (round.turn.awaitingStreakDecision) return 'STALE_TURN';
+      // Time's up: counts like a wrong answer — no points, turn over.
+      const attemptNo = round.turn.attemptNo;
+      const a = record(s, round, 'timed_out', null, now);
+      recomputeScores(s);
+      events.push(attemptEvent(s, a));
+      if (attemptNo === 2) failStreak(s, round, events);
+      endTurn(s, events);
+      return null;
+    }
 
     case 'end_question': {
       // The host can end (skip) the current question at any time.

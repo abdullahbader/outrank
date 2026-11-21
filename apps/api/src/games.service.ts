@@ -1,5 +1,5 @@
 import { randomBytes, randomInt } from 'node:crypto';
-import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import {
   apply, buildView, createGame, finalSummary, selectQuestions, shuffle,
@@ -20,9 +20,11 @@ export type ActionResult = { ok: true; version: number } | { ok: false; error: s
 type Tx = Prisma.TransactionClient;
 
 @Injectable()
-export class GamesService {
+export class GamesService implements OnModuleInit {
   private readonly log = new Logger('Games');
   private joinAttempts = new Map<string, number[]>();
+  /** One countdown alarm per game (server clock). */
+  private alarms = new Map<string, NodeJS.Timeout>();
   /** Dev-only practice games: the phone practising as a player, and the autopilot timer. */
   private practice = new Map<string, { playerDeviceId: string; timer?: NodeJS.Timeout }>();
 
@@ -34,11 +36,22 @@ export class GamesService {
 
   // ───────────── setup
 
-  async create(deviceId: string, categories: string[]) {
+  /** After a restart, pick up the countdowns of games still being played. */
+  async onModuleInit() {
+    const games = await this.prisma.game.findMany({ where: { status: 'playing' }, select: { id: true, state: true } });
+    for (const g of games) this.scheduleTimer(g.id, g.state as unknown as GameState);
+  }
+
+  async create(deviceId: string, categories: string[], answerSeconds = 30) {
+    const t = config.timerTestSeconds;
     const state = createGame({
       now: Date.now(),
       categories,
-      config: { minQuestions: config.minQuestions, maxPlayers: config.maxPlayers, targetScore: config.targetScore },
+      config: {
+        minQuestions: config.minQuestions, maxPlayers: config.maxPlayers, targetScore: config.targetScore,
+        answerSeconds: t && answerSeconds ? t : answerSeconds,
+        ...(t ? { streakSeconds: t, nextSeconds: t } : {}),
+      },
     });
     const recovery = randomCode(8);
     for (let i = 0; i < 10; i++) {
@@ -148,7 +161,7 @@ export class GamesService {
     const ids = [...new Set(s.rounds.map((r) => r.questionId))];
     const questions = await this.content.load(ids);
     const presence = await this.realtime.presence(gameId);
-    return { gameId, code, version, ...buildView(s, questions, viewer), ...presence, practice: this.practice.has(gameId) };
+    return { gameId, code, version, ...buildView(s, questions, viewer), ...presence, practice: this.practice.has(gameId), serverNow: Date.now() };
   }
 
   // ───────────── the one door every game action goes through
@@ -274,6 +287,7 @@ export class GamesService {
     const game = await this.prisma.game.findUnique({ where: { id: gameId } });
     if (!game) return;
     const s = game.state as unknown as GameState;
+    this.scheduleTimer(gameId, s);
     const sockets = await this.realtime.socketsIn(gameId);
     const hostView = await this.render(game.id, game.code, game.version, s, { role: 'host' });
     for (const { socket, id } of sockets) {
@@ -285,6 +299,22 @@ export class GamesService {
           : null;
       if (view) socket.emit('game:state', { version: game.version, view, events });
     }
+  }
+
+  // ───────────── countdowns: when one runs out, the server tells the engine
+
+  private scheduleTimer(gameId: string, s: GameState) {
+    const old = this.alarms.get(gameId);
+    if (old) clearTimeout(old);
+    this.alarms.delete(gameId);
+    const deadline = s.timer?.deadline;
+    if (!deadline || s.phase === 'finished') return;
+    const serial = s.turnSerial;
+    const wait = Math.max(0, deadline - Date.now()) + 50;
+    this.alarms.set(gameId, setTimeout(() => {
+      this.alarms.delete(gameId);
+      this.runAction(gameId, { role: 'system' }, { type: 'timeout', turnSerial: serial }, null).catch((e) => this.log.warn(`timer: ${String(e)}`));
+    }, wait));
   }
 
   // ───────────── host presence → auto pause
