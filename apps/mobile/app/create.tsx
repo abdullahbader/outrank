@@ -1,22 +1,20 @@
-import { useRouter } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { api, type Category } from '@/api';
 import { recoveryKey, useApp, useLocalized } from '@/app-context';
 import { storage } from '@/storage';
-import { color, radius, space } from '@/theme';
-import { Banner, Button, Chip, Gap, Row, Screen, TopBar, Txt, type IconName } from '@/ui';
+import { catStyle, color, radius, space } from '@/theme';
+import { Avatar, Banner, Button, Chip, FadeIn, Gap, IconPlate, Row, Screen, SectionTitle, TopBar, Txt, type IconName } from '@/ui';
 
 const MIN_QUESTIONS = 15;
-const ICONS: Record<string, IconName> = {
-  globe: 'globe', landmark: 'flag', trophy: 'award', atom: 'aperture', cpu: 'cpu', film: 'film',
-  utensils: 'coffee', briefcase: 'briefcase', leaf: 'feather', lightbulb: 'zap',
-};
 
 export default function CreateGame() {
-  const { t, profile, saveProfile, errorText } = useApp();
+  const { t, profile, saveProfile, errorText, locale } = useApp();
   const L = useLocalized();
   const router = useRouter();
+  const params = useLocalSearchParams<{ category?: string }>();
   const [cats, setCats] = useState<Category[] | null>(null);
   const [picked, setPicked] = useState<string[]>([]);
   const [name, setName] = useState(profile.name);
@@ -25,13 +23,19 @@ export default function CreateGame() {
 
   useEffect(() => {
     api<Category[]>('GET', '/categories')
-      .then((c) => { setCats(c); setPicked(c.filter((x) => x.ready > 0).map((x) => x.id)); })
+      .then((c) => {
+        setCats(c);
+        const ready = c.filter((x) => x.ready > 0).map((x) => x.id);
+        // Coming from a category tile: start with that one, the host adds more if needed.
+        setPicked(params.category && ready.includes(params.category) ? [params.category] : ready);
+      })
       .catch((e) => setError(errorText(e)));
-  }, [errorText]);
+  }, [errorText, params.category]);
 
   const total = useMemo(() => (cats ?? []).filter((c) => picked.includes(c.id)).reduce((n, c) => n + c.ready, 0), [cats, picked]);
   const toggle = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
   const all = (cats ?? []).filter((c) => c.ready > 0).map((c) => c.id);
+  const pct = Math.min(1, total / MIN_QUESTIONS);
 
   const create = async () => {
     setBusy(true);
@@ -50,36 +54,73 @@ export default function CreateGame() {
   return (
     <Screen footer={
       <View>
-        <Row style={{ justifyContent: 'space-between', marginBottom: space(3) }}>
-          <Txt v="small" dim>{t('create.totalReady', { n: total })}</Txt>
+        <Row style={{ justifyContent: 'space-between', marginBottom: space(2) }}>
+          <Txt v="small" color={total >= MIN_QUESTIONS ? color.good : color.warn}>{t('create.totalReady', { n: total })}</Txt>
           <Txt v="small" faint>{t('create.rules', { target: 100, wild: 5 })}</Txt>
         </Row>
+        <View style={styles.track}><View style={[styles.fill, { width: `${pct * 100}%`, backgroundColor: total >= MIN_QUESTIONS ? color.good : color.warn }]} /></View>
+        <Gap h={3} />
         <Button label={t('create.create')} icon="zap" size="lg" onPress={create} busy={busy} disabled={total < MIN_QUESTIONS || !picked.length} />
       </View>
     }>
       <TopBar title={t('create.title')} onBack={() => router.back()} />
-      <Txt v="label" faint>{t('create.yourName')}</Txt>
-      <Gap h={2} />
-      <TextInput
-        value={name} onChangeText={setName} maxLength={20} placeholder={t('create.yourName')} placeholderTextColor={color.textFaint}
-        style={{ height: 52, borderRadius: radius.md, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, color: color.text, paddingHorizontal: space(4), fontSize: 16 }}
-      />
+
+      <FadeIn>
+        <Row gap={3}>
+          <Avatar name={name || '?'} tint={profile.color} size={52} />
+          <View style={{ flex: 1 }}>
+            <Txt v="label" faint>{t('create.yourName')}</Txt>
+            <Gap h={1} />
+            <TextInput
+              value={name} onChangeText={setName} maxLength={20} placeholder={t('create.yourName')} placeholderTextColor={color.textFaint}
+              style={[styles.input, { textAlign: locale === 'ar' ? 'right' : 'left' }]}
+            />
+          </View>
+        </Row>
+      </FadeIn>
+
       <Gap h={6} />
-      <Row style={{ justifyContent: 'space-between' }}>
-        <Txt v="label" faint>{t('create.categories')}</Txt>
+      <SectionTitle title={t('create.categories')} />
+      <Row style={{ justifyContent: 'space-between', marginTop: -space(2), marginBottom: space(3) }}>
+        <Txt v="small" dim style={{ flex: 1 }}>{t('create.categoriesHint')}</Txt>
         <Chip label={t('create.selectAll')} selected={picked.length === all.length && all.length > 0} onPress={() => setPicked(picked.length === all.length ? [] : all)} />
       </Row>
-      <Gap h={1} />
-      <Txt v="small" dim>{t('create.categoriesHint')}</Txt>
-      <Gap h={3} />
-      <Row wrap gap={2}>
-        {(cats ?? []).map((c) => (
-          <Chip key={c.id} label={L(c.name)} sub={String(c.ready)} icon={ICONS[c.icon] ?? 'star'} selected={picked.includes(c.id)} onPress={() => toggle(c.id)} />
-        ))}
-      </Row>
+      <View style={styles.grid}>
+        {(cats ?? []).map((c, i) => {
+          const st = catStyle(c.id);
+          const on = picked.includes(c.id);
+          const empty = c.ready === 0;
+          return (
+            <FadeIn key={c.id} index={i} style={styles.cell}>
+              <Pressable disabled={empty} onPress={() => toggle(c.id)} accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled: empty }} accessibilityLabel={L(c.name)}
+                style={({ pressed }) => [styles.tile, { borderColor: on ? st.tint : color.line, backgroundColor: on ? st.tint + '22' : color.surface, opacity: empty ? 0.4 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+                <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <IconPlate icon={st.icon as IconName} tint={st.tint} size={40} solid={on} />
+                  <View style={[styles.check, on ? { backgroundColor: st.tint, borderColor: st.tint } : null]}>
+                    {on ? <Feather name="check" size={14} color={color.accentInk} /> : null}
+                  </View>
+                </Row>
+                <Gap h={3} />
+                <Txt numberOfLines={2} style={{ fontSize: 15 }}>{L(c.name)}</Txt>
+                <Txt v="small" dim>{t('home2.questionsN', { n: c.ready })}</Txt>
+              </Pressable>
+            </FadeIn>
+          );
+        })}
+      </View>
       <Gap h={4} />
       {total < MIN_QUESTIONS && cats ? <Banner tone="warn" text={t('create.needMore', { n: MIN_QUESTIONS })} /> : null}
       {error ? <><Gap h={3} /><Banner tone="bad" text={error} /></> : null}
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  input: { height: 50, borderRadius: radius.md, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, color: color.text, paddingHorizontal: space(4), fontSize: 16 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space(3) },
+  cell: { width: '47%', flexGrow: 1 },
+  tile: { borderRadius: radius.lg, borderWidth: 1.5, padding: space(3.5), minHeight: 140 },
+  check: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: color.line, alignItems: 'center', justifyContent: 'center' },
+  track: { height: 6, borderRadius: 3, backgroundColor: color.surface2, overflow: 'hidden' },
+  fill: { height: 6, borderRadius: 3 },
+});

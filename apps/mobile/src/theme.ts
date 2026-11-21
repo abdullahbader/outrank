@@ -36,6 +36,26 @@ export function avatarColor(seed: string): string {
   return avatarColors[h % avatarColors.length];
 }
 
+/** Each category's colour and icon (Feather names). Unknown categories fall back to the accent. */
+export const categoryStyle: Record<string, { tint: string; icon: string }> = {
+  geography: { tint: '#3ED8FF', icon: 'globe' },
+  history: { tint: '#FFB23E', icon: 'book-open' },
+  sports: { tint: '#3EF0A6', icon: 'award' },
+  science: { tint: '#B58CFF', icon: 'aperture' },
+  technology: { tint: '#6C8CFF', icon: 'cpu' },
+  entertainment: { tint: '#FF4F9A', icon: 'film' },
+  food: { tint: '#FF8A3D', icon: 'coffee' },
+  business: { tint: '#F2E94E', icon: 'trending-up' },
+  nature: { tint: '#7BE36A', icon: 'feather' },
+  general: { tint: '#C8FF3E', icon: 'zap' },
+};
+export const catStyle = (id: string) => categoryStyle[id] ?? { tint: color.accent, icon: 'star' };
+
+export const shadow = {
+  soft: { shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 5 },
+  glow: (c: string) => ({ shadowColor: c, shadowOpacity: 0.45, shadowRadius: 22, shadowOffset: { width: 0, height: 6 }, elevation: 8 }),
+} as const;
+
 export const radius = { sm: 10, md: 16, lg: 22, xl: 28, pill: 999 } as const;
 export const space = (n: number) => n * 4;
 

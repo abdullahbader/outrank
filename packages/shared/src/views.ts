@@ -23,6 +23,7 @@ export type Viewer = { role: 'host' } | { role: 'player'; playerId: string };
 export interface LeaderRow {
   id: string;
   name: string;
+  color: string | null;
   score: number;
   position: number;      // 1-based, equal scores share a position
   lastDelta: number;     // points gained/lost in the most recent question
@@ -71,7 +72,7 @@ export function leaderboard(s: GameState): LeaderRow[] {
   return sorted.map((p, i) => {
     if (prev === null || p.score !== prev) position = i + 1;
     prev = p.score;
-    return { id: p.id, name: p.name, score: p.score, position, lastDelta: delta.get(p.id) ?? 0, wild: p.wild, streak: p.streak };
+    return { id: p.id, name: p.name, color: p.color ?? null, score: p.score, position, lastDelta: delta.get(p.id) ?? 0, wild: p.wild, streak: p.streak };
   });
 }
 
@@ -160,7 +161,7 @@ export function buildView(s: GameState, questions: Record<string, QuestionConten
     targetScore: s.config.targetScore,
     wildMultiplier: s.config.wildMultiplier,
     turnSerial: s.turnSerial,
-    players: s.players.map((p) => ({ id: p.id, name: p.name })),
+    players: s.players.map((p) => ({ id: p.id, name: p.name, color: p.color ?? null })),
     leaderboard: leaderboard(s),
     rotation: s.rotation,
     questionsPlayed: s.rounds.filter((r) => r.finished).length,

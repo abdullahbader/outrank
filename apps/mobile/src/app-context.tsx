@@ -64,7 +64,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           }
         }
         if (!token) {
-          const created = await api<{ deviceId: string; token: string }>('POST', '/devices', { locale: l, ...(name ? { displayName: name.slice(0, 20) } : {}) });
+          const created = await api<{ deviceId: string; token: string }>('POST', '/devices', { locale: l, avatarColor: colorStored, ...(name ? { displayName: name.slice(0, 20) } : {}) });
           token = created.token;
           deviceId = created.deviceId;
           await storage.set(K.token, token);

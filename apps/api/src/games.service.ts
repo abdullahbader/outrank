@@ -11,6 +11,7 @@ import { ContentService } from './content.service';
 import { PrismaService } from './prisma.service';
 import { RealtimeService } from './realtime.service';
 
+const BOT_COLORS = ['#FF4F9A', '#3ED8FF', '#C8FF3E', '#FFC94A', '#B58CFF', '#FF8A3D', '#3EF0A6', '#FF5C6C', '#6C8CFF', '#F2E94E'];
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I
 const randomCode = (n: number) => Array.from({ length: n }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('');
 
@@ -84,7 +85,7 @@ export class GamesService {
     if (list.length > config.joinAttemptsPerMinute) throw new GameError('TOO_MANY_ATTEMPTS', HttpStatus.TOO_MANY_REQUESTS);
   }
 
-  async join(gameId: string, deviceId: string, name: string, isBot = false) {
+  async join(gameId: string, deviceId: string, name: string, isBot = false, botColor?: string) {
     if (!isBot) this.rateLimitJoin(deviceId);
     const game = await this.prisma.game.findUnique({ where: { id: gameId } });
     if (!game) throw new GameError('GAME_NOT_FOUND', HttpStatus.NOT_FOUND);
@@ -93,9 +94,10 @@ export class GamesService {
     if (existing) return { playerId: existing.playerId, rejoined: true };
 
     const playerId = `p_${randomBytes(6).toString('hex')}`;
+    const color = botColor ?? (await this.prisma.device.findUnique({ where: { id: deviceId }, select: { avatarColor: true } }))?.avatarColor ?? undefined;
     let res: ActionResult;
     try {
-      res = await this.runAction(gameId, { role: 'system' }, { type: 'join', playerId, name }, null, async (tx) => {
+      res = await this.runAction(gameId, { role: 'system' }, { type: 'join', playerId, name, color }, null, async (tx) => {
         await tx.gameParticipant.create({ data: { gameId, playerId, deviceId, displayName: name.trim().replace(/\s+/g, ' '), isBot } });
       });
     } catch (e) {
@@ -333,7 +335,7 @@ export class GamesService {
       const token = newToken();
       const device = await this.prisma.device.create({ data: { tokenHash: hashToken(token), displayName: `${n} (bot)` } });
       try {
-        const { playerId } = await this.join(gameId, device.id, n, true);
+        const { playerId } = await this.join(gameId, device.id, n, true, BOT_COLORS[added.length % BOT_COLORS.length]);
         added.push({ playerId, name: n, token });
       } catch (e) {
         if (e instanceof GameError) break;

@@ -24,6 +24,12 @@ export class HttpController {
   @Get('health')
   health() { return { ok: true, devTools: config.devTools }; }
 
+  /** Settings the apps read at start: support contacts (shown only when set). */
+  @Get('app-config')
+  appConfig() {
+    return { support: { whatsapp: process.env.SUPPORT_WHATSAPP || null, email: process.env.SUPPORT_EMAIL || null } };
+  }
+
   // ── devices (guest identity)
 
   @Post('devices')

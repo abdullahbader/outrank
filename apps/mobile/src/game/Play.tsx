@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DirectionRoot, useApp, useLocalized } from '../app-context';
-import { color, radius, space } from '../theme';
-import { Avatar, Banner, Button, Card, Gap, IconButton, ltr, Pulse, Row, Txt } from '../ui';
+import { catStyle, color, radius, space } from '../theme';
+import { Avatar, Banner, Button, Card, Gap, Gradient, IconButton, IconPlate, ltr, Pulse, Row, Txt } from '../ui';
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
 import { people, turnStates } from './helpers';
@@ -70,23 +70,42 @@ export function QuestionHeader({ view, categoryName, onMenu }: { view: LiveView;
   const L = useLocalized();
   const p = people(view);
   const r = view.round!;
+  const st = catStyle(r.categoryId);
+  const me = view.me ? view.leaderboard.find((x) => x.id === view.me!.playerId) : null;
   return (
-    <View>
-      <Row style={{ justifyContent: 'space-between' }}>
-        <Row gap={2} style={{ flex: 1, flexWrap: 'wrap' }}>
-          <View style={[styles.tag, r.isTiebreak ? { backgroundColor: color.gold } : null]}>
-            <Txt v="label" color={r.isTiebreak ? color.accentInk : color.textDim}>{r.isTiebreak ? t('game.tiebreak') : t('game.question', { n: r.number })}</Txt>
-          </View>
-          <View style={styles.tag}><Txt v="label" color={color.streak}>{categoryName}</Txt></View>
-          {view.endgame.triggered && !r.isTiebreak ? <View style={[styles.tag, { backgroundColor: color.wild }]}><Txt v="label" color={color.accentInk}>{t('game.finalQuestion')}</Txt></View> : null}
+    <Gradient from={st.tint + '33'} to={color.surface} style={{ borderWidth: 1, borderColor: st.tint + '55' }}>
+      <View style={{ padding: space(4) }}>
+        <Row style={{ justifyContent: 'space-between' }}>
+          <Row gap={2} style={{ flex: 1, flexWrap: 'wrap' }}>
+            <IconPlate icon={st.icon as never} tint={st.tint} size={34} solid />
+            <View style={[styles.tag, r.isTiebreak ? { backgroundColor: color.gold } : null]}>
+              <Txt v="label" color={r.isTiebreak ? color.accentInk : color.text}>{r.isTiebreak ? t('game.tiebreak') : t('game.question', { n: r.number })}</Txt>
+            </View>
+            <View style={styles.tag}><Txt v="label" color={st.tint}>{categoryName}</Txt></View>
+            {view.endgame.triggered && !r.isTiebreak ? <View style={[styles.tag, { backgroundColor: color.wild }]}><Txt v="label" color={color.accentInk}>{t('game.finalQuestion')}</Txt></View> : null}
+          </Row>
+          {me ? (
+            <View style={styles.myScore}>
+              <Txt v="small" faint style={{ fontSize: 11 }}>{t('common.you')}</Txt>
+              <Txt v="number" color={color.accent}>{me.score}</Txt>
+            </View>
+          ) : null}
+          {onMenu ? <IconButton icon="more-vertical" label={t('game.menu')} onPress={onMenu} /> : null}
         </Row>
-        {onMenu ? <IconButton icon="more-vertical" label={t('game.menu')} onPress={onMenu} /> : null}
-      </Row>
-      <Gap h={3} />
-      <Txt v="title">{L(r.title)}</Txt>
-      {r.rankingBasis ? <Txt v="small" dim style={{ marginTop: space(1) }}>{L(r.rankingBasis)}{r.asOf ? ` · ${t('game.asOf', { date: r.asOf })}` : ''}</Txt> : null}
-      {r.isTiebreak ? <Txt v="small" color={color.gold} style={{ marginTop: space(1) }}>{t('game.tiebreakPlayers', { names: p.list(r.participants) })}</Txt> : null}
-    </View>
+        <Gap h={3} />
+        <Txt v="title">{L(r.title)}</Txt>
+        {r.rankingBasis ? <Txt v="small" dim style={{ marginTop: space(1) }}>{L(r.rankingBasis)}{r.asOf ? ` · ${t('game.asOf', { date: r.asOf })}` : ''}</Txt> : null}
+        {r.isTiebreak ? <Txt v="small" color={color.gold} style={{ marginTop: space(1) }}>{t('game.tiebreakPlayers', { names: p.list(r.participants) })}</Txt> : null}
+        <Gap h={3} />
+        {/* ten segments: one per positive answer still to find */}
+        <Row gap={1}>
+          {Array.from({ length: 10 }, (_, i) => {
+            const found = !!r.slots[i]?.claimedBy;
+            return <View key={i} style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: found ? (i === 9 ? color.gold : st.tint) : color.surface2 }} />;
+          })}
+        </Row>
+      </View>
+    </Gradient>
   );
 }
 
@@ -336,7 +355,8 @@ function HostMenu({ view, open, onClose, run }: { view: LiveView; open: boolean;
 
 const styles = StyleSheet.create({
   max: { width: '100%', maxWidth: 640, alignSelf: 'center' },
-  tag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: color.surface },
+  tag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: color.bg + 'AA' },
+  myScore: { alignItems: 'center', paddingHorizontal: 12, paddingVertical: 4, borderRadius: radius.md, backgroundColor: color.bg + 'AA', marginEnd: 4 },
   badge: { position: 'absolute', bottom: -2, right: -2, width: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   gameCard: { flex: 1, borderRadius: radius.lg, borderWidth: 1.5, padding: space(3), minHeight: 150 },
   cardBtn: { marginTop: 'auto', height: 34, borderRadius: radius.pill, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },

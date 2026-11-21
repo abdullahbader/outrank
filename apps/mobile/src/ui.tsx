@@ -6,7 +6,7 @@ import {
   type StyleProp, type TextStyle, type ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Rect } from 'react-native-svg';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useApp } from './app-context';
 import { color, font, radius, space } from './theme';
 
@@ -273,6 +273,57 @@ function ConfettiPiece({ left, delay, size, tint, rot }: { left: number; delay: 
   const translateY = v.interpolate({ inputRange: [0, 1], outputRange: [-40, 820] });
   const rotate = v.interpolate({ inputRange: [0, 1], outputRange: [`${rot}deg`, `${rot + 540}deg`] });
   return <Animated.View style={{ position: 'absolute', top: 0, left: `${left}%`, width: size, height: size * 0.5, borderRadius: 2, backgroundColor: tint, transform: [{ translateY }, { rotate }] }} />;
+}
+
+// ───────────── decoration
+
+/** A soft diagonal gradient behind its children (drawn with SVG, no extra package). */
+export function Gradient({ from, to, children, style, radius: r = radius.xl }: { from: string; to: string; children?: ReactNode; style?: StyleProp<ViewStyle>; radius?: number }) {
+  const id = useMemo(() => `g${Math.random().toString(36).slice(2, 8)}`, []);
+  return (
+    <View style={[{ borderRadius: r, overflow: 'hidden' }, style]}>
+      <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 100">
+        <Defs>
+          <LinearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor={from} />
+            <Stop offset="1" stopColor={to} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100" height="100" fill={`url(#${id})`} />
+      </Svg>
+      {children}
+    </View>
+  );
+}
+
+/** Round icon plate in a colour. */
+export function IconPlate({ icon, tint, size = 44, solid }: { icon: IconName; tint: string; size?: number; solid?: boolean }) {
+  return (
+    <View style={{ width: size, height: size, borderRadius: size / 2, alignItems: 'center', justifyContent: 'center', backgroundColor: solid ? tint : tint + '26' }}>
+      <Feather name={icon} size={size * 0.48} color={solid ? color.accentInk : tint} />
+    </View>
+  );
+}
+
+export function SectionTitle({ title, action, onAction }: { title: string; action?: string; onAction?: () => void }) {
+  return (
+    <Row style={{ justifyContent: 'space-between', marginBottom: space(3) }}>
+      <Txt v="h2">{title}</Txt>
+      {action && onAction ? <Pressable onPress={onAction} accessibilityRole="button" hitSlop={8}><Txt v="small" color={color.accent}>{action}</Txt></Pressable> : null}
+    </Row>
+  );
+}
+
+/** Slides and fades content in once, a little after the item before it. */
+export function FadeIn({ children, index = 0, style }: { children: ReactNode; index?: number; style?: StyleProp<ViewStyle> }) {
+  const reduced = useReducedMotion();
+  const v = useRef(new Animated.Value(reduced ? 1 : 0)).current;
+  useEffect(() => {
+    if (reduced) { v.setValue(1); return; }
+    Animated.timing(v, { toValue: 1, duration: 420, delay: Math.min(index, 8) * 70, easing: Easing.out(Easing.cubic), useNativeDriver: native }).start();
+  }, [v, index, reduced]);
+  const translateY = v.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+  return <Animated.View style={[style, { opacity: v, transform: [{ translateY }] }]}>{children}</Animated.View>;
 }
 
 const styles = StyleSheet.create({

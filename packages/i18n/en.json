@@ -99,7 +99,9 @@
     "recovery": "Host recovery code",
     "recoveryHint": "If your phone dies, enter this code on another phone to keep hosting.",
     "leave": "Leave game",
-    "youJoined": "You're in! Get ready."
+    "youJoined": "You're in! Get ready.",
+    "shareBtn": "Invite friends",
+    "shareText": "Join my Outrank game! Code: {{code}}\n{{link}}"
   },
   "game": {
     "question": "Question {{n}}",
@@ -242,5 +244,72 @@
     "mute": "Mute {{name}}",
     "unmute": "Unmute {{name}}",
     "youAreMuted": "The host has muted you in the chat."
+  },
+  "nav": {
+    "home": "Home",
+    "rules": "How to play",
+    "play": "Host",
+    "stats": "Stats",
+    "profile": "Profile"
+  },
+  "home2": {
+    "hi": "Hi, {{name}} 👋",
+    "welcome": "Welcome 👋",
+    "heroTitle": "Ready to rank?",
+    "heroSub": "12 answers per question. Take turns, score big, avoid 11 and 12.",
+    "host": "Host a game",
+    "join": "Join",
+    "scan": "Scan QR",
+    "categories": "Pick a category",
+    "categoriesHint": "Tap one to host a game with it",
+    "questionsN": "{{n}} questions",
+    "howTitle": "How it works",
+    "statsTitle": "Your game night",
+    "seeStats": "All stats",
+    "games": "Games",
+    "wins": "Wins",
+    "best": "Best",
+    "activeTitle": "Your games",
+    "open": "Open",
+    "lobby": "In the lobby",
+    "playing": "Playing now"
+  },
+  "how": {
+    "s1t": "12 ranked answers",
+    "s1b": "Every question has exactly 12 answers, ranked 1 to 12.",
+    "s2t": "Take turns",
+    "s2b": "Say an answer on your turn. The host taps it. Turns go round until every positive answer is found.",
+    "s3t": "Score big",
+    "s3b": "Ranks 1–9 give 1–9 points, rank 10 gives 20. Ranks 11 and 12 cost you 11 and 12.",
+    "s4t": "Two cards each",
+    "s4b": "Wild ×5 one answer — negative too. Streak gives you one more answer after a correct one.",
+    "s5t": "First to 100",
+    "s5b": "Reach 100 and the game ends after that question. Highest score wins; ties play a tie-breaker."
+  },
+  "rules": {
+    "title": "How to play",
+    "scoring": "Scoring",
+    "scoringHint": "Points for each rank",
+    "cards": "Your two cards",
+    "flow": "A question, step by step",
+    "flow1": "The app picks a question from the chosen categories.",
+    "flow2": "Players answer out loud in turn; the host taps the answer or Wrong.",
+    "flow3": "Claimed answers show for everyone; the rest stay hidden.",
+    "flow4": "Turns go round again until ranks 1–10 are all found, or the host ends the question.",
+    "flow5": "The full ranking is revealed and the next question starts with the next player.",
+    "end": "Winning",
+    "end1": "First to 100 points ends the game after the current question.",
+    "end2": "Highest score wins. A tie means a tie-breaker question for the tied players only.",
+    "onceEach": "Once per game"
+  },
+  "stats": {
+    "title": "Your stats"
+  },
+  "profile2": {
+    "language": "Language",
+    "support": "Help & support",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "version": "Version {{v}}"
   }
 }

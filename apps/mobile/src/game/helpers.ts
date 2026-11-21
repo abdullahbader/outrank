@@ -3,9 +3,10 @@ import { avatarColor } from '../theme';
 
 export function people(view: LiveView) {
   const names = new Map(view.players.map((p) => [p.id, p.name]));
+  const colors = new Map(view.players.map((p) => [p.id, p.color]));
   return {
     name: (id: string | null | undefined) => (id ? names.get(id) ?? '?' : '?'),
-    tint: (id: string) => avatarColor(id),
+    tint: (id: string) => colors.get(id) ?? avatarColor(id),
     list: (ids: string[], sep = ', ') => ids.map((id) => names.get(id) ?? '?').join(sep),
   };
 }

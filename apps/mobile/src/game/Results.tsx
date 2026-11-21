@@ -4,7 +4,7 @@ import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp, useLocalized } from '../app-context';
 import { color, space } from '../theme';
-import { Avatar, Banner, Button, Card, Confetti, Gap, ltr, Pop, Row, Txt } from '../ui';
+import { Avatar, Banner, Button, Card, Confetti, FadeIn, Gap, ltr, Pop, Row, Txt } from '../ui';
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
 import { people } from './helpers';
@@ -115,7 +115,8 @@ export function Final({ view }: { view: LiveView }) {
               </Card>
             </Pop>
           ) : null}
-          <Gap h={2} />
+          {s.players.length >= 2 ? <><Gap h={5} /><Podium players={s.players.slice(0, 3)} tint={p.tint} /></> : null}
+          <Gap h={4} />
           <Txt v="small" dim center>{t('final.questions', { n: s.questionsPlayed })}</Txt>
           {s.reason && s.reason !== 'winner' ? <Txt v="small" faint center>{t(`final.reason_${s.reason}`)}</Txt> : null}
 
@@ -149,3 +150,27 @@ export function Final({ view }: { view: LiveView }) {
   );
 }
 
+
+/** Top three on steps: 2nd, 1st, 3rd. */
+function Podium({ players, tint }: { players: { id: string; name: string; score: number; position: number }[]; tint: (id: string) => string }) {
+  const order = [players[1], players[0], players[2]].filter(Boolean);
+  const heights: Record<number, number> = { 1: 110, 2: 82, 3: 62 };
+  const medal: Record<number, string> = { 1: color.gold, 2: '#C9D1E8', 3: '#E39A5B' };
+  return (
+    <Row gap={2} style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
+      {order.map((pl, i) => {
+        const pos = Math.min(pl.position, 3);
+        return (
+          <FadeIn key={pl.id} index={i} style={{ flex: 1, alignItems: 'center', maxWidth: 140 }}>
+            <Avatar name={pl.name} tint={tint(pl.id)} size={pos === 1 ? 60 : 48} ring={medal[pos]} />
+            <Txt v="small" numberOfLines={1} style={{ marginTop: 4 }}>{pl.name}</Txt>
+            <Txt v="number" color={medal[pos]}>{pl.score}</Txt>
+            <View style={{ width: '100%', height: heights[pos], marginTop: 6, borderTopLeftRadius: 14, borderTopRightRadius: 14, backgroundColor: medal[pos] + '33', borderWidth: 1, borderColor: medal[pos] + '88', alignItems: 'center', justifyContent: 'center' }}>
+              <Txt v="title" color={medal[pos]}>{pl.position}</Txt>
+            </View>
+          </FadeIn>
+        );
+      })}
+    </Row>
+  );
+}

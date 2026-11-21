@@ -14,6 +14,7 @@ export interface GameConfig {
 export interface Player {
   id: string;
   name: string;
+  color?: string;           // avatar colour the player picked (display only)
   score: number;            // derived from attempts — never set directly
   wild: WildState;
   streak: StreakState;
@@ -95,7 +96,7 @@ export interface GameState {
 export type Actor = { role: 'host' } | { role: 'player'; playerId: string } | { role: 'system' };
 
 export type Action =
-  | { type: 'join'; playerId: string; name: string }
+  | { type: 'join'; playerId: string; name: string; color?: string }
   | { type: 'leave' }
   | { type: 'remove_player'; playerId: string }
   | { type: 'set_categories'; categories: string[] }

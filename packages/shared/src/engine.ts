@@ -276,7 +276,8 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
       if (player(s, action.playerId)) return 'ALREADY_JOINED';
       if (s.players.some((p) => p.name.toLowerCase() === name.toLowerCase())) return 'NAME_TAKEN';
       if (s.players.length >= s.config.maxPlayers) return 'GAME_FULL';
-      s.players.push({ id: action.playerId, name, score: 0, wild: 'available', streak: 'available' });
+      const color = typeof action.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(action.color) ? action.color : undefined;
+      s.players.push({ id: action.playerId, name, ...(color ? { color } : {}), score: 0, wild: 'available', streak: 'available' });
       events.push({ type: 'player_joined', playerId: action.playerId, name });
       return null;
     }
