@@ -1,0 +1,186 @@
+// Outrank data model — see docs/03-data-model.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────── content (independent of the engine)
+
+model Category {
+  id        String     @id
+  nameEn    String     @map("name_en")
+  nameAr    String     @map("name_ar")
+  icon      String     @default("star")
+  sort      Int        @default(0)
+  active    Boolean    @default(true)
+  questions Question[]
+
+  @@map("categories")
+}
+
+model Question {
+  id             String           @id
+  categoryId     String           @map("category_id")
+  category       Category         @relation(fields: [categoryId], references: [id])
+  titleEn        String           @map("title_en")
+  titleAr        String?          @map("title_ar")
+  difficulty     Int              @default(2)
+  rankingBasisEn String?          @map("ranking_basis_en")
+  rankingBasisAr String?          @map("ranking_basis_ar")
+  explanationEn  String?          @map("explanation_en")
+  explanationAr  String?          @map("explanation_ar")
+  asOf           String?          @map("as_of")
+  status         String           @default("active") // draft | active | retired
+  verification   String           @default("unverified") // unverified | verified | disputed
+  lastVerifiedAt DateTime?        @map("last_verified_at")
+  dataset        String           @default("TEST")
+  version        Int              @default(1)
+  createdAt      DateTime         @default(now()) @map("created_at")
+  updatedAt      DateTime         @updatedAt @map("updated_at")
+  answers        QuestionAnswer[]
+  sources        QuestionSource[]
+
+  @@index([categoryId, status, verification])
+  @@map("questions")
+}
+
+model QuestionAnswer {
+  questionId String   @map("question_id")
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  rank       Int
+  textEn     String   @map("text_en")
+  textAr     String?  @map("text_ar")
+  aliases    String[] @default([])
+  valueNote  String?  @map("value_note")
+
+  @@id([questionId, rank])
+  @@map("question_answers")
+}
+
+model QuestionSource {
+  id         Int      @id @default(autoincrement())
+  questionId String   @map("question_id")
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  label      String
+  url        String?
+  accessedAt String?  @map("accessed_at")
+
+  @@index([questionId])
+  @@map("question_sources")
+}
+
+// ───────────── identity and play
+
+model Device {
+  id           String            @id @default(uuid())
+  tokenHash    String            @unique @map("token_hash")
+  displayName  String?           @map("display_name")
+  avatarColor  String?           @map("avatar_color")
+  locale       String?
+  createdAt    DateTime          @default(now()) @map("created_at")
+  lastSeenAt   DateTime          @default(now()) @map("last_seen_at")
+  hosted       Game[]
+  participants GameParticipant[]
+  results      GameResult[]
+
+  @@map("devices")
+}
+
+model Game {
+  id               String            @id @default(uuid())
+  code             String
+  hostDeviceId     String            @map("host_device_id")
+  host             Device            @relation(fields: [hostDeviceId], references: [id])
+  status           String            @default("lobby") // lobby | playing | finished | abandoned
+  categories       String[]          @default([])
+  state            Json
+  version          Int               @default(1)
+  hostRecoveryHash String            @map("host_recovery_hash")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  finishedAt       DateTime?         @map("finished_at")
+  participants     GameParticipant[]
+  questions        GameQuestion[]
+  events           GameEvent[]
+  actions          GameAction[]
+  results          GameResult[]
+
+  @@index([code])
+  @@map("games")
+}
+
+model GameParticipant {
+  gameId      String   @map("game_id")
+  game        Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  playerId    String   @map("player_id")
+  deviceId    String   @map("device_id")
+  device      Device   @relation(fields: [deviceId], references: [id])
+  displayName String   @map("display_name")
+  isBot       Boolean  @default(false) @map("is_bot")
+  joinedAt    DateTime @default(now()) @map("joined_at")
+  removedAt   DateTime? @map("removed_at")
+
+  @@id([gameId, playerId])
+  @@index([deviceId])
+  @@map("game_participants")
+}
+
+model GameQuestion {
+  gameId     String @map("game_id")
+  game       Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  position   Int
+  questionId String @map("question_id")
+
+  @@id([gameId, position])
+  @@unique([gameId, questionId])
+  @@map("game_questions")
+}
+
+model GameEvent {
+  gameId  String   @map("game_id")
+  game    Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  seq     Int
+  type    String
+  actor   String
+  payload Json
+  at      DateTime @default(now())
+
+  @@id([gameId, seq])
+  @@map("game_events")
+}
+
+model GameAction {
+  gameId         String   @map("game_id")
+  game           Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  clientActionId String   @map("client_action_id")
+  result         Json
+  at             DateTime @default(now())
+
+  @@id([gameId, clientActionId])
+  @@map("game_actions")
+}
+
+model GameResult {
+  gameId         String   @map("game_id")
+  game           Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  deviceId       String   @map("device_id")
+  device         Device   @relation(fields: [deviceId], references: [id])
+  playerId       String   @map("player_id")
+  finalRank      Int      @map("final_rank")
+  finalScore     Int      @map("final_score")
+  won            Boolean
+  answersClaimed Int      @map("answers_claimed")
+  pointsGained   Int      @map("points_gained")
+  pointsLost     Int      @map("points_lost")
+  cardsUsed      String[] @default([]) @map("cards_used")
+  at             DateTime @default(now())
+
+  @@id([gameId, deviceId])
+  @@index([deviceId])
+  @@map("game_results")
+}

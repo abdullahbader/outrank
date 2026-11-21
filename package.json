@@ -6,7 +6,14 @@
     "apps/*"
   ],
   "scripts": {
-    "test": "npm run test --workspaces --if-present"
+    "build": "npm run build -w @outrank/shared && npm run build -w @outrank/api",
+    "test": "npm run test -w @outrank/shared",
+    "typecheck": "npm run typecheck -w @outrank/shared && npm run typecheck -w @outrank/api",
+    "db:start": "powershell -ExecutionPolicy Bypass -File scripts/db.ps1 start",
+    "db:stop": "powershell -ExecutionPolicy Bypass -File scripts/db.ps1 stop",
+    "db:deploy": "npm run db:deploy -w @outrank/api",
+    "api:dev": "npm run dev -w @outrank/api",
+    "smoke": "npm run build && npm run smoke -w @outrank/api"
   },
   "engines": {
     "node": ">=24"
