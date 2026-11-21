@@ -15,9 +15,20 @@
     "api:dev": "npm run dev -w @outrank/api",
     "smoke": "npm run build && npm run smoke -w @outrank/api",
     "questions:check": "node content/validate.mjs",
-    "questions:import": "npm run questions:import -w @outrank/api --"
+    "questions:import": "npm run questions:import -w @outrank/api --",
+    "app:web": "npm run web -w @outrank/mobile",
+    "app:start": "npm run start -w @outrank/mobile",
+    "postinstall": "npm run build -w @outrank/shared"
   },
   "engines": {
     "node": ">=24"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.0"
+  },
+  "overrides": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5"
   }
 }

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "outrank-api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "api:dev"],
+      "port": 3300
+    },
+    {
+      "name": "outrank-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "app:web"],
+      "port": 8091
+    }
+  ]
+}

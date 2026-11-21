@@ -13,3 +13,17 @@ npm test -w @outrank/shared
 ```
 
 Needs Node 24 or newer (it runs TypeScript directly; no packages to install for the engine).
+
+## Run everything locally
+
+```powershell
+npm install                 # once (also builds the game engine)
+npm run db:start            # Outrank's own PostgreSQL on port 5436
+npm run db:deploy           # create/update tables
+npm run questions:import    # load the 30 TEST DATA questions
+npm run api:dev             # API on http://localhost:3300
+npm run app:web             # app in the browser on http://localhost:8091
+npm run app:start           # Expo Go QR for your phone (same Wi-Fi; the app finds the API on this PC)
+```
+
+Checks: `npm test` (rules engine), `npm run smoke` (full multiplayer run on the isolated test database).
