@@ -1,4 +1,4 @@
-import { Feather } from '@expo/vector-icons';
+import { Icon as Feather } from './icons';
 import QRCode from 'qrcode';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
@@ -8,9 +8,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useApp } from './app-context';
-import { color, font, inkOn, radius, space } from './theme';
+import { color, font, inkOn, radius, readableText, space } from './theme';
 
-export type IconName = keyof typeof Feather.glyphMap;
+export type IconName = string;
 
 // ───────────── text
 
@@ -35,7 +35,7 @@ export function Txt({ children, v = 'body', style, dim, faint, center, numberOfL
   return (
     <Text
       numberOfLines={numberOfLines}
-      style={[base, { color: c ?? (faint ? color.textFaint : dim ? color.textDim : color.text), textAlign: center ? 'center' : 'auto', writingDirection: auto ? 'auto' : ar ? 'rtl' : 'ltr' }, style]}
+      style={[base, { color: c ? readableText(c) : (faint ? color.textFaint : dim ? color.textDim : color.text), textAlign: center ? 'center' : 'auto', writingDirection: auto ? 'auto' : ar ? 'rtl' : 'ltr' }, style]}
     >
       {children}
     </Text>
@@ -94,7 +94,7 @@ export function Button({ label, onPress, kind = 'primary', icon, disabled, busy,
   label: string; onPress?: () => void; kind?: BtnKind; icon?: IconName; disabled?: boolean; busy?: boolean; size?: 'md' | 'lg' | 'sm'; style?: StyleProp<ViewStyle>;
 }) {
   const bg = { primary: color.accent, secondary: color.surface2, ghost: 'transparent', danger: color.bad, wild: color.wild, streak: color.streak, gold: color.gold }[kind];
-  const fg = kind === 'secondary' || kind === 'ghost' ? color.text : color.accentInk;
+  const fg = kind === 'secondary' || kind === 'ghost' ? color.text : inkOn(bg);
   const h = size === 'lg' ? 60 : size === 'sm' ? 38 : 50;
   return (
     <Pressable
@@ -329,8 +329,8 @@ export function FadeIn({ children, index = 0, style }: { children: ReactNode; in
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
   maxWidth: { width: '100%', maxWidth: 560, alignSelf: 'center' },
-  footer: { paddingHorizontal: space(4), paddingTop: space(3), backgroundColor: color.bgRaised, borderTopWidth: 1, borderTopColor: color.line, shadowColor: '#3B2A8C', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: -4 } },
-  card: { backgroundColor: color.surface, borderRadius: radius.lg, padding: space(4), borderWidth: 1, borderColor: color.line, shadowOffset: { width: 0, height: 6 }, shadowColor: '#3B2A8C', shadowOpacity: 0.08, shadowRadius: 16, elevation: 2 },
+  footer: { paddingHorizontal: space(4), paddingTop: space(3), backgroundColor: color.bgRaised, borderTopWidth: 1, borderTopColor: color.line, shadowColor: '#294638', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: -4 } },
+  card: { backgroundColor: color.surface, borderRadius: radius.lg, padding: space(4), borderWidth: 1, borderColor: color.line, shadowOffset: { width: 0, height: 6 }, shadowColor: '#294638', shadowOpacity: 0.08, shadowRadius: 16, elevation: 2 },
   btn: { borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space(5) },
   iconBtn: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   chip: { flexDirection: 'row', alignItems: 'center', gap: space(1.5), paddingHorizontal: space(3.5), height: 40, borderRadius: radius.pill, borderWidth: 1, borderColor: color.line, backgroundColor: color.surface },

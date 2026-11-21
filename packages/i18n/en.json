@@ -150,7 +150,9 @@
     "endQuestion": "End this question",
     "endQuestionSure": "Tap again to end the question",
     "positivesLeft": "{{n}} positive answers left",
-    "lap": "Round {{n}}"
+    "lap": "Round {{n}}",
+    "yourTurnBig": "Your turn!",
+    "yourTurnSub": "Say your answer out loud"
   },
   "cards": {
     "wild": "Wild",

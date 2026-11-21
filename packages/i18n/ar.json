@@ -150,7 +150,9 @@
     "endQuestion": "إنهاء هذا السؤال",
     "endQuestionSure": "اضغط مرة أخرى لإنهاء السؤال",
     "positivesLeft": "بقيت {{n}} إجابات موجبة",
-    "lap": "الجولة {{n}}"
+    "lap": "الجولة {{n}}",
+    "yourTurnBig": "دورك!",
+    "yourTurnSub": "قل إجابتك بصوت عالٍ"
   },
   "cards": {
     "wild": "وايلد",

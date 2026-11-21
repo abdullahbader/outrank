@@ -1,7 +1,7 @@
-import { Feather } from '@expo/vector-icons';
+import { Icon as Feather } from '../icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { useApp, useLocalized } from '../app-context';
-import { color, radius, rankColor, space } from '../theme';
+import { color, inkOn, radius, rankColor, space } from '../theme';
 import { Avatar, ltr, Pop, Row, Txt } from '../ui';
 import type { LiveView } from '../useGame';
 import { people } from './helpers';
@@ -40,7 +40,7 @@ export function Board({ view, onPick, disabled }: { view: LiveView; onPick?: (ra
             ]}
           >
             <View style={[styles.rank, { backgroundColor: claimed || round.finished ? tint : 'transparent', borderColor: tint }]}>
-              <Txt v="number" color={claimed || round.finished ? color.accentInk : tint} style={{ fontSize: 15 }}>{s.rank}</Txt>
+              <Txt v="number" color={claimed || round.finished ? inkOn(tint) : tint} style={{ fontSize: 15 }}>{s.rank}</Txt>
             </View>
             <View style={{ flex: 1 }}>
               {text ? (

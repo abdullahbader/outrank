@@ -1,4 +1,4 @@
-import { Feather } from '@expo/vector-icons';
+import { Icon as Feather } from '@/icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Tabs, useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';

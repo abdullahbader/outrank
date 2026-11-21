@@ -1,4 +1,4 @@
-import { Feather } from '@expo/vector-icons';
+import { Icon as Feather } from '@/icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Dimensions, Pressable, ScrollView, StyleSheet, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
@@ -11,7 +11,7 @@ const HOW: { key: string; icon: IconName; tint: string }[] = [
   { key: 's1', icon: 'list', tint: color.accent },
   { key: 's2', icon: 'repeat', tint: color.streak },
   { key: 's3', icon: 'trending-up', tint: color.gold },
-  { key: 's4', icon: 'layers', tint: color.wild },
+  { key: 's4', icon: 'cards-playing', tint: color.wild },
   { key: 's5', icon: 'flag', tint: color.good },
 ];
 
@@ -68,7 +68,7 @@ export default function Home() {
 
       {/* hero with the main actions */}
       <FadeIn index={1}>
-        <Gradient from="#5B2BFF" to="#FF4F9A" style={shadow.glow('#7B3BFF')}>
+        <Gradient from="#3F8F65" to="#75AFC5" style={shadow.glow('#3F8F65')}>
           <View style={{ padding: space(5) }}>
             <Ladder />
             <Gap h={4} />

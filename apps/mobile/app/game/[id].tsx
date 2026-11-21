@@ -1,4 +1,4 @@
-import { Feather } from '@expo/vector-icons';
+import { Icon as Feather } from '@/icons';
 import type { GameEvent } from '@outrank/shared';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -11,7 +11,7 @@ import { Lobby } from '@/game/Lobby';
 import { buzz, Play } from '@/game/Play';
 import { Final, Results } from '@/game/Results';
 import { Social } from '@/game/Social';
-import { color, radius, space } from '@/theme';
+import { color, inkOn, radius, space } from '@/theme';
 import { Button, Gap, Loading, ltr, Screen, Txt, useReducedMotion } from '@/ui';
 import { useGame, type LiveView } from '@/useGame';
 
@@ -135,15 +135,15 @@ function Offline({ text }: { text: string }) {
   const insets = useSafeAreaInsets();
   return (
     <View pointerEvents="none" style={[styles.offline, { bottom: insets.bottom + 90 }]}>
-      <Feather name="wifi-off" size={16} color={color.accentInk} />
-      <Txt v="small" color={color.accentInk}>{text}</Txt>
+      <Feather name="wifi-off" size={16} color={inkOn(color.warn)} />
+      <Txt v="small" color={inkOn(color.warn)}>{text}</Txt>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  toast: { position: 'absolute', left: space(4), right: space(4), maxWidth: 560, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(3.5), borderRadius: radius.lg, backgroundColor: color.bgRaised, borderWidth: 1.5, shadowColor: '#3B2A8C', shadowOpacity: 0.18, shadowRadius: 20, elevation: 8 },
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#F5F3FFEE', alignItems: 'center', justifyContent: 'center', padding: space(6) },
+  toast: { position: 'absolute', left: space(4), right: space(4), maxWidth: 560, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(3.5), borderRadius: radius.lg, backgroundColor: color.bgRaised, borderWidth: 1.5, shadowColor: '#294638', shadowOpacity: 0.18, shadowRadius: 20, elevation: 8 },
+  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#F5F8F3EE', alignItems: 'center', justifyContent: 'center', padding: space(6) },
   pauseCard: { width: '100%', maxWidth: 380, alignItems: 'center', padding: space(6), borderRadius: radius.xl, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
   offline: { position: 'absolute', alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, height: 36, borderRadius: radius.pill, backgroundColor: color.warn },
 });

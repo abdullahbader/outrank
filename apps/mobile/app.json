@@ -6,7 +6,7 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "backgroundColor": "#F5F3FF",
+    "backgroundColor": "#F5F8F3",
     "ios": {
       "bundleIdentifier": "com.outrank.app",
       "supportsTablet": false,
@@ -26,8 +26,8 @@
     "web": {
       "bundler": "metro",
       "output": "single",
-      "themeColor": "#6C3BFF",
-      "backgroundColor": "#F5F3FF"
+      "themeColor": "#3F8F65",
+      "backgroundColor": "#F5F8F3"
     },
     "plugins": [
       "expo-router",

@@ -2,24 +2,38 @@
 // Change the brand here; every screen reads these tokens.
 
 export const color = {
-  bg: '#F5F3FF',          // soft lavender-white page
+  // "Modern Fresh" palette (owner, 2026-11-21)
+  bg: '#F5F8F3',          // background
   bgRaised: '#FFFFFF',
   surface: '#FFFFFF',     // cards
-  surface2: '#EFEBFC',    // quiet fills (secondary buttons, empty slots)
-  line: '#E4DEF7',
-  text: '#17122F',
-  textDim: '#5D5781',
-  textFaint: '#9690B6',
+  surface2: '#DCEBDD',    // soft green: quiet fills, secondary buttons, empty slots
+  line: '#E3E9E1',        // borders
+  text: '#294638',
+  textDim: '#5C7568',
+  textFaint: '#93A79B',
 
-  accent: '#6C3BFF',      // primary actions, current turn
-  accentInk: '#FFFFFF',   // text on accent and other strong fills
-  wild: '#E83E8C',        // Wild card
-  streak: '#0EA5E9',      // Streak card
-  gold: '#F59E0B',        // rank 10, winner
-  good: '#12B76A',        // correct
-  bad: '#E5484D',         // wrong, negative ranks
-  warn: '#F79009',
+  accent: '#3F8F65',      // primary green: main actions, current turn
+  accentInk: '#FFFFFF',   // text on the primary green and other strong fills
+  gold: '#E8C66A',        // muted gold: rank 10, winner
+  streak: '#75AFC5',      // muted blue: Streak card
+  wild: '#D4876F',        // muted coral (chosen to match): Wild card
+  good: '#3F8F65',        // correct
+  bad: '#C8614F',         // muted red (chosen to match): wrong, ranks 11–12
+  warn: '#D9A441',
 } as const;
+
+/** Light colours (gold, blue) used as text on white are darkened so they stay readable. White stays white. */
+export function readableText(hex: string): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex);
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  if (lum < 0.58 || lum > 0.95) return hex;
+  const k = 0.62;
+  const h = (x: number) => Math.round(x * k).toString(16).padStart(2, '0');
+  return `#${h(r)}${h(g)}${h(b)}`;
+}
 
 /** Readable text colour (dark or white) on a given fill. */
 export function inkOn(hex: string): string {
@@ -37,7 +51,7 @@ export function rankColor(rank: number): string {
   return color.accent;
 }
 
-export const avatarColors = ['#E83E8C', '#0EA5E9', '#7C3AED', '#F59E0B', '#10B981', '#F97316', '#6366F1', '#EF4444', '#14B8A6', '#D946EF'];
+export const avatarColors = ['#3F8F65', '#75AFC5', '#E8C66A', '#D4876F', '#8E7CC3', '#5E9E8F', '#C8614F', '#6F8FB8', '#B5A04A', '#A0789A'];
 
 export function avatarColor(seed: string): string {
   let h = 0;
@@ -47,21 +61,21 @@ export function avatarColor(seed: string): string {
 
 /** Each category's colour and icon (Feather names). Unknown categories fall back to the accent. */
 export const categoryStyle: Record<string, { tint: string; icon: string }> = {
-  geography: { tint: '#0EA5E9', icon: 'globe' },
-  history: { tint: '#F59E0B', icon: 'book-open' },
-  sports: { tint: '#10B981', icon: 'award' },
-  science: { tint: '#8B5CF6', icon: 'aperture' },
-  technology: { tint: '#6366F1', icon: 'cpu' },
-  entertainment: { tint: '#E83E8C', icon: 'film' },
-  food: { tint: '#F97316', icon: 'coffee' },
-  business: { tint: '#CA8A04', icon: 'trending-up' },
-  nature: { tint: '#16A34A', icon: 'feather' },
-  general: { tint: '#7C3AED', icon: 'zap' },
+  geography: { tint: '#75AFC5', icon: 'earth' },
+  history: { tint: '#C9A24D', icon: 'pillar' },
+  sports: { tint: '#3F8F65', icon: 'soccer' },
+  science: { tint: '#8E7CC3', icon: 'flask' },
+  technology: { tint: '#6F8FB8', icon: 'laptop' },
+  entertainment: { tint: '#D4876F', icon: 'movie-open' },
+  food: { tint: '#C97B4A', icon: 'food-apple' },
+  business: { tint: '#B5A04A', icon: 'briefcase' },
+  nature: { tint: '#5E9E8F', icon: 'leaf' },
+  general: { tint: '#7A9A5C', icon: 'lightbulb-on' },
 };
 export const catStyle = (id: string) => categoryStyle[id] ?? { tint: color.accent, icon: 'star' };
 
 export const shadow = {
-  soft: { shadowColor: '#3B2A8C', shadowOpacity: 0.12, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 5 },
+  soft: { shadowColor: '#294638', shadowOpacity: 0.12, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 5 },
   glow: (c: string) => ({ shadowColor: c, shadowOpacity: 0.3, shadowRadius: 22, shadowOffset: { width: 0, height: 6 }, elevation: 8 }),
 } as const;
 

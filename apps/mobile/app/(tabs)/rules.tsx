@@ -37,8 +37,8 @@ export default function Rules() {
         <SectionTitle title={t('rules.cards')} />
         <Row gap={3} style={{ alignItems: 'stretch' }}>
           {[
-            { title: t('cards.wild'), body: t('cards.wildEffect'), tint: color.wild, icon: 'zap' as const },
-            { title: t('cards.streak'), body: t('cards.streakEffect'), tint: color.streak, icon: 'repeat' as const },
+            { title: t('cards.wild'), body: t('cards.wildEffect'), tint: color.wild, icon: 'cards-playing' },
+            { title: t('cards.streak'), body: t('cards.streakEffect'), tint: color.streak, icon: 'fire' },
           ].map((c) => (
             <Card key={c.title} style={{ flex: 1, borderColor: c.tint, backgroundColor: c.tint + '14' }}>
               <IconPlate icon={c.icon} tint={c.tint} solid />

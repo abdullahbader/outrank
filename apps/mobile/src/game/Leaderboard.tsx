@@ -1,9 +1,9 @@
-import { Feather } from '@expo/vector-icons';
+import { Icon as Feather } from '../icons';
 import { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DirectionRoot, useApp } from '../app-context';
-import { color, radius, space } from '../theme';
+import { color, inkOn, radius, space } from '../theme';
 import { Avatar, CountUp, IconButton, ltr, Row, Txt } from '../ui';
 import type { LiveView } from '../useGame';
 import { people } from './helpers';
@@ -73,7 +73,7 @@ export function LeaderTable({ view }: { view: LiveView }) {
 function CardDot({ label, tint, used, armed }: { label: string; tint: string; used: boolean; armed?: boolean }) {
   return (
     <View style={[styles.dot, { borderColor: tint, backgroundColor: armed ? tint : 'transparent', opacity: used ? 0.35 : 1 }]}>
-      <Txt v="small" color={armed ? color.accentInk : tint} style={{ fontSize: 11, lineHeight: 14, textDecorationLine: used ? 'line-through' : 'none' }}>{label}</Txt>
+      <Txt v="small" color={armed ? inkOn(tint) : tint} style={{ fontSize: 11, lineHeight: 14, textDecorationLine: used ? 'line-through' : 'none' }}>{label}</Txt>
     </View>
   );
 }
@@ -104,6 +104,6 @@ const styles = StyleSheet.create({
   track: { height: 6, borderRadius: 3, backgroundColor: color.surface2, overflow: 'hidden' },
   fill: { height: 6, borderRadius: 3 },
   dot: { paddingHorizontal: 8, borderRadius: radius.pill, borderWidth: 1 },
-  backdrop: { flex: 1, backgroundColor: '#17122F66' },
+  backdrop: { flex: 1, backgroundColor: '#29463866' },
   sheet: { maxHeight: '80%', backgroundColor: color.bgRaised, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, padding: space(4), borderTopWidth: 1, borderColor: color.line },
 });

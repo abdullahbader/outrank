@@ -1,12 +1,12 @@
-import { Feather } from '@expo/vector-icons';
+import { Icon as Feather } from '../icons';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useRef, useState } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Animated, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DirectionRoot, useApp, useLocalized } from '../app-context';
-import { catStyle, color, radius, rankColor as rankColorOf, space } from '../theme';
+import { catStyle, color, inkOn, radius, rankColor as rankColorOf, space } from '../theme';
 import { api } from '../api';
-import { Avatar, Banner, Button, Card, Gap, Gradient, IconButton, IconPlate, ltr, Pulse, Row, Txt } from '../ui';
+import { Avatar, Banner, Button, Card, Gap, Gradient, IconButton, IconPlate, ltr, Pulse, Row, Txt, useReducedMotion } from '../ui';
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
 import { people, turnStates } from './helpers';
@@ -37,17 +37,21 @@ export function Play({ view, act, onError, categoryName }: { view: LiveView; act
     if (!r.ok) onError(r.error);
   };
 
-  // A gentle buzz when it becomes this phone's turn.
+  // A buzz and a big "Your turn!" pop-up when it becomes this phone's turn.
   const wasMine = useRef(false);
+  const [splash, setSplash] = useState(false);
   useEffect(() => {
     const mine = !!view.me?.isMyTurn;
-    if (mine && !wasMine.current) buzz('turn');
+    if (mine && !wasMine.current) { buzz('turn'); setSplash(true); }
+    if (!mine) setSplash(false);
     wasMine.current = mine;
   }, [view.me?.isMyTurn]);
+  const myTurn = !!view.me?.isMyTurn;
 
   return (
     <View style={{ flex: 1, backgroundColor: color.bg }}>
-      <ScrollView contentContainerStyle={{ padding: space(4), paddingTop: insets.top + space(3), paddingBottom: space(20) }}>
+      {myTurn ? <MyTurnBar view={view} top={insets.top} /> : null}
+      <ScrollView contentContainerStyle={{ padding: space(4), paddingTop: myTurn ? space(4) : insets.top + space(3), paddingBottom: space(20) }}>
         <View style={styles.max}>
           <QuestionHeader view={view} categoryName={categoryName} onMenu={host ? () => setMenu(true) : undefined} />
           <Gap h={4} />
@@ -62,7 +66,52 @@ export function Play({ view, act, onError, categoryName }: { view: LiveView; act
       </ScrollView>
       <View style={{ paddingBottom: insets.bottom }}><LeaderStrip view={view} /></View>
       {host ? <HostMenu view={view} open={menu} onClose={() => setMenu(false)} run={run} /> : null}
+      {splash ? <TurnSplash name={view.leaderboard.find((r) => r.id === view.me?.playerId)?.name ?? ''} tint={view.players.find((p) => p.id === view.me?.playerId)?.color ?? color.accent} onDone={() => setSplash(false)} /> : null}
     </View>
+  );
+}
+
+/** Pinned to the top for as long as it is your turn: impossible to miss. */
+function MyTurnBar({ view, top }: { view: LiveView; top: number }) {
+  const { t } = useApp();
+  const turn = view.round?.turn;
+  const title = turn?.awaitingStreakDecision ? t('game.streakOfferedMe') : turn?.attemptNo === 2 ? t('game.secondAttempt') : t('game.yourTurnBig');
+  const sub = turn?.awaitingStreakDecision ? '' : turn?.attemptNo === 2 ? t('game.secondAttemptMe') : t('game.yourTurnSub');
+  return (
+    <Pulse active={!turn?.awaitingStreakDecision}>
+      <View style={[styles.turnBar, { paddingTop: top + space(3) }]} accessibilityRole="alert" accessibilityLiveRegion="assertive">
+        <View style={styles.turnBarIcon}><Feather name="microphone" size={26} color={color.accent} /></View>
+        <View style={{ flex: 1 }}>
+          <Txt v="title" color="#FFFFFF" style={{ fontSize: 24 }}>{title}</Txt>
+          {sub ? <Txt v="small" color="#FFFFFFE6">{sub}</Txt> : null}
+        </View>
+      </View>
+    </Pulse>
+  );
+}
+
+/** A big pop-up the moment your turn starts; disappears by itself (or on tap). */
+function TurnSplash({ name, tint, onDone }: { name: string; tint: string; onDone: () => void }) {
+  const { t } = useApp();
+  const reduced = useReducedMotion();
+  const v = useRef(new Animated.Value(reduced ? 1 : 0)).current;
+  const done = useRef(onDone);
+  done.current = onDone;
+  useEffect(() => {
+    if (!reduced) Animated.spring(v, { toValue: 1, friction: 6, tension: 90, useNativeDriver: Platform.OS !== 'web' }).start();
+    const id = setTimeout(() => done.current(), 2400);
+    return () => clearTimeout(id);
+  }, [v, reduced]);
+  const scale = v.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] });
+  return (
+    <Pressable style={styles.splashBack} onPress={onDone} accessibilityRole="button" accessibilityLabel={t('game.yourTurnBig')}>
+      <Animated.View style={[styles.splashCard, { opacity: v, transform: [{ scale }] }]}>
+        <Avatar name={name} tint={tint} size={88} ring={color.gold} />
+        <Gap h={4} />
+        <Txt v="hero" color={color.accent} center>{t('game.yourTurnBig')}</Txt>
+        <Txt dim center>{t('game.yourTurnSub')}</Txt>
+      </Animated.View>
+    </Pressable>
   );
 }
 
@@ -80,7 +129,7 @@ export function QuestionHeader({ view, categoryName, onMenu }: { view: LiveView;
           <Row gap={2} style={{ flex: 1, flexWrap: 'wrap' }}>
             <IconPlate icon={st.icon as never} tint={st.tint} size={34} solid />
             <View style={[styles.tag, r.isTiebreak ? { backgroundColor: color.gold } : null]}>
-              <Txt v="label" color={r.isTiebreak ? color.accentInk : color.text}>{r.isTiebreak ? t('game.tiebreak') : t('game.question', { n: r.number })}</Txt>
+              <Txt v="label" color={r.isTiebreak ? inkOn(color.gold) : color.text}>{r.isTiebreak ? t('game.tiebreak') : t('game.question', { n: r.number })}</Txt>
             </View>
             <View style={styles.tag}><Txt v="label" color={st.tint}>{categoryName}</Txt></View>
             {view.endgame.triggered && !r.isTiebreak ? <View style={[styles.tag, { backgroundColor: color.wild }]}><Txt v="label" color={color.accentInk}>{t('game.finalQuestion')}</Txt></View> : null}
@@ -227,11 +276,11 @@ function PlayerPanel({ view, run, busy }: { view: LiveView; run: (a: ActionInput
       <Gap h={3} />
       <Row gap={3}>
         <GameCard
-          title={t('cards.wild')} effect={t('cards.wildEffect')} tint={color.wild} icon="zap" state={me.wild}
+          title={t('cards.wild')} effect={t('cards.wildEffect')} tint={color.wild} icon="cards-playing" state={me.wild}
           canUse={me.canActivateWild} busy={busy} onUse={() => run({ type: 'activate_wild', turnSerial: view.turnSerial })}
         />
         <GameCard
-          title={t('cards.streak')} effect={t('cards.streakEffect')} tint={color.streak} icon="repeat" state={me.streak}
+          title={t('cards.streak')} effect={t('cards.streakEffect')} tint={color.streak} icon="fire" state={me.streak}
           canUse={me.canActivateStreak} busy={busy} onUse={() => run({ type: 'activate_streak', turnSerial: view.turnSerial })}
         />
       </Row>
@@ -277,7 +326,7 @@ function PracticeHost({ view }: { view: LiveView }) {
 }
 
 function GameCard({ title, effect, tint, icon, state, canUse, onUse, busy }: {
-  title: string; effect: string; tint: string; icon: 'zap' | 'repeat'; state: 'available' | 'armed' | 'used'; canUse: boolean; onUse: () => void; busy: boolean;
+  title: string; effect: string; tint: string; icon: string; state: 'available' | 'armed' | 'used'; canUse: boolean; onUse: () => void; busy: boolean;
 }) {
   const { t } = useApp();
   const used = state === 'used';
@@ -285,15 +334,15 @@ function GameCard({ title, effect, tint, icon, state, canUse, onUse, busy }: {
   return (
     <View style={[styles.gameCard, { borderColor: tint, backgroundColor: armed ? tint : tint + '14', opacity: used ? 0.4 : 1 }]}>
       <Row style={{ justifyContent: 'space-between' }}>
-        <Feather name={icon} size={22} color={armed ? color.accentInk : tint} />
-        <Txt v="label" color={armed ? color.accentInk : tint}>{used ? t('cards.used') : armed ? t('cards.armed') : t('cards.available')}</Txt>
+        <Feather name={icon} size={22} color={armed ? inkOn(tint) : tint} />
+        <Txt v="label" color={armed ? inkOn(tint) : tint}>{used ? t('cards.used') : armed ? t('cards.armed') : t('cards.available')}</Txt>
       </Row>
-      <Txt v="h2" color={armed ? color.accentInk : color.text} style={{ marginTop: space(2) }}>{title}</Txt>
-      <Txt v="small" color={armed ? color.accentInk : color.textDim} numberOfLines={3}>{effect}</Txt>
+      <Txt v="h2" color={armed ? inkOn(tint) : color.text} style={{ marginTop: space(2) }}>{title}</Txt>
+      <Txt v="small" color={armed ? inkOn(tint) : color.textDim} numberOfLines={3}>{effect}</Txt>
       {!used && !armed ? (
         <Pressable disabled={!canUse || busy} onPress={onUse} accessibilityRole="button" accessibilityLabel={`${t('cards.activate')} ${title}`}
           style={({ pressed }) => [styles.cardBtn, { backgroundColor: canUse ? tint : 'transparent', borderColor: tint, opacity: pressed ? 0.8 : 1 }]}>
-          <Txt v="small" color={canUse ? color.accentInk : color.textFaint}>{canUse ? t('cards.activate') : t('cards.onlyYourTurn')}</Txt>
+          <Txt v="small" color={canUse ? inkOn(tint) : color.textFaint}>{canUse ? t('cards.activate') : t('cards.onlyYourTurn')}</Txt>
         </Pressable>
       ) : null}
     </View>
@@ -396,6 +445,10 @@ function HostMenu({ view, open, onClose, run }: { view: LiveView; open: boolean;
 
 const styles = StyleSheet.create({
   max: { width: '100%', maxWidth: 640, alignSelf: 'center' },
+  turnBar: { flexDirection: 'row', alignItems: 'center', gap: space(3), paddingHorizontal: space(4), paddingBottom: space(4), backgroundColor: color.accent, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl, shadowColor: color.accent, shadowOpacity: 0.4, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
+  turnBarIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+  splashBack: { ...StyleSheet.absoluteFillObject, backgroundColor: '#29463859', alignItems: 'center', justifyContent: 'center', padding: space(6) },
+  splashCard: { width: '100%', maxWidth: 360, alignItems: 'center', padding: space(7), borderRadius: radius.xl, backgroundColor: '#FFFFFF', borderWidth: 3, borderColor: color.accent, shadowColor: '#294638', shadowOpacity: 0.25, shadowRadius: 30, elevation: 12 },
   tag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: color.bg + 'AA' },
   myScore: { alignItems: 'center', paddingHorizontal: 12, paddingVertical: 4, borderRadius: radius.md, backgroundColor: color.bg + 'AA', marginEnd: 4 },
   badge: { position: 'absolute', bottom: -2, right: -2, width: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
@@ -403,6 +456,6 @@ const styles = StyleSheet.create({
   cardBtn: { marginTop: 'auto', height: 34, borderRadius: radius.pill, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   feedRow: { paddingVertical: space(2), borderBottomWidth: 1, borderBottomColor: color.line },
   undo: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: color.surface },
-  backdrop: { flex: 1, backgroundColor: '#17122F66', alignItems: 'center', justifyContent: 'center', padding: space(4) },
+  backdrop: { flex: 1, backgroundColor: '#29463866', alignItems: 'center', justifyContent: 'center', padding: space(4) },
   dialog: { width: '100%', maxWidth: 420, backgroundColor: color.bgRaised, borderRadius: radius.xl, padding: space(5), borderWidth: 1, borderColor: color.line },
 });
