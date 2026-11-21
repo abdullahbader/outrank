@@ -76,18 +76,20 @@ export default function Home() {
             <Txt v="small" color="#ffffffcc">{t('home2.heroSub')}</Txt>
             <Gap h={5} />
             {/* the main action: a big Join block */}
-            <Pressable onPress={() => router.push('/join')} accessibilityRole="button" accessibilityLabel={t('home.join')}
-              style={({ pressed }) => [styles.joinBlock, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-              <View style={styles.joinPlate}><Feather name="log-in" size={26} color="#FFFFFF" /></View>
-              <View style={{ flex: 1 }}>
-                <Txt v="h2" color={color.text} style={{ fontSize: 20 }}>{t('home.join')}</Txt>
-                <Txt v="small" dim>{t('home.joinHint')}</Txt>
-              </View>
+            <View style={styles.joinBlock}>
+              <Pressable onPress={() => router.push('/join')} accessibilityRole="button" accessibilityLabel={t('home.join')}
+                style={({ pressed }) => [{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: space(3) }, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+                <View style={styles.joinPlate}><Feather name="log-in" size={26} color="#FFFFFF" /></View>
+                <View style={{ flex: 1 }}>
+                  <Txt v="h2" color={color.text} style={{ fontSize: 20 }}>{t('home.join')}</Txt>
+                  <Txt v="small" dim>{t('home.joinHint')}</Txt>
+                </View>
+              </Pressable>
               <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} hitSlop={6}
                 style={({ pressed }) => [styles.scanBtn, { transform: [{ scale: pressed ? 0.94 : 1 }] }]}>
                 <Feather name="maximize" size={20} color={color.accent} />
               </Pressable>
-            </Pressable>
+            </View>
             <Gap h={3} />
             <Pressable onPress={() => router.push('/create')} accessibilityRole="button" style={({ pressed }) => [styles.hostRow, { opacity: pressed ? 0.8 : 1 }]}>
               <Feather name="zap" size={18} color="#FFFFFF" />

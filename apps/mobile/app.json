@@ -40,7 +40,8 @@
           "cameraPermission": "The camera is used only to scan a game's QR code so you can join it.",
           "recordAudioAndroid": false
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "extra": {
       "supportsRTL": true

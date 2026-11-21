@@ -1,5 +1,4 @@
 import { Icon as Feather } from '@/icons';
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Tabs, useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,7 +12,14 @@ const ICONS: Record<string, IconName> = { index: 'home', rules: 'book-open', sta
  * Floating bottom bar with a raised centre "Join" button: joining a game (what most people do) is
  * one tap from anywhere. Home · How to play · [Join] · Stats · Profile. Hosting starts from Home.
  */
-function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+interface TabBarProps {
+  state: { index: number; routes: { key: string; name: string }[] };
+  descriptors: Record<string, { options: { title?: string } }>;
+  navigateToTab?: (routeKey: string) => void; // navigation 8
+  navigation?: { navigate: (name: string) => void }; // older navigation
+}
+
+function FloatingTabBar({ state, descriptors, navigateToTab, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   return (
@@ -39,8 +45,9 @@ function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             );
           }
           const onPress = () => {
-            const e = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-            if (!focused && !e.defaultPrevented) navigation.navigate(route.name);
+            if (focused) return;
+            if (navigateToTab) navigateToTab(route.key);
+            else navigation?.navigate(route.name);
           };
           return (
             <Pressable key={route.key} accessibilityRole="tab" accessibilityLabel={title} accessibilityState={{ selected: focused }} onPress={onPress}
@@ -60,7 +67,7 @@ function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 export default function TabsLayout() {
   const { t } = useApp();
   return (
-    <Tabs tabBar={(props) => <FloatingTabBar {...props} />} screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: color.bg } }}>
+    <Tabs tabBar={(props) => <FloatingTabBar {...(props as unknown as TabBarProps)} />} screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: color.bg } }}>
       <Tabs.Screen name="index" options={{ title: t('nav.home') }} />
       <Tabs.Screen name="rules" options={{ title: t('nav.rules') }} />
       <Tabs.Screen name="play" options={{ title: t('nav.play') }} />

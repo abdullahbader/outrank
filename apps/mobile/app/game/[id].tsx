@@ -147,7 +147,7 @@ function Offline({ text }: { text: string }) {
 
 const styles = StyleSheet.create({
   toast: { position: 'absolute', left: space(4), right: space(4), maxWidth: 560, alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(3.5), borderRadius: radius.lg, backgroundColor: color.bgRaised, borderWidth: 1.5, shadowColor: '#294638', shadowOpacity: 0.18, shadowRadius: 20, elevation: 8 },
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: '#F5F8F3EE', alignItems: 'center', justifyContent: 'center', padding: space(6) },
+  overlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#F5F8F3EE', alignItems: 'center', justifyContent: 'center', padding: space(6) },
   pauseCard: { width: '100%', maxWidth: 380, alignItems: 'center', padding: space(6), borderRadius: radius.xl, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
   offline: { position: 'absolute', alignSelf: 'center', flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, height: 36, borderRadius: radius.pill, backgroundColor: color.warn },
 });

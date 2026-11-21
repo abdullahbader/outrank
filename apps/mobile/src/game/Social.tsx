@@ -1,5 +1,5 @@
 import { Icon as Feather } from '../icons';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated, Easing, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View,
 } from 'react-native';
@@ -101,7 +101,7 @@ function ChatSheet({ view, chat, open, onClose, onError, mine, amMuted, react }:
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [menu, setMenu] = useState<ChatMessage | null>(null);
-  const scroll = useRef<ScrollView>(null);
+  const scroll = useRef<React.ComponentRef<typeof ScrollView>>(null);
   const host = view.role === 'host';
 
   useEffect(() => { if (open) setTimeout(() => scroll.current?.scrollToEnd({ animated: false }), 50); }, [open, chat.messages.length]);
