@@ -5,6 +5,7 @@ import {
 } from '@nestjs/websockets';
 import type { Server, Socket } from 'socket.io';
 import { GameError, hashToken } from './auth';
+import { ChatService } from './chat.service';
 import { GamesService } from './games.service';
 import { PrismaService } from './prisma.service';
 import { RealtimeService, type SocketIdentity } from './realtime.service';
@@ -20,6 +21,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     private readonly prisma: PrismaService,
     private readonly games: GamesService,
     private readonly realtime: RealtimeService,
+    private readonly chat: ChatService,
   ) {}
 
   afterInit(server: Server) { this.realtime.server = server; }
@@ -79,6 +81,33 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
+  // ───────────── chat and reactions (only for phones subscribed to this game)
+
+  @SubscribeMessage('chat:history')
+  async chatHistory(@ConnectedSocket() socket: Socket, @MessageBody() body: { gameId?: string }) {
+    try { return { ok: true, ...(await this.chat.history(identOf(socket, body?.gameId).gameId)) }; } catch (e) { return { ok: false, error: errorCode(e) }; }
+  }
+
+  @SubscribeMessage('chat:send')
+  async chatSend(@ConnectedSocket() socket: Socket, @MessageBody() body: { gameId?: string; text?: unknown }) {
+    try { return { ok: true, message: await this.chat.send(identOf(socket, body?.gameId), body?.text) }; } catch (e) { return { ok: false, error: errorCode(e) }; }
+  }
+
+  @SubscribeMessage('chat:delete')
+  async chatDelete(@ConnectedSocket() socket: Socket, @MessageBody() body: { gameId?: string; messageId?: unknown }) {
+    try { await this.chat.remove(identOf(socket, body?.gameId), body?.messageId); return { ok: true }; } catch (e) { return { ok: false, error: errorCode(e) }; }
+  }
+
+  @SubscribeMessage('chat:mute')
+  async chatMute(@ConnectedSocket() socket: Socket, @MessageBody() body: { gameId?: string; playerId?: unknown; muted?: unknown }) {
+    try { await this.chat.mute(identOf(socket, body?.gameId), body?.playerId, body?.muted); return { ok: true }; } catch (e) { return { ok: false, error: errorCode(e) }; }
+  }
+
+  @SubscribeMessage('react')
+  async react(@ConnectedSocket() socket: Socket, @MessageBody() body: { gameId?: string; emoji?: unknown }) {
+    try { await this.chat.react(identOf(socket, body?.gameId), body?.emoji); return { ok: true }; } catch (e) { return { ok: false, error: errorCode(e) }; }
+  }
+
   @SubscribeMessage('game:action')
   async action(@ConnectedSocket() socket: Socket, @MessageBody() body: unknown) {
     try {
@@ -94,6 +123,12 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       return { ok: false, error: errorCode(e) };
     }
   }
+}
+
+function identOf(socket: Socket, gameId: unknown): SocketIdentity {
+  const ident = socket.data.ident as SocketIdentity | undefined;
+  if (!ident || ident.gameId !== gameId) throw new GameError('NOT_IN_GAME');
+  return ident;
 }
 
 function errorCode(e: unknown): string {

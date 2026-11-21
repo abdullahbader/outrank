@@ -40,7 +40,7 @@ export function Results({ view, act, onError, categoryName }: { view: LiveView; 
 
   return (
     <View style={{ flex: 1, backgroundColor: color.bg }}>
-      <ScrollView contentContainerStyle={{ padding: space(4), paddingTop: insets.top + space(3), paddingBottom: space(6) }}>
+      <ScrollView contentContainerStyle={{ padding: space(4), paddingTop: insets.top + space(3), paddingBottom: space(20) }}>
         <View style={{ width: '100%', maxWidth: 640, alignSelf: 'center' }}>
           <QuestionHeader view={view} categoryName={categoryName} />
           <Gap h={4} />

@@ -101,4 +101,13 @@ changed without touching screens.
 ## 5. Explicitly out of scope (brief §9, §18)
 
 Question editors, community submissions, AI-generated questions during play, extra game mechanics,
-in-app purchases, chat.
+in-app purchases.
+
+## 6. Added after the brief (owner's requests)
+
+- **Players can be in the room or joining from elsewhere.** (2026-11-21)
+- **Game chat** for everyone in the game (host and players): plain text up to 200 characters, kept
+  with the game; the host can delete any message and mute/unmute a player. Rate-limited.
+- **Quick reactions**: 8 one-tap emoji that float across every screen with the sender's name. Not
+  stored. Rate-limited; muted players cannot react.
+- **Voice chat**: requested; needs an outside voice service — see docs/11 once chosen.

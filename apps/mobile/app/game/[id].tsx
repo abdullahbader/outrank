@@ -10,6 +10,7 @@ import { people } from '@/game/helpers';
 import { Lobby } from '@/game/Lobby';
 import { buzz, Play } from '@/game/Play';
 import { Final, Results } from '@/game/Results';
+import { Social } from '@/game/Social';
 import { color, radius, space } from '@/theme';
 import { Button, Gap, Loading, ltr, Screen, Txt, useReducedMotion } from '@/ui';
 import { useGame, type LiveView } from '@/useGame';
@@ -19,7 +20,7 @@ export default function GameScreen() {
   const { t, errorText } = useApp();
   const L = useLocalized();
   const router = useRouter();
-  const { view, connected, error, act, lastEvents } = useGame(id);
+  const { view, connected, error, act, lastEvents, chat } = useGame(id);
   const [cats, setCats] = useState<Category[]>([]);
   const [toast, setToast] = useState<{ id: number; text: string; tone: string } | null>(null);
   const toastId = useRef(0);
@@ -63,6 +64,7 @@ export default function GameScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: color.bg }}>
       {body}
+      <Social view={view} chat={chat} onError={onError} lift={view.phase === 'question' ? 0 : -4} />
       {view.paused && view.phase !== 'finished' ? <PausedOverlay view={view} onResume={() => act({ type: 'resume' }).then((r) => { if (!r.ok) onError(r.error); })} /> : null}
       {!connected ? <Offline text={t('common.offline')} /> : null}
       {toast ? <Toast key={toast.id} text={toast.text} tone={toast.tone} onDone={() => setToast(null)} /> : null}

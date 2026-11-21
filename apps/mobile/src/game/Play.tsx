@@ -46,7 +46,7 @@ export function Play({ view, act, onError, categoryName }: { view: LiveView; act
 
   return (
     <View style={{ flex: 1, backgroundColor: color.bg }}>
-      <ScrollView contentContainerStyle={{ padding: space(4), paddingTop: insets.top + space(3), paddingBottom: space(6) }}>
+      <ScrollView contentContainerStyle={{ padding: space(4), paddingTop: insets.top + space(3), paddingBottom: space(20) }}>
         <View style={styles.max}>
           <QuestionHeader view={view} categoryName={categoryName} onMenu={host ? () => setMenu(true) : undefined} />
           <Gap h={4} />

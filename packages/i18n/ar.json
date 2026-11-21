@@ -223,7 +223,24 @@
     "TOO_MANY_ATTEMPTS": "محاولات كثيرة. انتظر دقيقة.",
     "WRONG_RECOVERY_CODE": "رمز الاستعادة غير صحيح",
     "CANNOT_REPLAY": "يمكن إعادة آخر إجابة فقط",
-    "OFFLINE": "لا يوجد اتصال"
+    "OFFLINE": "لا يوجد اتصال",
+    "CHAT_EMPTY": "اكتب رسالة أولاً",
+    "CHAT_TOO_LONG": "الحد الأقصى للرسالة 200 حرف",
+    "CHAT_TOO_FAST": "تمهّل قليلاً",
+    "CHAT_MUTED": "قام المضيف بكتمك",
+    "UNKNOWN_MESSAGE": "هذه الرسالة لم تعد موجودة"
   },
-  "categories": {}
+  "categories": {},
+  "chat": {
+    "title": "دردشة اللعبة",
+    "empty": "لا رسائل بعد. قل مرحباً!",
+    "placeholder": "اكتب رسالة للجميع…",
+    "send": "إرسال",
+    "react": "تفاعلات",
+    "options": "خيارات الرسالة",
+    "delete": "حذف الرسالة",
+    "mute": "كتم {{name}}",
+    "unmute": "إلغاء كتم {{name}}",
+    "youAreMuted": "قام المضيف بكتمك في الدردشة."
+  }
 }

@@ -109,6 +109,7 @@ model Game {
   events           GameEvent[]
   actions          GameAction[]
   results          GameResult[]
+  messages         GameMessage[]
 
   @@index([code])
   @@map("games")
@@ -122,6 +123,7 @@ model GameParticipant {
   device      Device   @relation(fields: [deviceId], references: [id])
   displayName String   @map("display_name")
   isBot       Boolean  @default(false) @map("is_bot")
+  mutedAt     DateTime? @map("muted_at")
   joinedAt    DateTime @default(now()) @map("joined_at")
   removedAt   DateTime? @map("removed_at")
 
@@ -183,4 +185,21 @@ model GameResult {
   @@id([gameId, deviceId])
   @@index([deviceId])
   @@map("game_results")
+}
+
+/// In-game chat. Deleted messages are kept (soft delete) for the audit trail but never sent again.
+model GameMessage {
+  id        Int       @id @default(autoincrement())
+  gameId    String    @map("game_id")
+  game      Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  deviceId  String    @map("device_id")
+  role      String    // host | player
+  playerId  String?   @map("player_id")
+  name      String
+  text      String
+  at        DateTime  @default(now())
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([gameId, id])
+  @@map("game_messages")
 }

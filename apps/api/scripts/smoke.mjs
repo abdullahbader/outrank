@@ -68,6 +68,11 @@ async function device(name) {
 function phone(token, label) {
   const socket = io(BASE, { auth: { token }, transports: ['websocket'], reconnection: false, forceNew: true });
   const p = { label, token, socket, payloads: [], view: null, version: 0 };
+  p.chat = []; p.deleted = []; p.reactions = []; p.mutes = [];
+  socket.on('chat:message', (m) => p.chat.push(m));
+  socket.on('chat:deleted', (m) => p.deleted.push(m.id));
+  socket.on('chat:muted', (m) => p.mutes.push(m));
+  socket.on('reaction', (m) => p.reactions.push(m));
   socket.on('game:state', (m) => { p.payloads.push(JSON.stringify(m)); if (m.version >= p.version) { p.version = m.version; p.view = m.view; } });
   p.ready = new Promise((r) => socket.on('connect', r));
   p.emit = (ev, body) => new Promise((r) => socket.timeout(5000).emit(ev, body, (err, res) => r(err ? { ok: false, error: 'TIMEOUT' } : res)));
@@ -326,6 +331,38 @@ async function main() {
     check((await http('POST', `/dev/games/${g2.gameId}/bots`, tokens[0], { count: 1 })).body.error === 'NOT_IN_GAME', 'only the host adds bots');
     const events = await prisma.gameEvent.count({ where: { gameId } });
     check(events > 30, `event history kept (${events} events)`);
+
+    stage('13. Game chat and reactions');
+    const [c1, c2, c3] = players;
+    const sent = await c1.emit('chat:send', { gameId, text: '  what a   game!  ' });
+    check(sent.ok && sent.message.text === 'what a game!', 'a player sends a message (spaces tidied)');
+    await sleep(150);
+    check(c2.chat.some((m) => m.text === 'what a game!') && H.chat.some((m) => m.text === 'what a game!'), 'other players and the host receive it');
+    const hostMsg = await H.emit('chat:send', { gameId, text: 'Good game everyone' });
+    check(hostMsg.ok && hostMsg.message.role === 'host', 'the host can chat too');
+    check((await c1.emit('chat:send', { gameId, text: 'x'.repeat(201) })).error === 'CHAT_TOO_LONG', 'messages over 200 characters are refused');
+    check((await c1.emit('chat:send', { gameId, text: '   ' })).error === 'CHAT_EMPTY', 'empty messages are refused');
+    check((await outsider.emit('chat:send', { gameId, text: 'hi' })).error === 'NOT_IN_GAME', 'a phone not in the game cannot chat');
+    check((await outsider.emit('chat:history', { gameId })).error === 'NOT_IN_GAME', '…or read the chat');
+    let fast = 0;
+    for (let i = 0; i < 6; i++) if ((await c3.emit('chat:send', { gameId, text: `spam ${i}` })).error === 'CHAT_TOO_FAST') fast++;
+    check(fast >= 1, 'flooding the chat is slowed down');
+    check((await c2.emit('chat:delete', { gameId, messageId: sent.message.id })).error === 'NOT_HOST', 'players cannot delete messages');
+    check((await H.emit('chat:delete', { gameId, messageId: sent.message.id })).ok, 'host deletes a message');
+    await sleep(150);
+    check(c2.deleted.includes(sent.message.id), 'the deleted message disappears for everyone');
+    const hist = await c2.emit('chat:history', { gameId });
+    check(hist.ok && !hist.messages.some((m) => m.id === sent.message.id) && hist.messages.some((m) => m.role === 'host'), 'history skips deleted messages');
+    check((await H.emit('chat:mute', { gameId, playerId: pid(c2), muted: true })).ok, 'host mutes a player');
+    check((await c2.emit('chat:send', { gameId, text: 'can I talk?' })).error === 'CHAT_MUTED', 'a muted player cannot send');
+    check((await c2.emit('react', { gameId, emoji: '🔥' })).error === 'CHAT_MUTED', '…or react');
+    await H.emit('chat:mute', { gameId, playerId: pid(c2), muted: false });
+    check((await c2.emit('chat:send', { gameId, text: 'thanks' })).ok, 'unmuted player can talk again');
+    check((await c1.emit('react', { gameId, emoji: '🔥' })).ok, 'a player sends a reaction');
+    check((await c1.emit('react', { gameId, emoji: '🔥' })).error === 'CHAT_TOO_FAST', 'reaction spam is slowed down');
+    check((await c1.emit('react', { gameId, emoji: '<script>' })).error === 'INVALID_INPUT', 'only the offered emoji are allowed');
+    await sleep(150);
+    check(H.reactions.some((r) => r.emoji === '🔥' && r.playerId === pid(c1)), 'everyone sees the reaction');
 
     for (const p of [...players, H, outsider]) p.socket.disconnect();
   } catch (e) {

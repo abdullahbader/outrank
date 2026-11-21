@@ -16,8 +16,10 @@ export type IconName = keyof typeof Feather.glyphMap;
 
 type TxtVariant = 'hero' | 'title' | 'h2' | 'body' | 'small' | 'label' | 'number';
 
-export function Txt({ children, v = 'body', style, dim, faint, center, numberOfLines, color: c }: {
+export function Txt({ children, v = 'body', style, dim, faint, center, numberOfLines, color: c, auto }: {
   children: ReactNode; v?: TxtVariant; style?: StyleProp<TextStyle>; dim?: boolean; faint?: boolean; center?: boolean; numberOfLines?: number; color?: string;
+  /** Text typed by people (chat): direction follows the text's own language. */
+  auto?: boolean;
 }) {
   const { locale } = useApp();
   const ar = locale === 'ar';
@@ -33,7 +35,7 @@ export function Txt({ children, v = 'body', style, dim, faint, center, numberOfL
   return (
     <Text
       numberOfLines={numberOfLines}
-      style={[base, { color: c ?? (faint ? color.textFaint : dim ? color.textDim : color.text), textAlign: center ? 'center' : 'auto', writingDirection: ar ? 'rtl' : 'ltr' }, style]}
+      style={[base, { color: c ?? (faint ? color.textFaint : dim ? color.textDim : color.text), textAlign: center ? 'center' : 'auto', writingDirection: auto ? 'auto' : ar ? 'rtl' : 'ltr' }, style]}
     >
       {children}
     </Text>
@@ -49,7 +51,7 @@ export function Screen({ children, scroll = true, footer, padded = true }: { chi
   const insets = useSafeAreaInsets();
   const pad = padded ? space(4) : 0;
   const body = scroll ? (
-    <ScrollView contentContainerStyle={{ padding: pad, paddingTop: insets.top + space(3), paddingBottom: space(8) }} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={{ padding: pad, paddingTop: insets.top + space(3), paddingBottom: space(24) }} keyboardShouldPersistTaps="handled">
       <View style={styles.maxWidth}>{children}</View>
     </ScrollView>
   ) : (

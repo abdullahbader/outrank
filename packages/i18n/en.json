@@ -223,7 +223,24 @@
     "TOO_MANY_ATTEMPTS": "Too many tries. Wait a minute.",
     "WRONG_RECOVERY_CODE": "Wrong recovery code",
     "CANNOT_REPLAY": "Only the most recent answer can be given back",
-    "OFFLINE": "No connection"
+    "OFFLINE": "No connection",
+    "CHAT_EMPTY": "Write a message first",
+    "CHAT_TOO_LONG": "Messages can be up to 200 characters",
+    "CHAT_TOO_FAST": "Slow down a little",
+    "CHAT_MUTED": "The host has muted you",
+    "UNKNOWN_MESSAGE": "That message is gone"
   },
-  "categories": {}
+  "categories": {},
+  "chat": {
+    "title": "Game chat",
+    "empty": "No messages yet. Say hi!",
+    "placeholder": "Message everyone…",
+    "send": "Send",
+    "react": "Reactions",
+    "options": "Message options",
+    "delete": "Delete message",
+    "mute": "Mute {{name}}",
+    "unmute": "Unmute {{name}}",
+    "youAreMuted": "The host has muted you in the chat."
+  }
 }
