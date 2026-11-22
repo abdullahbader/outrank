@@ -17,6 +17,7 @@ export function HeroVideo({ children, style }: { children: ReactNode; style?: St
   const player = useVideoPlayer(SOURCE, (p) => {
     p.loop = true;
     p.muted = true;
+    if (!reduced) p.play(); // start straight away; focus changes pause/resume it below
   });
 
   useFocusEffect(useCallback(() => {
@@ -26,7 +27,8 @@ export function HeroVideo({ children, style }: { children: ReactNode; style?: St
 
   return (
     <View style={[{ borderRadius: radius.xl, overflow: 'hidden' }, style]}>
-      <VideoView player={player} style={StyleSheet.absoluteFill} contentFit="cover" nativeControls={false} allowsPictureInPicture={false} />
+      {/* textureView: on Android the default surface can be drawn behind the rounded card and vanish */}
+      <VideoView player={player} style={StyleSheet.absoluteFill} contentFit="cover" nativeControls={false} allowsPictureInPicture={false} surfaceType="textureView" />
       {/* brand wash: green to blue, see-through so the video shows */}
       <Gradient from="#2F7A55C4" to="#5E9DB38C" radius={0} style={StyleSheet.absoluteFill} />
       {children}
