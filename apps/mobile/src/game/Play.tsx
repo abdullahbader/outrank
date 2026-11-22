@@ -1,12 +1,12 @@
 import { Icon as Feather } from '../icons';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Animated, Easing, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DirectionRoot, useApp, useLocalized } from '../app-context';
 import { catStyle, color, inkOn, radius, rankColor as rankColorOf, space } from '../theme';
 import { api } from '../api';
-import { Avatar, Banner, Button, Card, Gap, Gradient, IconButton, IconPlate, ltr, Pulse, Row, Txt, useReducedMotion } from '../ui';
+import { Avatar, Banner, Button, Card, Gap, Gradient, IconButton, IconPlate, ltr, Pulse, Row, Txt, useReducedMotion, CountUp } from '../ui';
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
 import { CountdownBar, CountdownPill } from './Countdown';
@@ -207,13 +207,47 @@ export function QuestionHeader({ view, categoryName, onMenu }: { view: LiveView;
 }
 
 /** Small leaderboard position on top of a player's picture (gold for 1st). */
+const MEDAL: Record<number, string> = { 1: '#E8C66A', 2: '#B8C4C9', 3: '#D49A6A' };
+
 function RankBadge({ view, id }: { view: LiveView; id: string }) {
   const row = view.leaderboard.find((r) => r.id === id);
   if (!row) return null;
-  const first = row.position === 1;
+  const medal = MEDAL[row.position];
   return (
-    <View style={[styles.rankBadge, { backgroundColor: first ? color.gold : color.text }]} accessibilityLabel={`#${row.position}`}>
-      <Txt v="number" color={first ? inkOn(color.gold) : '#FFFFFF'} style={{ fontSize: 11, lineHeight: 14 }}>{row.position}</Txt>
+    <View style={[styles.rankBadge, { backgroundColor: medal ?? color.text }]} accessibilityLabel={`#${row.position}`}>
+      <Txt v="number" color={medal ? inkOn(medal) : '#FFFFFF'} style={{ fontSize: 11, lineHeight: 14 }}>{row.position}</Txt>
+    </View>
+  );
+}
+
+/** Total points in a pill under the picture; a "+7" / "−11" floats up whenever it changes. */
+function ScorePill({ view, id }: { view: LiveView; id: string }) {
+  const reduced = useReducedMotion();
+  const score = view.leaderboard.find((r) => r.id === id)?.score ?? 0;
+  const prev = useRef(score);
+  const [delta, setDelta] = useState<{ key: number; n: number } | null>(null);
+  const v = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const d = score - prev.current;
+    prev.current = score;
+    if (!d) return;
+    setDelta((old) => ({ key: (old?.key ?? 0) + 1, n: d }));
+    v.setValue(0);
+    Animated.timing(v, { toValue: 1, duration: reduced ? 1200 : 1600, easing: Easing.out(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }).start(() => setDelta(null));
+  }, [score, v, reduced]);
+  const y = v.interpolate({ inputRange: [0, 1], outputRange: [0, reduced ? 0 : -34] });
+  const o = v.interpolate({ inputRange: [0, 0.15, 0.75, 1], outputRange: [0, 1, 1, 0] });
+  const tone = score < 0 ? color.bad : color.text;
+  return (
+    <View style={styles.scoreWrap}>
+      <View style={[styles.scorePill, { borderColor: score < 0 ? color.bad : color.line }]}>
+        <CountUp value={score} style={{ fontSize: 13, lineHeight: 16, color: tone }} />
+      </View>
+      {delta ? (
+        <Animated.View pointerEvents="none" style={[styles.deltaFloat, { opacity: o, transform: [{ translateY: y }] }]}>
+          <Txt v="number" color={delta.n > 0 ? color.good : color.bad} style={{ fontSize: 15, lineHeight: 18 }}>{ltr(delta.n > 0 ? `+${delta.n}` : `${delta.n}`)}</Txt>
+        </Animated.View>
+      ) : null}
     </View>
   );
 }
@@ -236,10 +270,11 @@ function TurnStrip({ view }: { view: LiveView }) {
       <Txt v="small" faint style={{ marginBottom: space(1) }}>{t('game.positivesLeft', { n: r.positivesLeft })} · {t('game.lap', { n: r.lap })}</Txt>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space(2), paddingVertical: 2 }}>
         {states.map((s) => (
-          <View key={s.id} style={{ alignItems: 'center', width: 52 }}>
-            <View>
-              <Avatar name={p.name(s.id)} tint={p.tint(s.id)} emoji={p.emoji(s.id)} size={44} ring={s.status === 'current' ? color.accent : undefined} dim={s.status === 'scored' || s.status === 'missed'} />
+          <View key={s.id} style={{ alignItems: 'center', width: 58 }}>
+            <View style={{ alignItems: 'center' }}>
+              <Avatar name={p.name(s.id)} tint={p.tint(s.id)} emoji={p.emoji(s.id)} size={46} ring={s.status === 'current' ? color.accent : undefined} dim={s.status === 'scored' || s.status === 'missed'} />
               <RankBadge view={view} id={s.id} />
+              <ScorePill view={view} id={s.id} />
               {s.status === 'scored' || s.status === 'missed' ? (
                 <View style={[styles.badge, { backgroundColor: s.status === 'scored' ? color.good : color.bad }]}>
                   <Feather name={s.status === 'scored' ? 'check' : 'x'} size={10} color={color.accentInk} />
@@ -247,7 +282,7 @@ function TurnStrip({ view }: { view: LiveView }) {
               ) : null}
               {view.online[s.id] === false ? <View style={[styles.badge, { backgroundColor: color.textFaint, top: -2, bottom: undefined }]}><Feather name="wifi-off" size={9} color={color.bg} /></View> : null}
             </View>
-            <Txt v="small" numberOfLines={1} dim={s.status !== 'current'} style={{ fontSize: 11, marginTop: 2 }}>{p.name(s.id)}</Txt>
+            <Txt v="small" numberOfLines={1} dim={s.status !== 'current'} style={{ fontSize: 11, marginTop: 4 }}>{p.name(s.id)}</Txt>
           </View>
         ))}
       </ScrollView>
@@ -562,6 +597,9 @@ function HostMenu({ view, open, onClose, run }: { view: LiveView; open: boolean;
 
 const styles = StyleSheet.create({
   max: { width: '100%', maxWidth: 640, alignSelf: 'center' },
+  scoreWrap: { marginTop: -10, alignItems: 'center' },
+  scorePill: { minWidth: 34, height: 20, paddingHorizontal: 6, borderRadius: 10, backgroundColor: '#FFFFFF', borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', shadowColor: '#294638', shadowOpacity: 0.12, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, elevation: 2 },
+  deltaFloat: { position: 'absolute', top: -6 },
   rankBadge: { position: 'absolute', top: -4, start: -4, minWidth: 20, height: 20, paddingHorizontal: 4, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFFFFF' },
   turnBar: { flexDirection: 'row', alignItems: 'center', gap: space(3), paddingHorizontal: space(4), paddingBottom: space(4), backgroundColor: color.accent, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl, shadowColor: color.accent, shadowOpacity: 0.4, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
   turnBarIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
@@ -571,7 +609,7 @@ const styles = StyleSheet.create({
   typeAgain: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: space(2), paddingHorizontal: 12, height: 32, borderRadius: radius.pill, backgroundColor: '#FFFFFF' },
   tag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: color.bg + 'AA' },
   myScore: { alignItems: 'center', paddingHorizontal: 12, paddingVertical: 4, borderRadius: radius.md, backgroundColor: color.bg + 'AA', marginEnd: 4 },
-  badge: { position: 'absolute', bottom: -2, right: -2, width: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  badge: { position: 'absolute', top: 22, right: -2, width: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   gameCard: { flex: 1, borderRadius: radius.lg, borderWidth: 1.5, padding: space(3), minHeight: 150 },
   usedX: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' },
   usedXCircle: { width: 64, height: 64, borderRadius: 32, backgroundColor: color.bad, alignItems: 'center', justifyContent: 'center', borderWidth: 4, borderColor: '#FFFFFF', shadowColor: '#294638', shadowOpacity: 0.2, shadowRadius: 10, elevation: 4 },
