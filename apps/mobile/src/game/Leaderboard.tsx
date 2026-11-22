@@ -25,7 +25,7 @@ export function LeaderStrip({ view }: { view: LiveView }) {
           {view.leaderboard.map((r) => (
             <View key={r.id} style={[styles.pill, r.id === view.me?.playerId ? { borderColor: color.accent } : null]}>
               <Txt v="small" faint>#{r.position}</Txt>
-              <Avatar name={r.name} tint={p.tint(r.id)} size={24} dim={view.online[r.id] === false} />
+              <Avatar name={r.name} tint={p.tint(r.id)} emoji={p.emoji(r.id)} size={24} dim={view.online[r.id] === false} />
               <Txt v="small" numberOfLines={1} style={{ maxWidth: 84 }}>{r.name}</Txt>
               <CountUp value={r.score} style={{ fontSize: 15 }} />
               {r.lastDelta ? <Txt v="small" color={r.lastDelta > 0 ? color.good : color.bad}>{ltr(r.lastDelta > 0 ? `+${r.lastDelta}` : r.lastDelta)}</Txt> : null}
@@ -48,7 +48,7 @@ export function LeaderTable({ view }: { view: LiveView }) {
       {view.leaderboard.map((r) => (
         <View key={r.id} style={styles.row}>
           <Txt v="number" faint style={{ width: 28 }}>{r.position}</Txt>
-          <Avatar name={r.name} tint={p.tint(r.id)} size={36} dim={view.online[r.id] === false} />
+          <Avatar name={r.name} tint={p.tint(r.id)} emoji={p.emoji(r.id)} size={36} dim={view.online[r.id] === false} />
           <View style={{ flex: 1, gap: 6 }}>
             <Row style={{ justifyContent: 'space-between' }}>
               <Txt numberOfLines={1} style={{ flex: 1 }}>{r.name}{r.id === view.me?.playerId ? ` · ${t('common.you')}` : ''}</Txt>

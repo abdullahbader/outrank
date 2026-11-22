@@ -141,11 +141,11 @@ export function Chip({ label, selected, onPress, icon, sub }: { label: string; s
   );
 }
 
-export function Avatar({ name, tint, size = 36, ring, dim }: { name: string; tint: string; size?: number; ring?: string; dim?: boolean }) {
+export function Avatar({ name, tint, size = 36, ring, dim, emoji }: { name: string; tint: string; size?: number; ring?: string; dim?: boolean; emoji?: string | null }) {
   const initials = name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
   return (
-    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: tint, alignItems: 'center', justifyContent: 'center', opacity: dim ? 0.45 : 1, borderWidth: ring ? 3 : 0, borderColor: ring }}>
-      <Text style={{ color: inkOn(tint), fontFamily: font.display, fontSize: size * 0.38 }}>{initials}</Text>
+    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: emoji ? tint + '33' : tint, alignItems: 'center', justifyContent: 'center', opacity: dim ? 0.45 : 1, borderWidth: ring ? 3 : 0, borderColor: ring }}>
+      {emoji ? <Text style={{ fontSize: size * 0.56, lineHeight: size * 0.72 }}>{emoji}</Text> : <Text style={{ color: inkOn(tint), fontFamily: font.display, fontSize: size * 0.38 }}>{initials}</Text>}
     </View>
   );
 }

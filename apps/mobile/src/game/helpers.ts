@@ -4,9 +4,11 @@ import { avatarColor } from '../theme';
 export function people(view: LiveView) {
   const names = new Map(view.players.map((p) => [p.id, p.name]));
   const colors = new Map(view.players.map((p) => [p.id, p.color]));
+  const emojis = new Map(view.players.map((p) => [p.id, p.emoji]));
   return {
     name: (id: string | null | undefined) => (id ? names.get(id) ?? '?' : '?'),
     tint: (id: string) => colors.get(id) ?? avatarColor(id),
+    emoji: (id: string | null | undefined) => (id ? emojis.get(id) ?? null : null),
     list: (ids: string[], sep = ', ') => ids.map((id) => names.get(id) ?? '?').join(sep),
   };
 }

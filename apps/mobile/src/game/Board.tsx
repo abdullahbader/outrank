@@ -36,6 +36,7 @@ export function Board({ view, onPick, disabled }: { view: LiveView; onPick?: (ra
               styles.slot,
               claimed ? { backgroundColor: color.surface2, borderColor: tint + '88' } : null,
               host && !claimed && !round.finished ? { borderColor: color.line, borderStyle: 'dashed' } : null,
+              host && round.suggestedRank === s.rank && !round.finished ? { borderColor: color.gold, borderStyle: 'solid', borderWidth: 2, backgroundColor: color.gold + '1A' } : null,
               { opacity: pressed ? 0.75 : 1 },
             ]}
           >
@@ -53,7 +54,7 @@ export function Board({ view, onPick, disabled }: { view: LiveView; onPick?: (ra
               {host && !claimed && s.aliases?.length ? <Txt v="small" faint numberOfLines={1}>{s.aliases.join(' · ')}</Txt> : null}
               {s.valueNote && (claimed || host || round.finished) ? <Txt v="small" faint numberOfLines={1}>{ltr(s.valueNote)}</Txt> : null}
             </View>
-            {claimed ? <Avatar name={p.name(s.claimedBy)} tint={p.tint(s.claimedBy!)} size={28} /> : round.finished ? <Txt v="small" faint>{t('results.unclaimed')}</Txt> : null}
+            {claimed ? <Avatar name={p.name(s.claimedBy)} tint={p.tint(s.claimedBy!)} emoji={p.emoji(s.claimedBy)} size={28} /> : round.finished ? <Txt v="small" faint>{t('results.unclaimed')}</Txt> : null}
             <Txt v="number" color={tint} style={{ minWidth: 40, textAlign: 'right', fontSize: 15 }}>{pts(s.points)}</Txt>
           </Pressable>
         );

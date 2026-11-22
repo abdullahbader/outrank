@@ -68,7 +68,7 @@ export default function CreateGame() {
 
       <FadeIn>
         <Row gap={3}>
-          <Avatar name={name || '?'} tint={profile.color} size={52} />
+          <Avatar name={name || '?'} tint={profile.color} emoji={profile.emoji} size={52} />
           <View style={{ flex: 1 }}>
             <Txt v="label" faint>{t('create.yourName')}</Txt>
             <Gap h={1} />

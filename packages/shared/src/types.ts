@@ -18,6 +18,7 @@ export interface Player {
   id: string;
   name: string;
   color?: string;           // avatar colour the player picked (display only)
+  emoji?: string;           // profile picture emoji (display only)
   score: number;            // derived from attempts — never set directly
   wild: WildState;
   streak: StreakState;
@@ -48,6 +49,8 @@ export interface Turn {
   attemptNo: 1 | 2;
   awaitingStreakDecision: boolean;
   firstAttemptId: string | null;
+  /** What the player typed for this attempt (the host still rules on it). */
+  typed?: string | null;
 }
 
 export interface Round {
@@ -104,7 +107,7 @@ export interface GameTimer { key: string; kind: TimerKind; deadline: number | nu
 export type Actor = { role: 'host' } | { role: 'player'; playerId: string } | { role: 'system' };
 
 export type Action =
-  | { type: 'join'; playerId: string; name: string; color?: string }
+  | { type: 'join'; playerId: string; name: string; color?: string; emoji?: string }
   | { type: 'leave' }
   | { type: 'remove_player'; playerId: string }
   | { type: 'set_categories'; categories: string[] }
@@ -117,6 +120,7 @@ export type Action =
   | { type: 'activate_streak'; turnSerial: number }
   | { type: 'void_attempt'; attemptId: string; replayTurn: boolean }
   | { type: 'end_question' }
+  | { type: 'submit_answer'; text: string; turnSerial: number }
   | { type: 'timeout'; turnSerial: number }
   | { type: 'next_question' }
   | { type: 'pause' }
@@ -128,7 +132,7 @@ export type ErrorCode =
   | 'ALREADY_CLAIMED' | 'INVALID_RANK' | 'CARD_USED' | 'CARD_NOT_ALLOWED_NOW'
   | 'NAME_TAKEN' | 'NAME_INVALID' | 'GAME_FULL' | 'ALREADY_JOINED' | 'NOT_ENOUGH_PLAYERS'
   | 'NOT_ENOUGH_QUESTIONS' | 'NO_CATEGORIES' | 'UNKNOWN_PLAYER' | 'UNKNOWN_ATTEMPT'
-  | 'CANNOT_REPLAY' | 'TOO_EARLY' | 'NO_TIMER' | 'NOTHING_CLAIMED' | 'ALREADY_VOIDED' | 'NOT_CURRENT_QUESTION' | 'GAME_FINISHED' | 'NOT_PAUSED' | 'UNKNOWN_ACTION';
+  | 'CANNOT_REPLAY' | 'ANSWER_INVALID' | 'TOO_EARLY' | 'NO_TIMER' | 'NOTHING_CLAIMED' | 'ALREADY_VOIDED' | 'NOT_CURRENT_QUESTION' | 'GAME_FINISHED' | 'NOT_PAUSED' | 'UNKNOWN_ACTION';
 
 export interface GameEvent {
   type: string;

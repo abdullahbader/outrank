@@ -101,7 +101,7 @@ export function Lobby({ view, act, onError }: { view: LiveView; act: (a: ActionI
           <FadeIn key={pl.id} index={i} style={{ width: '30%', flexGrow: 1, maxWidth: '33%' }}>
             <Card style={{ alignItems: 'center', padding: space(3), borderColor: pl.id === view.me?.playerId ? color.accent : color.line }}>
               <View>
-                <Pop trigger={pl.id}><Avatar name={pl.name} tint={p.tint(pl.id)} size={52} /></Pop>
+                <Pop trigger={pl.id}><Avatar name={pl.name} tint={p.tint(pl.id)} emoji={p.emoji(pl.id)} size={52} /></Pop>
                 <View style={{ position: 'absolute', bottom: 0, end: 0, width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: color.surface, backgroundColor: view.online[pl.id] ? color.good : color.textFaint }} />
               </View>
               <Gap h={2} />

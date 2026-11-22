@@ -6,9 +6,9 @@ import { api, ApiError, setApiToken } from './api';
 import { storage } from './storage';
 import { avatarColors } from './theme';
 
-const K = { token: 'outrank.token', locale: 'outrank.locale', name: 'outrank.name', color: 'outrank.color' };
+const K = { token: 'outrank.token', locale: 'outrank.locale', name: 'outrank.name', color: 'outrank.color', emoji: 'outrank.emoji' };
 
-export interface Profile { deviceId: string | null; name: string; color: string }
+export interface Profile { deviceId: string | null; name: string; color: string; emoji: string }
 
 interface AppState {
   ready: boolean;
@@ -18,7 +18,7 @@ interface AppState {
   t: (key: string, vars?: Record<string, string | number>) => string;
   setLocale: (l: AppLocale) => void;
   profile: Profile;
-  saveProfile: (p: Partial<Pick<Profile, 'name' | 'color'>>) => Promise<void>;
+  saveProfile: (p: Partial<Pick<Profile, 'name' | 'color' | 'emoji'>>) => Promise<void>;
   errorText: (e: unknown) => string;
   retry: () => void;
 }
@@ -39,7 +39,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<AppLocale>('ar');
   const [ready, setReady] = useState(false);
   const [online, setOnline] = useState(true);
-  const [profile, setProfile] = useState<Profile>({ deviceId: null, name: '', color: avatarColors[0] });
+  const [profile, setProfile] = useState<Profile>({ deviceId: null, name: '', color: avatarColors[0], emoji: '' });
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -50,6 +50,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setLocaleState(l);
       applyDirection(l);
       const name = (await storage.get(K.name)) ?? '';
+      const emojiStored = (await storage.get(K.emoji)) ?? '';
       const colorStored = (await storage.get(K.color)) ?? avatarColors[Math.floor(Math.random() * avatarColors.length)];
       let token = await storage.get(K.token);
       let deviceId: string | null = null;
@@ -75,7 +76,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setOnline(false);
       }
       await storage.set(K.color, colorStored);
-      setProfile({ deviceId, name, color: colorStored });
+      setProfile({ deviceId, name, color: colorStored, emoji: emojiStored });
       setReady(true);
     })();
   }, [attempt]);
@@ -89,12 +90,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     api('PATCH', '/devices/me', { locale: l }).catch(() => {});
   }, []);
 
-  const saveProfile = useCallback(async (p: Partial<Pick<Profile, 'name' | 'color'>>) => {
+  const saveProfile = useCallback(async (p: Partial<Pick<Profile, 'name' | 'color' | 'emoji'>>) => {
     const name = p.name?.trim();
     if (name !== undefined) await storage.set(K.name, name);
     if (p.color) await storage.set(K.color, p.color);
-    setProfile((old) => ({ ...old, ...(name !== undefined ? { name } : {}), ...(p.color ? { color: p.color } : {}) }));
-    await api('PATCH', '/devices/me', { ...(name ? { displayName: name.slice(0, 20) } : {}), ...(p.color ? { avatarColor: p.color } : {}) }).catch(() => {});
+    if (p.emoji !== undefined) await storage.set(K.emoji, p.emoji);
+    setProfile((old) => ({ ...old, ...(name !== undefined ? { name } : {}), ...(p.color ? { color: p.color } : {}), ...(p.emoji !== undefined ? { emoji: p.emoji } : {}) }));
+    await api('PATCH', '/devices/me', { ...(name ? { displayName: name.slice(0, 20) } : {}), ...(p.color ? { avatarColor: p.color } : {}), ...(p.emoji ? { avatarEmoji: p.emoji } : {}) }).catch(() => {});
   }, []);
 
   const errorText = useCallback((e: unknown) => {

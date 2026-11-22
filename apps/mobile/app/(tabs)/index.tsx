@@ -51,7 +51,7 @@ export default function Home() {
         <Row style={{ justifyContent: 'space-between' }}>
           <Pressable onPress={() => router.navigate('/profile')} accessibilityRole="button" accessibilityLabel={t('nav.profile')}>
             <Row gap={3}>
-              <Avatar name={profile.name || '?'} tint={profile.color} size={46} />
+              <Avatar name={profile.name || '?'} tint={profile.color} emoji={profile.emoji} size={46} />
               <View>
                 <Txt v="h2">{profile.name ? t('home2.hi', { name: profile.name }) : t('home2.welcome')}</Txt>
                 <Txt v="small" dim>{t('app.name')}</Txt>

@@ -346,7 +346,8 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
       if (s.players.some((p) => p.name.toLowerCase() === name.toLowerCase())) return 'NAME_TAKEN';
       if (s.players.length >= s.config.maxPlayers) return 'GAME_FULL';
       const color = typeof action.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(action.color) ? action.color : undefined;
-      s.players.push({ id: action.playerId, name, ...(color ? { color } : {}), score: 0, wild: 'available', streak: 'available' });
+      const emoji = typeof action.emoji === 'string' && action.emoji.length > 0 && action.emoji.length <= 16 ? action.emoji : undefined;
+      s.players.push({ id: action.playerId, name, ...(color ? { color } : {}), ...(emoji ? { emoji } : {}), score: 0, wild: 'available', streak: 'available' });
       events.push({ type: 'player_joined', playerId: action.playerId, name });
       return null;
     }
@@ -498,6 +499,7 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
       p.streak = 'used';
       round.turn.awaitingStreakDecision = false;
       round.turn.attemptNo = 2;
+      round.turn.typed = null;
       s.turnSerial += 1;
       s.cardLog.push({ playerId: p.id, card: 'streak', roundIndex: round.index, attemptId: null, at: now });
       events.push({ type: 'card_activated', card: 'streak', playerId: p.id });
@@ -532,6 +534,19 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
       events.push(attemptEvent(s, a));
       if (attemptNo === 2) failStreak(s, round, events);
       endTurn(s, events);
+      return null;
+    }
+
+    case 'submit_answer': {
+      // The player types the answer they are giving; the host still decides. Can be changed until ruled.
+      if (actor.role !== 'player') return 'NOT_PLAYER';
+      if (s.phase !== 'question' || !round.turn) return 'WRONG_PHASE';
+      if (round.turn.playerId !== actor.playerId) return 'NOT_YOUR_TURN';
+      if (action.turnSerial !== s.turnSerial || round.turn.awaitingStreakDecision) return 'STALE_TURN';
+      const text = String(action.text ?? '').replace(/\s+/g, ' ').trim();
+      if (!text || text.length > 80) return 'ANSWER_INVALID';
+      round.turn.typed = text;
+      events.push({ type: 'answer_submitted', playerId: actor.playerId, text });
       return null;
     }
 

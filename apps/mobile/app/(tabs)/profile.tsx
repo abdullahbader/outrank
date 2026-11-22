@@ -12,14 +12,15 @@ export default function Profile() {
   const { t, profile, saveProfile, locale, setLocale } = useApp();
   const [name, setName] = useState(profile.name);
   const [tint, setTint] = useState(profile.color);
+  const [emoji, setEmoji] = useState(profile.emoji);
   const [saved, setSaved] = useState(false);
   const [cfg, setCfg] = useState<AppConfig | null>(null);
 
   useEffect(() => { api<AppConfig>('GET', '/app-config').then(setCfg).catch(() => {}); }, []);
-  const dirty = name.trim() !== profile.name || tint !== profile.color;
+  const dirty = name.trim() !== profile.name || tint !== profile.color || emoji !== profile.emoji;
 
   const save = async () => {
-    await saveProfile({ name: name.trim(), color: tint });
+    await saveProfile({ name: name.trim(), color: tint, emoji });
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   };
@@ -33,7 +34,7 @@ export default function Profile() {
       <Gap h={5} />
       <FadeIn>
         <Card style={{ alignItems: 'center', paddingVertical: space(6) }} glow={tint}>
-          <Avatar name={name || '?'} tint={tint} size={92} />
+          <Avatar name={name || '?'} tint={tint} emoji={emoji} size={92} />
           <Gap h={3} />
           <Txt v="title">{name || '—'}</Txt>
         </Card>
@@ -44,6 +45,21 @@ export default function Profile() {
         <SectionTitle title={t('profile.name')} />
         <TextInput value={name} onChangeText={setName} maxLength={20} placeholderTextColor={color.textFaint} placeholder={t('profile.name')}
           style={{ height: 52, borderRadius: radius.md, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, color: color.text, paddingHorizontal: space(4), fontSize: 16, textAlign: locale === 'ar' ? 'right' : 'left' }} />
+        <Gap h={5} />
+        <SectionTitle title={t('profile.picture')} />
+        <Txt v="small" dim style={{ marginTop: -space(2), marginBottom: space(3) }}>{t('profile.pictureHint')}</Txt>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space(2) }}>
+          <Pressable onPress={() => setEmoji('')} accessibilityRole="radio" accessibilityState={{ selected: !emoji }} accessibilityLabel={t('profile.initials')}
+            style={{ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: tint, borderWidth: !emoji ? 3 : 0, borderColor: color.text }}>
+            <Txt v="small" color="#FFFFFF">{(name || '?').slice(0, 2).toUpperCase()}</Txt>
+          </Pressable>
+          {'😎 🤓 🥳 🤩 😺 🦊 🐼 🦁 🐯 🐸 🐵 🦉 🐨 🐙 🦄 🐲 🐫 🦅 👑 🚀 ⚽ 🎮 🎯 🧠 🔥 🌟 🍕 🎸'.split(' ').map((e) => (
+            <Pressable key={e} onPress={() => setEmoji(e)} accessibilityRole="radio" accessibilityState={{ selected: emoji === e }} accessibilityLabel={e}
+              style={({ pressed }) => ({ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: emoji === e ? tint + '33' : color.surface, borderWidth: emoji === e ? 3 : 1, borderColor: emoji === e ? tint : color.line, transform: [{ scale: pressed ? 1.15 : 1 }] })}>
+              <Txt style={{ fontSize: 26, lineHeight: 34 }}>{e}</Txt>
+            </Pressable>
+          ))}
+        </View>
         <Gap h={5} />
         <SectionTitle title={t('profile.color')} />
         <Row wrap gap={3}>

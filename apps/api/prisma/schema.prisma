@@ -81,6 +81,7 @@ model Device {
   tokenHash    String            @unique @map("token_hash")
   displayName  String?           @map("display_name")
   avatarColor  String?           @map("avatar_color")
+  avatarEmoji  String?           @map("avatar_emoji")
   locale       String?
   createdAt    DateTime          @default(now()) @map("created_at")
   lastSeenAt   DateTime          @default(now()) @map("last_seen_at")

@@ -12,6 +12,7 @@ import { PrismaService } from './prisma.service';
 import { RealtimeService } from './realtime.service';
 
 const BOT_COLORS = ['#3F8F65', '#75AFC5', '#E8C66A', '#D4876F', '#8E7CC3', '#5E9E8F', '#C8614F', '#6F8FB8', '#B5A04A', '#A0789A'];
+const BOT_EMOJI = ['🦊', '🐼', '🦁', '🐸', '🐵', '🦉', '🐯', '🐨', '🐙', '🦄'];
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O/1/I
 const randomCode = (n: number) => Array.from({ length: n }, () => CODE_ALPHABET[randomInt(CODE_ALPHABET.length)]).join('');
 
@@ -109,10 +110,12 @@ export class GamesService implements OnModuleInit {
     if (existing) return { playerId: existing.playerId, rejoined: true };
 
     const playerId = `p_${randomBytes(6).toString('hex')}`;
-    const color = botColor ?? (await this.prisma.device.findUnique({ where: { id: deviceId }, select: { avatarColor: true } }))?.avatarColor ?? undefined;
+    const dev = await this.prisma.device.findUnique({ where: { id: deviceId }, select: { avatarColor: true, avatarEmoji: true } });
+    const color = botColor ?? dev?.avatarColor ?? undefined;
+    const emoji = isBot ? BOT_EMOJI[Math.floor(Math.random() * BOT_EMOJI.length)] : dev?.avatarEmoji ?? undefined;
     let res: ActionResult;
     try {
-      res = await this.runAction(gameId, { role: 'system' }, { type: 'join', playerId, name, color }, null, async (tx) => {
+      res = await this.runAction(gameId, { role: 'system' }, { type: 'join', playerId, name, color, emoji }, null, async (tx) => {
         await tx.gameParticipant.create({ data: { gameId, playerId, deviceId, displayName: name.trim().replace(/\s+/g, ' '), isBot } });
       });
     } catch (e) {

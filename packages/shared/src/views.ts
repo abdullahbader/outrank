@@ -24,6 +24,7 @@ export interface LeaderRow {
   id: string;
   name: string;
   color: string | null;
+  emoji: string | null;
   score: number;
   position: number;      // 1-based, equal scores share a position
   lastDelta: number;     // points gained/lost in the most recent question
@@ -58,6 +59,36 @@ export interface AttemptView {
   combo: boolean;          // part of an 11 + 12 combo (worth +20 together)
 }
 
+/** Loose comparison for typed answers: case, accents, punctuation, Arabic letter forms, leading "the"/"ال". */
+export function normalizeAnswer(v: string): string {
+  return v
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u064B-\u0652\u0640]/g, '')            // Arabic diacritics and tatweel
+    .replace(/[إأآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .replace(/^(the|ال)\s*/u, '')
+    .replace(/\s(of|the)\s/g, ' ')
+    .trim();
+}
+
+/** The answer (rank) a typed text most likely matches, for the host's one-tap confirm. */
+export function suggestRank(q: QuestionContent | undefined, typed: string | null | undefined): number | null {
+  if (!q || !typed) return null;
+  const t = normalizeAnswer(typed);
+  if (!t) return null;
+  let best: { rank: number; score: number } | null = null;
+  for (const a of q.answers) {
+    for (const name of [a.text.en, a.text.ar, ...(a.aliases ?? [])].filter(Boolean) as string[]) {
+      const n = normalizeAnswer(name);
+      if (!n) continue;
+      const score = n === t ? 3 : (n.length >= 4 && t.length >= 4 && (n.includes(t) || t.includes(n))) ? 1 : 0;
+      if (score && (!best || score > best.score)) best = { rank: a.rank, score };
+    }
+  }
+  return best?.rank ?? null;
+}
+
 export function leaderboard(s: GameState): LeaderRow[] {
   const last = currentRound(s);
   const delta = new Map<string, number>();
@@ -75,7 +106,7 @@ export function leaderboard(s: GameState): LeaderRow[] {
   return sorted.map((p, i) => {
     if (prev === null || p.score !== prev) position = i + 1;
     prev = p.score;
-    return { id: p.id, name: p.name, color: p.color ?? null, score: p.score, position, lastDelta: delta.get(p.id) ?? 0, wild: p.wild, streak: p.streak };
+    return { id: p.id, name: p.name, color: p.color ?? null, emoji: p.emoji ?? null, score: p.score, position, lastDelta: delta.get(p.id) ?? 0, wild: p.wild, streak: p.streak };
   });
 }
 
@@ -151,6 +182,7 @@ export function buildView(s: GameState, questions: Record<string, QuestionConten
         turn,
         finished: round.finished,
         claimedCount: Object.keys(round.claimed).length,
+        suggestedRank: viewer.role === 'host' ? suggestRank(q, round.turn?.typed) : null,
         positivesLeft: positivesLeft(round),
         nextPlayerId: round.turn ? playerAt(round, round.turnIndex + 1) : null,
         lap: Math.floor(round.turnIndex / round.participants.length) + 1,
@@ -167,7 +199,7 @@ export function buildView(s: GameState, questions: Record<string, QuestionConten
     targetScore: s.config.targetScore,
     wildMultiplier: s.config.wildMultiplier,
     turnSerial: s.turnSerial,
-    players: s.players.map((p) => ({ id: p.id, name: p.name, color: p.color ?? null })),
+    players: s.players.map((p) => ({ id: p.id, name: p.name, color: p.color ?? null, emoji: p.emoji ?? null })),
     leaderboard: leaderboard(s),
     rotation: s.rotation,
     questionsPlayed: s.rounds.filter((r) => r.finished).length,

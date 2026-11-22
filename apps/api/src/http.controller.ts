@@ -36,7 +36,7 @@ export class HttpController {
   async createDevice(@Body() body: unknown) {
     const b = parse(deviceBody, body);
     const token = newToken();
-    const d = await this.prisma.device.create({ data: { tokenHash: hashToken(token), displayName: b.displayName, avatarColor: b.avatarColor, locale: b.locale } });
+    const d = await this.prisma.device.create({ data: { tokenHash: hashToken(token), displayName: b.displayName, avatarColor: b.avatarColor, avatarEmoji: b.avatarEmoji, locale: b.locale } });
     return { deviceId: d.id, token };
   }
 
@@ -45,14 +45,14 @@ export class HttpController {
   async updateDevice(@CurrentDevice() dev: AuthedDevice, @Body() body: unknown) {
     const b = parse(deviceBody, body);
     const d = await this.prisma.device.update({ where: { id: dev.id }, data: b });
-    return { deviceId: d.id, displayName: d.displayName, avatarColor: d.avatarColor, locale: d.locale };
+    return { deviceId: d.id, displayName: d.displayName, avatarColor: d.avatarColor, avatarEmoji: d.avatarEmoji, locale: d.locale };
   }
 
   @Get('devices/me')
   @UseGuards(DeviceGuard)
   async me(@CurrentDevice() dev: AuthedDevice) {
     const d = await this.prisma.device.findUniqueOrThrow({ where: { id: dev.id } });
-    return { deviceId: d.id, displayName: d.displayName, avatarColor: d.avatarColor, locale: d.locale };
+    return { deviceId: d.id, displayName: d.displayName, avatarColor: d.avatarColor, avatarEmoji: d.avatarEmoji, locale: d.locale };
   }
 
   @Get('devices/me/stats')

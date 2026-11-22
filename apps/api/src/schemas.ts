@@ -16,6 +16,7 @@ export const actionSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('activate_streak'), turnSerial: serial }),
   z.object({ type: z.literal('void_attempt'), attemptId: z.string().min(1).max(64), replayTurn: z.boolean() }),
   z.object({ type: z.literal('end_question') }),
+  z.object({ type: z.literal('submit_answer'), text: z.string().max(200), turnSerial: serial }),
   z.object({ type: z.literal('next_question') }),
   z.object({ type: z.literal('pause') }),
   z.object({ type: z.literal('resume') }),
@@ -38,6 +39,7 @@ export const recoverBody = z.object({ recoveryCode: z.string().min(4).max(20) })
 export const deviceBody = z.object({
   displayName: z.string().trim().min(1).max(20).optional(),
   avatarColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  avatarEmoji: z.string().min(1).max(16).optional(),
   locale: z.enum(['en', 'ar']).optional(),
 });
 export const botsBody = z.object({ count: z.number().int().min(1).max(15) });

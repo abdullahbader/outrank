@@ -1,7 +1,7 @@
 import { Icon as Feather } from '../icons';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Animated, Modal, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DirectionRoot, useApp, useLocalized } from '../app-context';
 import { catStyle, color, inkOn, radius, rankColor as rankColorOf, space } from '../theme';
@@ -39,20 +39,24 @@ export function Play({ view, act, onError, categoryName }: { view: LiveView; act
     if (!r.ok) onError(r.error);
   };
 
-  // A buzz and a big "Your turn!" pop-up when it becomes this phone's turn.
-  const wasMine = useRef(false);
-  const [splash, setSplash] = useState(false);
-  useEffect(() => {
-    const mine = !!view.me?.isMyTurn;
-    if (mine && !wasMine.current) { buzz('turn'); setSplash(true); }
-    if (!mine) setSplash(false);
-    wasMine.current = mine;
-  }, [view.me?.isMyTurn]);
+  // A buzz and the answer pop-up when it becomes this phone's turn (again for a Streak extra answer).
   const myTurn = !!view.me?.isMyTurn;
+  const answering = myTurn && !view.round?.turn?.awaitingStreakDecision;
+  const attemptKey = answering ? `${view.turnSerial}` : '';
+  const [popup, setPopup] = useState(false);
+  const lastKey = useRef('');
+  useEffect(() => {
+    if (attemptKey && attemptKey !== lastKey.current) {
+      if (!lastKey.current || view.round?.turn?.attemptNo === 1) buzz('turn');
+      setPopup(true);
+    }
+    if (!attemptKey) setPopup(false);
+    lastKey.current = attemptKey;
+  }, [attemptKey]);
 
   return (
     <View style={{ flex: 1, backgroundColor: color.bg }}>
-      {myTurn ? <MyTurnBar view={view} top={insets.top} /> : null}
+      {myTurn ? <MyTurnBar view={view} top={insets.top} onType={answering && !popup ? () => setPopup(true) : undefined} /> : null}
       <ScrollView contentContainerStyle={{ padding: space(4), paddingTop: myTurn ? space(4) : insets.top + space(3), paddingBottom: space(20) }}>
         <View style={styles.max}>
           <QuestionHeader view={view} categoryName={categoryName} onMenu={host ? () => setMenu(true) : undefined} />
@@ -68,13 +72,13 @@ export function Play({ view, act, onError, categoryName }: { view: LiveView; act
       </ScrollView>
       <View style={{ paddingBottom: insets.bottom }}><LeaderStrip view={view} /></View>
       {host ? <HostMenu view={view} open={menu} onClose={() => setMenu(false)} run={run} /> : null}
-      {splash ? <TurnSplash name={view.leaderboard.find((r) => r.id === view.me?.playerId)?.name ?? ''} tint={view.players.find((p) => p.id === view.me?.playerId)?.color ?? color.accent} onDone={() => setSplash(false)} /> : null}
+      {popup && answering ? <AnswerPopup view={view} act={act} onError={onError} onHide={() => setPopup(false)} /> : null}
     </View>
   );
 }
 
 /** Pinned to the top for as long as it is your turn: impossible to miss. */
-function MyTurnBar({ view, top }: { view: LiveView; top: number }) {
+function MyTurnBar({ view, top, onType }: { view: LiveView; top: number; onType?: () => void }) {
   const { t } = useApp();
   const turn = view.round?.turn;
   const title = turn?.awaitingStreakDecision ? t('game.streakOfferedMe') : turn?.attemptNo === 2 ? t('game.secondAttempt') : t('game.yourTurnBig');
@@ -86,6 +90,12 @@ function MyTurnBar({ view, top }: { view: LiveView; top: number }) {
         <View style={{ flex: 1 }}>
           <Txt v="title" color="#FFFFFF" style={{ fontSize: 24 }}>{title}</Txt>
           {sub ? <Txt v="small" color="#FFFFFFE6">{sub}</Txt> : null}
+          {onType ? (
+            <Pressable onPress={onType} accessibilityRole="button" style={styles.typeAgain}>
+              <Feather name="pencil" size={14} color={color.accent} />
+              <Txt v="small" color={color.accent}>{view.round?.turn?.typed ? t('answer.edit') : t('answer.open')}</Txt>
+            </Pressable>
+          ) : null}
         </View>
         <CountdownPill view={view} big light />
       </View>
@@ -93,28 +103,63 @@ function MyTurnBar({ view, top }: { view: LiveView; top: number }) {
   );
 }
 
-/** A big pop-up the moment your turn starts; disappears by itself (or on tap). */
-function TurnSplash({ name, tint, onDone }: { name: string; tint: string; onDone: () => void }) {
-  const { t } = useApp();
+/**
+ * Opens by itself when your turn starts: type the answer you are giving (and say it out loud).
+ * The host sees it with the likely match and rules on it. You can change it until the host does.
+ */
+function AnswerPopup({ view, act, onError, onHide }: { view: LiveView; act: Act; onError: (c: string) => void; onHide: () => void }) {
+  const { t, locale } = useApp();
   const reduced = useReducedMotion();
+  const turn = view.round!.turn!;
+  const [text, setText] = useState(turn.typed ?? '');
+  const [busy, setBusy] = useState(false);
+  const sent = !!turn.typed && turn.typed === text.trim();
   const v = useRef(new Animated.Value(reduced ? 1 : 0)).current;
-  const done = useRef(onDone);
-  done.current = onDone;
   useEffect(() => {
-    if (!reduced) Animated.spring(v, { toValue: 1, friction: 6, tension: 90, useNativeDriver: Platform.OS !== 'web' }).start();
-    const id = setTimeout(() => done.current(), 2400);
-    return () => clearTimeout(id);
+    if (!reduced) Animated.spring(v, { toValue: 1, friction: 7, tension: 80, useNativeDriver: Platform.OS !== 'web' }).start();
   }, [v, reduced]);
-  const scale = v.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] });
+  const scale = v.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] });
+  const me = view.players.find((p) => p.id === view.me?.playerId);
+
+  const send = async () => {
+    const value = text.trim();
+    if (!value || busy) return;
+    setBusy(true);
+    const r = await act({ type: 'submit_answer', text: value, turnSerial: view.turnSerial });
+    setBusy(false);
+    if (!r.ok) onError(r.error);
+  };
+
   return (
-    <Pressable style={styles.splashBack} onPress={onDone} accessibilityRole="button" accessibilityLabel={t('game.yourTurnBig')}>
-      <Animated.View style={[styles.splashCard, { opacity: v, transform: [{ scale }] }]}>
-        <Avatar name={name} tint={tint} size={88} ring={color.gold} />
+    <View style={styles.popupBack}>
+      <Animated.View style={[styles.popupCard, { opacity: v, transform: [{ scale }] }]}>
+        <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Row gap={3} style={{ flex: 1 }}>
+            <Avatar name={me?.name ?? ''} tint={me?.color ?? color.accent} emoji={me?.emoji ?? undefined} size={52} ring={color.gold} />
+            <View style={{ flex: 1 }}>
+              <Txt v="title" color={color.accent}>{turn.attemptNo === 2 ? t('game.secondAttempt') : t('game.yourTurnBig')}</Txt>
+              <Txt v="small" dim>{t('answer.hint')}</Txt>
+            </View>
+          </Row>
+          <CountdownPill view={view} />
+        </Row>
         <Gap h={4} />
-        <Txt v="hero" color={color.accent} center>{t('game.yourTurnBig')}</Txt>
-        <Txt dim center>{t('game.yourTurnSub')}</Txt>
+        <TextInput
+          value={text} onChangeText={(x) => setText(x.slice(0, 80))} autoFocus maxLength={80}
+          placeholder={t('answer.placeholder')} placeholderTextColor={color.textFaint}
+          onSubmitEditing={send} returnKeyType="send" accessibilityLabel={t('answer.placeholder')}
+          style={[styles.answerInput, { textAlign: locale === 'ar' ? 'right' : 'left' }]}
+        />
+        <Gap h={3} />
+        {sent ? (
+          <Banner tone="good" icon="check-circle" text={t('answer.sent', { text: turn.typed ?? '' })} />
+        ) : (
+          <Button label={t('answer.send')} icon="send" size="lg" busy={busy} disabled={!text.trim()} onPress={send} />
+        )}
+        <Gap h={2} />
+        <Button label={t('answer.hide')} kind="ghost" size="sm" onPress={onHide} />
       </Animated.View>
-    </Pressable>
+    </View>
   );
 }
 
@@ -182,7 +227,7 @@ function TurnStrip({ view }: { view: LiveView }) {
         {states.map((s) => (
           <View key={s.id} style={{ alignItems: 'center', width: 52 }}>
             <View>
-              <Avatar name={p.name(s.id)} tint={p.tint(s.id)} size={40} ring={s.status === 'current' ? color.accent : undefined} dim={s.status === 'scored' || s.status === 'missed'} />
+              <Avatar name={p.name(s.id)} tint={p.tint(s.id)} emoji={p.emoji(s.id)} size={40} ring={s.status === 'current' ? color.accent : undefined} dim={s.status === 'scored' || s.status === 'missed'} />
               {s.status === 'scored' || s.status === 'missed' ? (
                 <View style={[styles.badge, { backgroundColor: s.status === 'scored' ? color.good : color.bad }]}>
                   <Feather name={s.status === 'scored' ? 'check' : 'x'} size={10} color={color.accentInk} />
@@ -224,6 +269,7 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
     <View>
       {turn.attemptNo === 2 ? <><Banner tone="info" icon="repeat" text={t('game.secondAttempt')} /><Gap h={2} /></> : null}
       {wildOn ? <><Banner tone="warn" icon="zap" text={`${name}: ${t('cards.wildOn')} (×${view.wildMultiplier})`} /><Gap h={2} /></> : null}
+      {turn.typed ? <TypedCard view={view} run={run} busy={busy} /> : null}
       <Txt v="small" dim>{t('game.tapRank')}</Txt>
       <Gap h={2} />
       <Row gap={2}>
@@ -256,6 +302,37 @@ function EndQuestion({ run, busy }: { run: (a: ActionInput) => void; busy: boole
       icon="fast-forward" kind={sure ? 'gold' : 'ghost'} size="sm" disabled={busy}
       onPress={() => { if (sure) { setSure(false); run({ type: 'end_question' }); } else setSure(true); }}
     />
+  );
+}
+
+/** Host: the answer the player typed, and a one-tap confirm when it matches one on the list. */
+function TypedCard({ view, run, busy }: { view: LiveView; run: (a: ActionInput) => void; busy: boolean }) {
+  const { t } = useApp();
+  const L = useLocalized();
+  const p = people(view);
+  const r = view.round!;
+  const turn = r.turn!;
+  const slot = r.suggestedRank ? r.slots.find((x) => x.rank === r.suggestedRank) : null;
+  return (
+    <Card glow={color.gold} style={{ marginBottom: space(3) }}>
+      <Row gap={2}>
+        <Feather name="pencil" size={18} color={color.gold} />
+        <Txt v="small" dim>{t('answer.typedBy', { name: p.name(turn.playerId) })}</Txt>
+      </Row>
+      <Txt v="title" auto style={{ marginTop: space(1) }}>“{turn.typed}”</Txt>
+      {slot ? (
+        <>
+          <Gap h={3} />
+          {slot.claimedBy ? (
+            <Button label={t('answer.matchClaimed', { rank: slot.rank })} icon="copy" kind="secondary" disabled={busy}
+              onPress={() => run({ type: 'reject', reason: 'already_claimed', turnSerial: view.turnSerial })} />
+          ) : (
+            <Button label={t('answer.confirmMatch', { rank: slot.rank, answer: L(slot.text) })} icon="check" size="lg" busy={busy}
+              onPress={() => run({ type: 'confirm', rank: slot.rank, turnSerial: view.turnSerial })} />
+          )}
+        </>
+      ) : <Txt v="small" faint style={{ marginTop: space(1) }}>{t('answer.noMatch')}</Txt>}
+    </Card>
   );
 }
 
@@ -398,7 +475,7 @@ export function AnswerFeed({ view, run }: { view: LiveView; run: (a: ActionInput
           : t('feed.wrong', { name: p.name(a.playerId) });
         return (
           <Row key={a.id} gap={3} style={[styles.feedRow, a.voided ? { opacity: 0.45 } : null]}>
-            <Avatar name={p.name(a.playerId)} tint={p.tint(a.playerId)} size={28} />
+            <Avatar name={p.name(a.playerId)} tint={p.tint(a.playerId)} emoji={p.emoji(a.playerId)} size={28} />
             <View style={{ flex: 1 }}>
               <Txt v="small" style={a.voided || a.cancelledByStreak ? { textDecorationLine: 'line-through' } : null} numberOfLines={2}>{label}</Txt>
               {a.usedWild || a.usedStreak || a.combo ? (
@@ -475,8 +552,10 @@ const styles = StyleSheet.create({
   max: { width: '100%', maxWidth: 640, alignSelf: 'center' },
   turnBar: { flexDirection: 'row', alignItems: 'center', gap: space(3), paddingHorizontal: space(4), paddingBottom: space(4), backgroundColor: color.accent, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl, shadowColor: color.accent, shadowOpacity: 0.4, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
   turnBarIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  splashBack: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#29463859', alignItems: 'center', justifyContent: 'center', padding: space(6) },
-  splashCard: { width: '100%', maxWidth: 360, alignItems: 'center', padding: space(7), borderRadius: radius.xl, backgroundColor: '#FFFFFF', borderWidth: 3, borderColor: color.accent, shadowColor: '#294638', shadowOpacity: 0.25, shadowRadius: 30, elevation: 12 },
+  popupBack: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#29463866', alignItems: 'center', justifyContent: 'center', padding: space(5) },
+  popupCard: { width: '100%', maxWidth: 420, padding: space(5), borderRadius: radius.xl, backgroundColor: '#FFFFFF', borderWidth: 3, borderColor: color.accent, shadowColor: '#294638', shadowOpacity: 0.25, shadowRadius: 30, elevation: 12 },
+  answerInput: { height: 60, borderRadius: radius.lg, borderWidth: 2, borderColor: color.accent, backgroundColor: color.bg, color: color.text, paddingHorizontal: space(4), fontSize: 20, fontWeight: '600' },
+  typeAgain: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: space(2), paddingHorizontal: 12, height: 32, borderRadius: radius.pill, backgroundColor: '#FFFFFF' },
   tag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: color.bg + 'AA' },
   myScore: { alignItems: 'center', paddingHorizontal: 12, paddingVertical: 4, borderRadius: radius.md, backgroundColor: color.bg + 'AA', marginEnd: 4 },
   badge: { position: 'absolute', bottom: -2, right: -2, width: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },

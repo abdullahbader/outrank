@@ -85,7 +85,10 @@
     "history": "Recent games",
     "noHistory": "Play a game and it will show up here.",
     "rank": "#{{rank}}",
-    "winner": "Winner"
+    "winner": "Winner",
+    "picture": "Profile picture",
+    "pictureHint": "Pick an emoji — everyone sees it in the game",
+    "initials": "My initials"
   },
   "lobby": {
     "title": "Lobby",
@@ -341,5 +344,19 @@
     "wildSub": "{{name}} played Wild — this answer counts five times",
     "streakTitle": "STREAK!",
     "streakSub": "{{name}} is on fire — one more answer"
+  },
+  "answer": {
+    "open": "Type answer",
+    "edit": "Change answer",
+    "hint": "Type your answer and say it out loud",
+    "placeholder": "Your answer…",
+    "send": "Send answer",
+    "sent": "Sent: “{{text}}” — the host is checking",
+    "hide": "Hide (I'll just say it)",
+    "typedBy": "{{name}} typed",
+    "confirmMatch": "Correct: #{{rank}} {{answer}}",
+    "matchClaimed": "#{{rank}} is already claimed",
+    "noMatch": "No exact match on the list — tap the right answer below, or Wrong.",
+    "toast": "{{name}} answered: “{{text}}”"
   }
 }

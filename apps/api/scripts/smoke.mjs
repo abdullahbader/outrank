@@ -378,6 +378,14 @@ async function main() {
     check(await TH.waitFor((v) => v.round?.turn && v.round.turn.playerId !== firstTurn, 5000), 'when the answer timer runs out the turn moves on by itself');
     const tState = (await prisma.game.findUnique({ where: { id: tg.gameId } })).state;
     check(tState.attempts[0]?.outcome === 'timed_out', 'the missed turn is recorded as time up (zero points)');
+    const onTurn = tPlayers.find((ph) => ph.view?.me?.playerId === TH.view.round.turn.playerId);
+    const other = tPlayers.find((ph) => ph !== onTurn);
+    const qid = TH.view.round.questionId;
+    check((await other.act(tg.gameId, { type: 'submit_answer', text: 'hello', turnSerial: TH.view.turnSerial })).error === 'NOT_YOUR_TURN', 'only the player on turn can type an answer');
+    check((await onTurn.act(tg.gameId, { type: 'submit_answer', text: `secret-${qid}-4`, turnSerial: TH.view.turnSerial })).ok, 'the player on turn types an answer');
+    check(await TH.waitFor((v) => v.round?.suggestedRank === 4), 'the host sees the typed answer with the matching rank suggested');
+    await other.waitFor((v) => v.round?.turn?.typed);
+    check(other.view.round.turn.typed === `secret-${qid}-4` && other.view.round.suggestedRank === null, 'other players see what was typed, never the suggested rank');
     check((await TH.act(tg.gameId, { type: 'reject', reason: 'pass', turnSerial: TH.view.turnSerial })).ok, 'host taps Pass for a player who passes');
     await TH.waitFor((v) => v.round?.attempts?.some((a) => a.outcome === 'passed'));
     check(TH.view.round.attempts.some((a) => a.outcome === 'passed'), 'the pass shows in the answer feed');

@@ -57,7 +57,7 @@ export function Results({ view, act, onError, categoryName }: { view: LiveView; 
           <Card style={{ padding: space(3) }}>
             {deltas.map((d) => (
               <Row key={d.id} gap={3} style={{ paddingVertical: space(1.5) }}>
-                <Avatar name={p.name(d.id)} tint={p.tint(d.id)} size={28} />
+                <Avatar name={p.name(d.id)} tint={p.tint(d.id)} emoji={p.emoji(d.id)} size={28} />
                 <Txt style={{ flex: 1 }} numberOfLines={1}>{p.name(d.id)}</Txt>
                 {d.cards.some((a) => a.usedWild) ? <Txt v="small" color={color.wild}>{t('cards.wild')}</Txt> : null}
                 {d.cards.some((a) => a.usedStreak) ? <Txt v="small" color={color.streak}>{t('cards.streak')}</Txt> : null}
@@ -135,7 +135,7 @@ export function Final({ view }: { view: LiveView }) {
             <Card key={pl.id} style={{ marginBottom: space(3), padding: space(3) }} glow={pl.won ? color.gold : undefined}>
               <Row gap={3}>
                 <Txt v="number" faint style={{ width: 28 }}>{pl.position}</Txt>
-                <Avatar name={pl.name} tint={p.tint(pl.id)} size={40} />
+                <Avatar name={pl.name} tint={p.tint(pl.id)} emoji={p.emoji(pl.id)} size={40} />
                 <View style={{ flex: 1 }}>
                   <Txt numberOfLines={1}>{pl.name}{pl.id === view.me?.playerId ? ` · ${t('common.you')}` : ''}</Txt>
                   <Txt v="small" dim>
