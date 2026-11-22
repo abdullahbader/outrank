@@ -7,7 +7,7 @@ import { useApp, useLocalized } from '@/app-context';
 import { Icon3D } from '@/icons3d';
 import { CategoryPhoto } from '@/photos';
 import { HeroVideo } from '@/HeroVideo';
-import { catStyle, color, radius, rankColor, shadow, space } from '@/theme';
+import { catStyle, color, radius, rankColor, space } from '@/theme';
 import { Avatar, Card, FadeIn, Gap, Gradient, IconPlate, ltr, Row, Screen, SectionTitle, Txt, type IconName, useReducedMotion } from '@/ui';
 
 const HOW: { key: string; icon: IconName; tint: string; img?: string }[] = [
@@ -71,7 +71,8 @@ export default function Home() {
 
       {/* hero with the main actions */}
       <FadeIn index={1}>
-        <HeroVideo style={shadow.glow('#3F8F65')}>
+        {/* edge to edge: cancel the screen's side padding, no rounded corners */}
+        <HeroVideo style={{ marginHorizontal: -space(4), borderRadius: 0 }}>
           <View style={{ padding: space(5) }}>
             <BrandLogo />
             <Gap h={4} />
