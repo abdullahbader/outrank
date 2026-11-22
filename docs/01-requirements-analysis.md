@@ -125,7 +125,7 @@ in-app purchases.
   saying; the host sees it with the likely match highlighted and confirms with one tap. Players
   never receive the suggested rank.
 - **Emoji profile pictures**; **rank numbers on each player's picture** replace the bottom
-  leaderboard; the **chat docks** at the bottom and stays open during play.
+  leaderboard. (A docked always-open chat was tried and reverted: it hid the game; chat opens on tap again.)
 - **Look**: a boy hops along the logo's columns; Join shows a runner leaping onto a game
   controller; each category has a real photo (Unsplash, credited in apps/mobile/assets/photos).
 - **Voice chat**: requested; needs an outside voice service — see docs/11 once chosen.

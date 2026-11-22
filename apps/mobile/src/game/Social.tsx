@@ -61,7 +61,7 @@ export function Social({ view, chat, onError, lift = 0 }: { view: LiveView; chat
   return (
     <>
       <FloatingReactions reactions={chat.reactions} />
-      {open ? null : <View pointerEvents="box-none" style={[styles.dock, { bottom }]}>
+      <View pointerEvents="box-none" style={[styles.dock, { bottom }]}>
         {preview ? (
           <Pressable onPress={() => { setPreview(null); setOpen(true); }} style={styles.preview} accessibilityRole="button">
             <Txt v="small" color={preview.role === 'host' ? color.gold : color.streak} numberOfLines={1}>{preview.name}</Txt>
@@ -87,7 +87,7 @@ export function Social({ view, chat, onError, lift = 0 }: { view: LiveView; chat
             {unread ? <View style={styles.badge}><Text style={styles.badgeText}>{unread > 9 ? '9+' : unread}</Text></View> : null}
           </Pressable>
         </Row>
-      </View>}
+      </View>
       <ChatSheet view={view} chat={chat} open={open} onClose={() => setOpen(false)} onError={onError} mine={mine} amMuted={amMuted} react={react} />
     </>
   );
@@ -118,19 +118,15 @@ function ChatSheet({ view, chat, open, onClose, onError, mine, amMuted, react }:
   const time = (iso: string) => new Date(iso).toLocaleTimeString(locale === 'ar' ? 'ar-JO-u-nu-latn' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <>
-      {open ? (
-        // Docked, not a full-screen sheet: the game stays visible and playable above it.
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[styles.docked, { paddingBottom: insets.bottom + space(2) }]}>
-          <View style={styles.grabber} />
-          <Row style={{ justifyContent: 'space-between', marginBottom: space(1) }}>
-            <Row gap={2}>
-              <Feather name="chat" size={18} color={color.streak} />
-              <Txt v="h2">{t('chat.title')}</Txt>
-            </Row>
-            <IconButton icon="chevron-down" label={t('chat.minimise')} onPress={onClose} />
+    <Modal visible={open} animationType="slide" transparent onRequestClose={onClose}>
+      <DirectionRoot>
+        <Pressable style={styles.backdrop} onPress={onClose} />
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[styles.sheet, { paddingBottom: insets.bottom + space(3) }]}>
+          <Row style={{ justifyContent: 'space-between', marginBottom: space(2) }}>
+            <Txt v="h2">{t('chat.title')}</Txt>
+            <IconButton icon="x" label={t('common.close')} onPress={onClose} />
           </Row>
-          <ScrollView ref={scroll} style={{ flexGrow: 0, maxHeight: 210 }} contentContainerStyle={{ gap: space(2), paddingVertical: space(2) }}>
+          <ScrollView ref={scroll} style={{ flexGrow: 0, maxHeight: 420 }} contentContainerStyle={{ gap: space(2), paddingVertical: space(2) }}>
             {!chat.messages.length ? <Txt dim center>{t('chat.empty')}</Txt> : null}
             {chat.messages.map((m) => {
               const me = mine(m);
@@ -182,7 +178,6 @@ function ChatSheet({ view, chat, open, onClose, onError, mine, amMuted, react }:
           )}
           {text.length > MAX - 30 ? <Txt v="small" faint>{text.length}/{MAX}</Txt> : null}
         </KeyboardAvoidingView>
-      ) : null}
 
         <Modal visible={!!menu} transparent animationType="fade" onRequestClose={() => setMenu(null)}>
           <DirectionRoot>
@@ -200,7 +195,8 @@ function ChatSheet({ view, chat, open, onClose, onError, mine, amMuted, react }:
             </Pressable>
           </DirectionRoot>
         </Modal>
-    </>
+      </DirectionRoot>
+    </Modal>
   );
 }
 
@@ -251,8 +247,6 @@ const styles = StyleSheet.create({
   emojiSmall: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center' },
   preview: { maxWidth: 260, padding: space(3), borderRadius: radius.lg, borderBottomEndRadius: 4, backgroundColor: color.bgRaised, borderWidth: 1, borderColor: color.streak },
   backdrop: { flex: 1, backgroundColor: '#29463866' },
-  docked: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: color.bgRaised, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, paddingHorizontal: space(4), paddingTop: space(2), borderTopWidth: 1, borderColor: color.line, shadowColor: '#294638', shadowOpacity: 0.18, shadowRadius: 20, shadowOffset: { width: 0, height: -6 }, elevation: 16 },
-  grabber: { alignSelf: 'center', width: 44, height: 5, borderRadius: 3, backgroundColor: color.line, marginBottom: space(2) },
   sheet: { backgroundColor: color.bgRaised, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, padding: space(4), borderTopWidth: 1, borderColor: color.line },
   msgRow: { flexDirection: 'row', alignItems: 'flex-end', gap: space(2) },
   bubble: { maxWidth: '78%', paddingHorizontal: space(3), paddingVertical: space(2), borderRadius: radius.lg, borderBottomStartRadius: 4, backgroundColor: color.surface2 },
