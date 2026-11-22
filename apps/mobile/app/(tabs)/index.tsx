@@ -51,16 +51,16 @@ export default function Home() {
     <Screen>
       {/* header */}
       <FadeIn>
-        <BrandLogo height={48} />
-        <Gap h={3} />
-        <Row>
-          <Pressable onPress={() => router.navigate('/profile')} accessibilityRole="button" accessibilityLabel={t('nav.profile')}>
-            <Row gap={3}>
-              <Avatar name={profile.name || '?'} tint={profile.color} emoji={profile.emoji} size={46} />
-              <View>
-                <Txt v="h2">{profile.name ? t('home2.hi', { name: profile.name }) : t('home2.welcome')}</Txt>
-                <Txt v="small" dim>{t('app.name')}</Txt>
+        {/* logo on one side, the player's picture and name on the other */}
+        <Row style={{ justifyContent: 'space-between' }}>
+          <BrandLogo height={48} />
+          <Pressable onPress={() => router.navigate('/profile')} accessibilityRole="button" accessibilityLabel={t('nav.profile')} style={{ flexShrink: 1, marginStart: space(3) }}>
+            <Row gap={2}>
+              <View style={{ flexShrink: 1, alignItems: 'flex-end' }}>
+                <Txt v="h2" numberOfLines={1} style={{ fontSize: 17 }}>{profile.name ? t('home2.hi', { name: profile.name }) : t('home2.welcome')}</Txt>
+                <Txt v="small" dim>{t('nav.profile')}</Txt>
               </View>
+              <Avatar name={profile.name || '?'} tint={profile.color} emoji={profile.emoji} size={42} />
             </Row>
           </Pressable>
         </Row>
