@@ -57,7 +57,8 @@
           "backgroundColor": "#F5F8F3",
           "resizeMode": "contain"
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "extra": {
       "supportsRTL": true,

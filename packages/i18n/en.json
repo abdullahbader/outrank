@@ -162,7 +162,9 @@
     "lap": "Round {{n}}",
     "yourTurnBig": "Your turn!",
     "yourTurnSub": "Say your answer out loud",
-    "pass": "Pass"
+    "pass": "Pass",
+    "soundOff": "Mute music",
+    "soundOn": "Turn music on"
   },
   "cards": {
     "wild": "Wild",

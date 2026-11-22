@@ -10,6 +10,7 @@ import { Avatar, Banner, Button, Card, Gap, Gradient, IconButton, IconPlate, ltr
 import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
 import { CountdownBar, CountdownPill } from './Countdown';
+import { useCountdownSound, useSoundSetting } from './sound';
 import { has3D, Icon3D } from '../icons3d';
 import { CategoryPhoto } from '../photos';
 import { people, turnStates } from './helpers';
@@ -30,6 +31,8 @@ export function Play({ view, act, onError, categoryName }: { view: LiveView; act
   const host = view.role === 'host';
   const [menu, setMenu] = useState(false);
   const [busy, setBusy] = useState(false);
+  const sound = useSoundSetting();
+  useCountdownSound(view, sound.on);
 
   const run = async (a: ActionInput) => {
     if (busy) return;
@@ -59,7 +62,7 @@ export function Play({ view, act, onError, categoryName }: { view: LiveView; act
       {myTurn ? <MyTurnBar view={view} top={insets.top} onType={answering && !popup ? () => setPopup(true) : undefined} /> : null}
       <ScrollView contentContainerStyle={{ padding: space(4), paddingTop: myTurn ? space(4) : insets.top + space(3), paddingBottom: space(20) }}>
         <View style={styles.max}>
-          <QuestionHeader view={view} categoryName={categoryName} onMenu={host ? () => setMenu(true) : undefined} />
+          <QuestionHeader view={view} categoryName={categoryName} onMenu={host ? () => setMenu(true) : undefined} sound={sound} />
           <Gap h={4} />
           <TurnStrip view={view} />
           <Gap h={4} />
@@ -162,7 +165,7 @@ function AnswerPopup({ view, act, onError, onHide }: { view: LiveView; act: Act;
   );
 }
 
-export function QuestionHeader({ view, categoryName, onMenu }: { view: LiveView; categoryName: string; onMenu?: () => void }) {
+export function QuestionHeader({ view, categoryName, onMenu, sound }: { view: LiveView; categoryName: string; onMenu?: () => void; sound?: { on: boolean; toggle: () => void } }) {
   const { t } = useApp();
   const L = useLocalized();
   const p = people(view);
@@ -187,6 +190,7 @@ export function QuestionHeader({ view, categoryName, onMenu }: { view: LiveView;
               <Txt v="number" color={color.accent}>{me.score}</Txt>
             </View>
           ) : null}
+          {sound ? <IconButton icon={sound.on ? 'volume-high' : 'volume-off'} label={sound.on ? t('game.soundOff') : t('game.soundOn')} onPress={sound.toggle} tint={sound.on ? color.accent : color.textFaint} bg={color.bg + 'AA'} /> : null}
           {onMenu ? <IconButton icon="more-vertical" label={t('game.menu')} onPress={onMenu} /> : null}
         </Row>
         <Gap h={3} />
