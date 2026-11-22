@@ -6,7 +6,7 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "backgroundColor": "#F5F8F3",
+    "backgroundColor": "#F3F6EF",
     "ios": {
       "bundleIdentifier": "com.outrank.app",
       "supportsTablet": false,
@@ -25,7 +25,7 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#3F8F65"
+        "backgroundColor": "#F3F6EF"
       },
       "versionCode": 1
     },
@@ -53,8 +53,8 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash.png",
-          "imageWidth": 180,
-          "backgroundColor": "#F5F8F3",
+          "imageWidth": 260,
+          "backgroundColor": "#F3F6EF",
           "resizeMode": "contain"
         }
       ],

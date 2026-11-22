@@ -73,7 +73,7 @@ export default function Home() {
       <FadeIn index={1}>
         <HeroVideo style={shadow.glow('#3F8F65')}>
           <View style={{ padding: space(5) }}>
-            <Ladder />
+            <BrandLogo />
             <Gap h={4} />
             <Txt v="title" color="#fff">{t('home2.heroTitle')}</Txt>
             <Txt v="small" color="#ffffffcc">{t('home2.heroSub')}</Txt>
@@ -216,12 +216,33 @@ export default function Home() {
   );
 }
 
-/** The brand mark: a 12-step ranking ladder (gold at 10, red at 11–12) with a smart boy hopping
- *  from column to column. Tap it to send him off again. Still when the phone asks for less motion. */
-const BAR_W = 14;
-const BAR_GAP = 6;
-const BOY = 30;
-const barHeight = (i: number) => 18 + (11 - i) * 4;
+/** The owner's logo (ladder + boy) on the hero; it floats gently, and a tap makes it bounce. */
+const LOGO = require('../../assets/brand/logo-mark.png');
+function BrandLogo() {
+  const reduced = useReducedMotion();
+  const bob = useRef(new Animated.Value(0)).current;
+  const pop = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (reduced) return;
+    const a = Animated.loop(Animated.sequence([
+      Animated.timing(bob, { toValue: 1, duration: 1600, easing: Easing.inOut(Easing.sin), useNativeDriver: Platform.OS !== 'web' }),
+      Animated.timing(bob, { toValue: 0, duration: 1600, easing: Easing.inOut(Easing.sin), useNativeDriver: Platform.OS !== 'web' }),
+    ]));
+    a.start();
+    return () => a.stop();
+  }, [bob, reduced]);
+  const bounce = () => {
+    if (reduced) return;
+    pop.setValue(0.9);
+    Animated.spring(pop, { toValue: 1, friction: 3, tension: 120, useNativeDriver: Platform.OS !== 'web' }).start();
+  };
+  const translateY = bob.interpolate({ inputRange: [0, 1], outputRange: [0, -5] });
+  return (
+    <Pressable onPress={bounce} accessibilityRole="image" accessibilityLabel="Outrank" style={{ alignSelf: 'flex-start' }}>
+      <Animated.Image source={LOGO} resizeMode="contain" style={{ width: 220, height: 121, transform: [{ translateY }, { scale: pop }] }} />
+    </Pressable>
+  );
+}
 
 /** "Join": a runner leaping onto a game controller, with a gentle hop. */
 export function JoinArt({ size = 56 }: { size?: number }) {
@@ -245,60 +266,6 @@ export function JoinArt({ size = 56 }: { size?: number }) {
         <Icon3D name="runner" size={size * 0.6} />
       </Animated.View>
     </View>
-  );
-}
-
-function Ladder() {
-  const reduced = useReducedMotion();
-  const t = useRef(new Animated.Value(0)).current;
-  const anim = useRef<Animated.CompositeAnimation | null>(null);
-
-  const run = useCallback(() => {
-    anim.current?.stop();
-    if (reduced) { t.setValue(0); return; }
-    t.setValue(0);
-    anim.current = Animated.loop(Animated.sequence([
-      Animated.timing(t, { toValue: 11, duration: 11 * 420, easing: Easing.linear, useNativeDriver: Platform.OS !== 'web' }),
-      Animated.delay(700),
-      Animated.timing(t, { toValue: 0, duration: 11 * 260, easing: Easing.linear, useNativeDriver: Platform.OS !== 'web' }),
-      Animated.delay(1200),
-    ]));
-    anim.current.start();
-  }, [t, reduced]);
-
-  useEffect(() => { run(); return () => anim.current?.stop(); }, [run]);
-
-  // Hop path: on top of each column at whole numbers, up in the air half-way between columns.
-  const xs: number[] = [];
-  const ys: number[] = [];
-  const inputs: number[] = [];
-  const maxH = barHeight(0);
-  for (let i = 0; i <= 11; i++) {
-    inputs.push(i);
-    xs.push(i * (BAR_W + BAR_GAP) + BAR_W / 2 - BOY / 2);
-    ys.push(maxH - barHeight(i));
-    if (i < 11) {
-      inputs.push(i + 0.5);
-      xs.push((i + 0.5) * (BAR_W + BAR_GAP) + BAR_W / 2 - BOY / 2);
-      ys.push(maxH - Math.max(barHeight(i), barHeight(i + 1)) - 22);
-    }
-  }
-  const translateX = t.interpolate({ inputRange: inputs, outputRange: xs });
-  const translateY = t.interpolate({ inputRange: inputs, outputRange: ys });
-
-  return (
-    <Pressable onPress={run} accessibilityRole="button" accessibilityLabel="Outrank" style={{ alignSelf: 'flex-start' }}>
-      <View style={{ height: maxH + BOY + 4, width: 12 * BAR_W + 11 * BAR_GAP, justifyContent: 'flex-end' }}>
-        <Row gap={BAR_GAP / 4} style={{ alignItems: 'flex-end' }}>
-          {Array.from({ length: 12 }, (_, i) => (
-            <View key={i} style={{ width: BAR_W, height: barHeight(i), borderRadius: 4, backgroundColor: i < 9 ? '#ffffff' : rankColor(i + 1), opacity: i < 9 ? 0.4 + (9 - i) * 0.066 : 1 }} />
-          ))}
-        </Row>
-        <Animated.View pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, transform: [{ translateX }, { translateY }] }}>
-          <Icon3D name="boy" size={BOY} />
-        </Animated.View>
-      </View>
-    </Pressable>
   );
 }
 
