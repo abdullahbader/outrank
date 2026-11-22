@@ -278,6 +278,10 @@ function ConfettiPiece({ left, delay, size, tint, rot }: { left: number; delay: 
 
 // ───────────── decoration
 
+/** SVG stops take the colour and its transparency separately (8-digit hex is not reliable on Android). */
+const solid = (hex: string) => (/^#[0-9a-f]{8}$/i.test(hex) ? hex.slice(0, 7) : hex);
+const alpha = (hex: string) => (/^#[0-9a-f]{8}$/i.test(hex) ? parseInt(hex.slice(7, 9), 16) / 255 : 1);
+
 /** A soft diagonal gradient behind its children (drawn with SVG, no extra package). */
 export function Gradient({ from, to, children, style, radius: r = radius.xl }: { from: string; to: string; children?: ReactNode; style?: StyleProp<ViewStyle>; radius?: number }) {
   const id = useMemo(() => `g${Math.random().toString(36).slice(2, 8)}`, []);
@@ -286,8 +290,8 @@ export function Gradient({ from, to, children, style, radius: r = radius.xl }: {
       <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 100">
         <Defs>
           <LinearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor={from} />
-            <Stop offset="1" stopColor={to} />
+            <Stop offset="0" stopColor={solid(from)} stopOpacity={alpha(from)} />
+            <Stop offset="1" stopColor={solid(to)} stopOpacity={alpha(to)} />
           </LinearGradient>
         </Defs>
         <Rect x="0" y="0" width="100" height="100" fill={`url(#${id})`} />
