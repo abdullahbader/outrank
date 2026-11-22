@@ -52,6 +52,14 @@ export default function Home() {
       {/* header */}
       <FadeIn>
         <Row style={{ justifyContent: 'space-between' }}>
+          <BrandLogo height={48} />
+          <Pressable accessibilityRole="button" onPress={() => setLocale(locale === 'ar' ? 'en' : 'ar')} style={styles.lang}>
+            <Feather name="globe" size={15} color={color.textDim} />
+            <Txt v="small" dim>{t('common.language')}</Txt>
+          </Pressable>
+        </Row>
+        <Gap h={3} />
+        <Row>
           <Pressable onPress={() => router.navigate('/profile')} accessibilityRole="button" accessibilityLabel={t('nav.profile')}>
             <Row gap={3}>
               <Avatar name={profile.name || '?'} tint={profile.color} emoji={profile.emoji} size={46} />
@@ -60,10 +68,6 @@ export default function Home() {
                 <Txt v="small" dim>{t('app.name')}</Txt>
               </View>
             </Row>
-          </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => setLocale(locale === 'ar' ? 'en' : 'ar')} style={styles.lang}>
-            <Feather name="globe" size={15} color={color.textDim} />
-            <Txt v="small" dim>{t('common.language')}</Txt>
           </Pressable>
         </Row>
       </FadeIn>
@@ -74,8 +78,6 @@ export default function Home() {
         {/* edge to edge: cancel the screen's side padding, no rounded corners */}
         <HeroVideo style={{ marginHorizontal: -space(4), borderRadius: 0 }}>
           <View style={{ padding: space(5) }}>
-            <BrandLogo />
-            <Gap h={4} />
             <Txt v="title" color="#fff">{t('home2.heroTitle')}</Txt>
             <Txt v="small" color="#ffffffcc">{t('home2.heroSub')}</Txt>
             <Gap h={5} />
@@ -219,7 +221,7 @@ export default function Home() {
 
 /** The owner's logo (ladder + boy) on the hero; it floats gently, and a tap makes it bounce. */
 const LOGO = require('../../assets/brand/logo-mark.png');
-function BrandLogo() {
+function BrandLogo({ height = 121 }: { height?: number }) {
   const reduced = useReducedMotion();
   const bob = useRef(new Animated.Value(0)).current;
   const pop = useRef(new Animated.Value(1)).current;
@@ -237,10 +239,10 @@ function BrandLogo() {
     pop.setValue(0.9);
     Animated.spring(pop, { toValue: 1, friction: 3, tension: 120, useNativeDriver: Platform.OS !== 'web' }).start();
   };
-  const translateY = bob.interpolate({ inputRange: [0, 1], outputRange: [0, -5] });
+  const translateY = bob.interpolate({ inputRange: [0, 1], outputRange: [0, -Math.max(2, height / 24)] });
   return (
     <Pressable onPress={bounce} accessibilityRole="image" accessibilityLabel="Outrank" style={{ alignSelf: 'flex-start' }}>
-      <Animated.Image source={LOGO} resizeMode="contain" style={{ width: 220, height: 121, transform: [{ translateY }, { scale: pop }] }} />
+      <Animated.Image source={LOGO} resizeMode="contain" style={{ width: height * (220 / 121), height, transform: [{ translateY }, { scale: pop }] }} />
     </Pressable>
   );
 }
