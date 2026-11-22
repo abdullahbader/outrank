@@ -19,7 +19,7 @@ const HOW: { key: string; icon: IconName; tint: string; img?: string }[] = [
 ];
 
 export default function Home() {
-  const { t, locale, setLocale, profile, rtl } = useApp();
+  const { t, locale, profile, rtl } = useApp();
   const L = useLocalized();
   const router = useRouter();
   const [active, setActive] = useState<ActiveGame[]>([]);
@@ -51,13 +51,7 @@ export default function Home() {
     <Screen>
       {/* header */}
       <FadeIn>
-        <Row style={{ justifyContent: 'space-between' }}>
-          <BrandLogo height={48} />
-          <Pressable accessibilityRole="button" onPress={() => setLocale(locale === 'ar' ? 'en' : 'ar')} style={styles.lang}>
-            <Feather name="globe" size={15} color={color.textDim} />
-            <Txt v="small" dim>{t('common.language')}</Txt>
-          </Pressable>
-        </Row>
+        <BrandLogo height={48} />
         <Gap h={3} />
         <Row>
           <Pressable onPress={() => router.navigate('/profile')} accessibilityRole="button" accessibilityLabel={t('nav.profile')}>
@@ -273,7 +267,6 @@ export function JoinArt({ size = 56 }: { size?: number }) {
 }
 
 const styles = StyleSheet.create({
-  lang: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, height: 38, borderRadius: radius.pill, borderWidth: 1, borderColor: color.line },
   joinBlock: { flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(4), borderRadius: radius.lg, backgroundColor: '#FFFFFF', minHeight: 84 },
   joinPlate: { width: 52, height: 52, borderRadius: 26, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   scanBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: color.accent + '18', alignItems: 'center', justifyContent: 'center' },
