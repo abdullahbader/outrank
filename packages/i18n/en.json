@@ -183,7 +183,9 @@
     "voided": "Host undid an answer",
     "multiplier": "×{{n}}",
     "passed": "{{name}} · passed",
-    "timeUp": "{{name}} · time is up"
+    "timeUp": "{{name}} · time is up",
+    "combo": "COMBO! {{name}} has rank 11 and 12 → +20 instead of −23",
+    "comboTag": "11+12 combo"
   },
   "results": {
     "title": "The full ranking",
@@ -314,7 +316,8 @@
     "end": "Winning",
     "end1": "First to 100 points ends the game after the current question.",
     "end2": "Highest score wins. A tie means a tie-breaker question for the tied players only.",
-    "onceEach": "Once per game"
+    "onceEach": "Once per game",
+    "combo": "Claim both rank 11 and rank 12 in the same question (on any turns) and the pair is worth +20 instead of −23. Wild does not multiply it."
   },
   "stats": {
     "title": "Your stats"

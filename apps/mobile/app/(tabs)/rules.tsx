@@ -29,6 +29,11 @@ export default function Rules() {
               );
             })}
           </View>
+          <Gap h={3} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(3), borderRadius: radius.md, backgroundColor: color.gold + '22', borderWidth: 1, borderColor: color.gold }}>
+            <Txt v="number" color={color.gold}>{ltr('11 + 12 = +20')}</Txt>
+            <View style={{ flex: 1 }}><Txt v="small">{t('rules.combo')}</Txt></View>
+          </View>
         </Card>
       </FadeIn>
 

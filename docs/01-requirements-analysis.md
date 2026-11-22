@@ -118,4 +118,7 @@ in-app purchases.
 - **Pass**: the host taps Pass when a player passes — zero points, turn moves on, a Wild switched
   on is given back; passing on a Streak extra answer counts as failing it.
 - **Used cards** are crossed out with an X on the player's phone and in the leaderboard.
+- **11 + 12 combo** (owner, 2026-11-22): when the same player claims both rank 11 and rank 12 in
+  one question (on any turns, Streak included), those two answers are worth a fixed **+20** in
+  total instead of −23; Wild does not multiply it. Undoing or cancelling either half removes it.
 - **Voice chat**: requested; needs an outside voice service — see docs/11 once chosen.

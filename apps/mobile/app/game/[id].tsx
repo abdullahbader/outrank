@@ -86,6 +86,8 @@ export default function GameScreen() {
 function describe(events: GameEvent[], view: LiveView, t: (k: string, v?: Record<string, string | number>) => string, L: (v: { en: string; ar?: string } | null | undefined) => string) {
   const p = people(view);
   const ev = (type: string) => events.find((e) => e.type === type) as (GameEvent & Record<string, any>) | undefined;
+  const combo = ev('combo_11_12');
+  if (combo) return { text: t('feed.combo', { name: p.name(combo.playerId) }), tone: color.gold };
   const reached = ev('target_reached');
   if (reached) return { text: t('game.targetReached', { names: p.list(reached.playerIds as string[]), n: view.targetScore }), tone: color.gold };
   const lost = ev('streak_failed');

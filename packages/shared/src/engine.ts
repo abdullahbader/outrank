@@ -122,11 +122,42 @@ function nextId(s: GameState, prefix: string): string {
 /** Scores are always derived from the answers — never stored independently. */
 export function recomputeScores(s: GameState): void {
   for (const p of s.players) p.score = 0;
+  const pts = effectivePoints(s);
+  for (const a of s.attempts) {
+    const v = pts.get(a.id);
+    if (v === undefined) continue;
+    const p = player(s, a.playerId);
+    if (p) p.score += v;
+  }
+}
+
+/** Owner's rule (2026-11-22): the same player claiming both rank 11 and rank 12 in one question. */
+export const COMBO_POINTS = 20;
+
+/**
+ * What each counting answer is worth. Normally its own points; but when one player holds both
+ * rank 11 and rank 12 in the same question (any turns), those two together are worth a fixed +20
+ * instead of −23 (Wild does not multiply it): the earlier of the two counts 0, the later +20.
+ */
+export function effectivePoints(s: GameState): Map<string, number> {
+  const out = new Map<string, number>();
+  const pairs = new Map<string, Attempt[]>();
   for (const a of s.attempts) {
     if (a.voided || a.cancelledByStreak || a.outcome !== 'correct') continue;
-    const p = player(s, a.playerId);
-    if (p) p.score += a.points;
+    out.set(a.id, a.points);
+    if (a.rank === 11 || a.rank === 12) {
+      const key = `${a.roundIndex}:${a.playerId}`;
+      pairs.set(key, [...(pairs.get(key) ?? []), a]);
+    }
   }
+  for (const list of pairs.values()) {
+    if (list.some((a) => a.rank === 11) && list.some((a) => a.rank === 12)) {
+      const [first, second] = [...list].sort((x, y) => s.attempts.indexOf(x) - s.attempts.indexOf(y));
+      out.set(first.id, 0);
+      out.set(second.id, COMBO_POINTS);
+    }
+  }
+  return out;
 }
 
 function checkTrigger(s: GameState, attemptId: string | null, events: GameEvent[]): void {
@@ -408,6 +439,9 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
         const a = record(s, round, 'correct', action.rank, now);
         recomputeScores(s);
         events.push(attemptEvent(s, a));
+        if ((a.rank === 11 || a.rank === 12) && effectivePoints(s).get(a.id) === COMBO_POINTS) {
+          events.push({ type: 'combo_11_12', playerId: a.playerId, points: COMBO_POINTS, total: player(s, a.playerId)?.score ?? 0 });
+        }
         checkTrigger(s, a.id, events);
         const p = player(s, a.playerId)!;
         if (attemptNo === 1 && p.streak === 'available' && positivesLeft(round) > 0) {

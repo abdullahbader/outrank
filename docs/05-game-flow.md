@@ -33,6 +33,8 @@ answer awaited (attempt 1)          player may switch on Wild
 
 Wild multiplies by 5 (negative too: rank 11 → −55).
 
+**11 + 12 combo:** one player holding both rank 11 and rank 12 in a question scores a fixed +20 for the pair (instead of −23); Wild does not multiply it.
+
 ## How long a question lasts
 
 Turns go round the table in order, lap after lap (A, B, C, A, B, C, …). The question ends when every

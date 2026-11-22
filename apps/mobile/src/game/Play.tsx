@@ -401,10 +401,11 @@ export function AnswerFeed({ view, run }: { view: LiveView; run: (a: ActionInput
             <Avatar name={p.name(a.playerId)} tint={p.tint(a.playerId)} size={28} />
             <View style={{ flex: 1 }}>
               <Txt v="small" style={a.voided || a.cancelledByStreak ? { textDecorationLine: 'line-through' } : null} numberOfLines={2}>{label}</Txt>
-              {a.usedWild || a.usedStreak ? (
+              {a.usedWild || a.usedStreak || a.combo ? (
                 <Row gap={2}>
                   {a.usedWild ? <Txt v="small" color={color.wild}>{t('cards.wild')} {ltr(`×${a.multiplier}`)}</Txt> : null}
                   {a.usedStreak ? <Txt v="small" color={color.streak}>{t('cards.streak')}</Txt> : null}
+                  {a.combo ? <Txt v="small" color={color.gold}>{t('feed.comboTag')}</Txt> : null}
                 </Row>
               ) : null}
             </View>

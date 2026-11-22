@@ -3,7 +3,7 @@
 
 import type { Attempt, GameState, Player, Round } from './types.ts';
 import { basePoints, RANKS } from './scoring.ts';
-import { currentRound, playerAt, positivesLeft } from './engine.ts';
+import { currentRound, effectivePoints, playerAt, positivesLeft } from './engine.ts';
 
 export interface Localized { en: string; ar?: string }
 
@@ -55,15 +55,18 @@ export interface AttemptView {
   usedStreak: boolean;
   cancelledByStreak: boolean;
   voided: boolean;
+  combo: boolean;          // part of an 11 + 12 combo (worth +20 together)
 }
 
 export function leaderboard(s: GameState): LeaderRow[] {
   const last = currentRound(s);
   const delta = new Map<string, number>();
+  const pts = effectivePoints(s);
   if (last) {
     for (const a of s.attempts) {
-      if (a.roundIndex !== last.index || a.voided || a.cancelledByStreak || a.outcome !== 'correct') continue;
-      delta.set(a.playerId, (delta.get(a.playerId) ?? 0) + a.points);
+      const v = pts.get(a.id);
+      if (a.roundIndex !== last.index || v === undefined) continue;
+      delta.set(a.playerId, (delta.get(a.playerId) ?? 0) + v);
     }
   }
   const sorted = [...s.players].sort((a, b) => b.score - a.score || s.players.indexOf(a) - s.players.indexOf(b));
@@ -98,6 +101,8 @@ function slotsFor(round: Round, q: QuestionContent | undefined, s: GameState, vi
 
 function attemptsFor(round: Round, q: QuestionContent | undefined, s: GameState, viewer: Viewer): AttemptView[] {
   const reveal = viewer.role === 'host' || round.finished;
+  const pts = effectivePoints(s);
+  const combo = new Set(s.attempts.filter((a) => a.roundIndex === round.index && a.outcome === 'correct' && (a.rank === 11 || a.rank === 12) && pts.get(a.id) !== undefined && pts.get(a.id) !== a.points).map((a) => a.id));
   return s.attempts
     .filter((a) => a.roundIndex === round.index)
     .map((a) => {
@@ -113,7 +118,8 @@ function attemptsFor(round: Round, q: QuestionContent | undefined, s: GameState,
         text: ans ? ans.text : null,
         basePoints: showRank || a.outcome !== 'correct' ? a.basePoints : 0,
         multiplier: a.multiplier,
-        points: showRank || a.outcome !== 'correct' ? a.points : 0,
+        points: showRank || a.outcome !== 'correct' ? (pts.get(a.id) ?? a.points) : 0,
+        combo: showRank && combo.has(a.id),
         usedWild: a.usedWild,
         usedStreak: a.usedStreak,
         cancelledByStreak: a.cancelledByStreak,
@@ -195,6 +201,7 @@ export type GameView = ReturnType<typeof buildView>;
 /** Per-player numbers for the Final Results screen and profile stats. */
 export function finalSummary(s: GameState) {
   const board = leaderboard(s);
+  const pts = effectivePoints(s);
   const winners = new Set(s.outcome?.winnerIds ?? []);
   return {
     questionsPlayed: s.rounds.filter((r) => r.finished).length,
@@ -202,7 +209,7 @@ export function finalSummary(s: GameState) {
     reason: s.outcome?.reason ?? null,
     players: board.map((row) => {
       const mine = s.attempts.filter((a) => a.playerId === row.id && !a.voided);
-      const scored = mine.filter((a) => a.outcome === 'correct' && !a.cancelledByStreak);
+      const scored = mine.filter((a) => a.outcome === 'correct' && !a.cancelledByStreak).map((a) => ({ ...a, points: pts.get(a.id) ?? a.points }));
       return {
         id: row.id,
         name: row.name,
