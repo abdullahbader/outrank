@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { api, type Category } from '@/api';
 import { recoveryKey, useApp, useLocalized } from '@/app-context';
+import { CategoryPhoto } from '@/photos';
 import { storage } from '@/storage';
 import { catStyle, color, radius, space } from '@/theme';
 import { Avatar, Banner, Button, Chip, FadeIn, Gap, IconPlate, Row, Screen, SectionTitle, TopBar, Txt, type IconName } from '@/ui';
@@ -103,16 +104,18 @@ export default function CreateGame() {
           return (
             <FadeIn key={c.id} index={i} style={styles.cell}>
               <Pressable disabled={empty} onPress={() => toggle(c.id)} accessibilityRole="checkbox" accessibilityState={{ checked: on, disabled: empty }} accessibilityLabel={L(c.name)}
-                style={({ pressed }) => [styles.tile, { borderColor: on ? st.tint : color.line, backgroundColor: on ? st.tint + '22' : color.surface, opacity: empty ? 0.4 : 1, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-                <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <IconPlate icon={st.icon as IconName} img={c.id} tint={st.tint} size={48} solid={on} />
-                  <View style={[styles.check, on ? { backgroundColor: st.tint, borderColor: st.tint } : null]}>
-                    {on ? <Feather name="check" size={14} color={color.accentInk} /> : null}
-                  </View>
-                </Row>
-                <Gap h={3} />
-                <Txt numberOfLines={2} style={{ fontSize: 15 }}>{L(c.name)}</Txt>
-                <Txt v="small" dim>{t('home2.questionsN', { n: c.ready })}</Txt>
+                style={({ pressed }) => [{ borderRadius: radius.lg, borderWidth: 3, borderColor: on ? st.tint : 'transparent', opacity: empty ? 0.4 : on ? 1 : 0.75, transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+                <CategoryPhoto category={c.id} radius={radius.lg - 3} shade={on ? 0.35 : 0.6} style={styles.tile}>
+                  <Row style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <IconPlate icon={st.icon as IconName} img={c.id} tint="#FFFFFF" size={48} solid={on} />
+                    <View style={[styles.check, { borderColor: '#FFFFFF' }, on ? { backgroundColor: st.tint, borderColor: st.tint } : null]}>
+                      {on ? <Feather name="check" size={14} color="#FFFFFF" /> : null}
+                    </View>
+                  </Row>
+                  <Gap h={3} />
+                  <Txt color="#FFFFFF" numberOfLines={2} style={{ fontSize: 16 }}>{L(c.name)}</Txt>
+                  <Txt v="small" color="#FFFFFFDD">{t('home2.questionsN', { n: c.ready })}</Txt>
+                </CategoryPhoto>
               </Pressable>
             </FadeIn>
           );
@@ -129,7 +132,7 @@ const styles = StyleSheet.create({
   input: { height: 50, borderRadius: radius.md, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, color: color.text, paddingHorizontal: space(4), fontSize: 16 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space(3) },
   cell: { width: '47%', flexGrow: 1 },
-  tile: { borderRadius: radius.lg, borderWidth: 1.5, padding: space(3.5), minHeight: 140 },
+  tile: { padding: space(3.5), minHeight: 150 },
   check: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: color.line, alignItems: 'center', justifyContent: 'center' },
   track: { height: 6, borderRadius: 3, backgroundColor: color.surface2, overflow: 'hidden' },
   fill: { height: 6, borderRadius: 3 },

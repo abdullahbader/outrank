@@ -262,7 +262,8 @@
     "delete": "Delete message",
     "mute": "Mute {{name}}",
     "unmute": "Unmute {{name}}",
-    "youAreMuted": "The host has muted you in the chat."
+    "youAreMuted": "The host has muted you in the chat.",
+    "minimise": "Minimise chat"
   },
   "nav": {
     "home": "Home",

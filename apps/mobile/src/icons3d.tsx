@@ -19,6 +19,10 @@ const IMAGES = {
   microphone: require('../assets/icons3d/microphone.png'),
   party: require('../assets/icons3d/party.png'),
   sparkles: require('../assets/icons3d/sparkles.png'),
+  boy: require('../assets/icons3d/boy.png'),
+  runner: require('../assets/icons3d/runner.png'),
+  nerd: require('../assets/icons3d/nerd.png'),
+  gamepad: require('../assets/icons3d/gamepad.png'),
 } as const;
 
 export type Icon3DName = keyof typeof IMAGES;

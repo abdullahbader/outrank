@@ -11,8 +11,8 @@ import type { ActResult, ActionInput, LiveView } from '../useGame';
 import { Board } from './Board';
 import { CountdownBar, CountdownPill } from './Countdown';
 import { has3D, Icon3D } from '../icons3d';
+import { CategoryPhoto } from '../photos';
 import { people, turnStates } from './helpers';
-import { LeaderStrip } from './Leaderboard';
 
 type Act = (a: ActionInput) => Promise<ActResult>;
 
@@ -70,7 +70,6 @@ export function Play({ view, act, onError, categoryName }: { view: LiveView; act
           <AnswerFeed view={view} run={run} />
         </View>
       </ScrollView>
-      <View style={{ paddingBottom: insets.bottom }}><LeaderStrip view={view} /></View>
       {host ? <HostMenu view={view} open={menu} onClose={() => setMenu(false)} run={run} /> : null}
       {popup && answering ? <AnswerPopup view={view} act={act} onError={onError} onHide={() => setPopup(false)} /> : null}
     </View>
@@ -171,7 +170,7 @@ export function QuestionHeader({ view, categoryName, onMenu }: { view: LiveView;
   const st = catStyle(r.categoryId);
   const me = view.me ? view.leaderboard.find((x) => x.id === view.me!.playerId) : null;
   return (
-    <Gradient from={st.tint + '33'} to={color.surface} style={{ borderWidth: 1, borderColor: st.tint + '55' }}>
+    <CategoryPhoto category={r.categoryId} radius={radius.xl} faded style={{ borderWidth: 1, borderColor: st.tint + '55', backgroundColor: color.surface }}>
       <View style={{ padding: space(4) }}>
         <Row style={{ justifyContent: 'space-between' }}>
           <Row gap={2} style={{ flex: 1, flexWrap: 'wrap' }}>
@@ -203,7 +202,19 @@ export function QuestionHeader({ view, categoryName, onMenu }: { view: LiveView;
           })}
         </Row>
       </View>
-    </Gradient>
+    </CategoryPhoto>
+  );
+}
+
+/** Small leaderboard position on top of a player's picture (gold for 1st). */
+function RankBadge({ view, id }: { view: LiveView; id: string }) {
+  const row = view.leaderboard.find((r) => r.id === id);
+  if (!row) return null;
+  const first = row.position === 1;
+  return (
+    <View style={[styles.rankBadge, { backgroundColor: first ? color.gold : color.text }]} accessibilityLabel={`#${row.position}`}>
+      <Txt v="number" color={first ? inkOn(color.gold) : '#FFFFFF'} style={{ fontSize: 11, lineHeight: 14 }}>{row.position}</Txt>
+    </View>
   );
 }
 
@@ -227,7 +238,8 @@ function TurnStrip({ view }: { view: LiveView }) {
         {states.map((s) => (
           <View key={s.id} style={{ alignItems: 'center', width: 52 }}>
             <View>
-              <Avatar name={p.name(s.id)} tint={p.tint(s.id)} emoji={p.emoji(s.id)} size={40} ring={s.status === 'current' ? color.accent : undefined} dim={s.status === 'scored' || s.status === 'missed'} />
+              <Avatar name={p.name(s.id)} tint={p.tint(s.id)} emoji={p.emoji(s.id)} size={44} ring={s.status === 'current' ? color.accent : undefined} dim={s.status === 'scored' || s.status === 'missed'} />
+              <RankBadge view={view} id={s.id} />
               {s.status === 'scored' || s.status === 'missed' ? (
                 <View style={[styles.badge, { backgroundColor: s.status === 'scored' ? color.good : color.bad }]}>
                   <Feather name={s.status === 'scored' ? 'check' : 'x'} size={10} color={color.accentInk} />
@@ -550,6 +562,7 @@ function HostMenu({ view, open, onClose, run }: { view: LiveView; open: boolean;
 
 const styles = StyleSheet.create({
   max: { width: '100%', maxWidth: 640, alignSelf: 'center' },
+  rankBadge: { position: 'absolute', top: -4, start: -4, minWidth: 20, height: 20, paddingHorizontal: 4, borderRadius: 10, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFFFFF' },
   turnBar: { flexDirection: 'row', alignItems: 'center', gap: space(3), paddingHorizontal: space(4), paddingBottom: space(4), backgroundColor: color.accent, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl, shadowColor: color.accent, shadowOpacity: 0.4, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
   turnBarIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
   popupBack: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#29463866', alignItems: 'center', justifyContent: 'center', padding: space(5) },

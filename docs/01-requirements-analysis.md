@@ -121,4 +121,11 @@ in-app purchases.
 - **11 + 12 combo** (owner, 2026-11-22): when the same player claims both rank 11 and rank 12 in
   one question (on any turns, Streak included), those two answers are worth a fixed **+20** in
   total instead of −23; Wild does not multiply it. Undoing or cancelling either half removes it.
+- **Typed answers** (2026-11-22): on their turn a pop-up lets the player type the answer they are
+  saying; the host sees it with the likely match highlighted and confirms with one tap. Players
+  never receive the suggested rank.
+- **Emoji profile pictures**; **rank numbers on each player's picture** replace the bottom
+  leaderboard; the **chat docks** at the bottom and stays open during play.
+- **Look**: a boy hops along the logo's columns; Join shows a runner leaping onto a game
+  controller; each category has a real photo (Unsplash, credited in apps/mobile/assets/photos).
 - **Voice chat**: requested; needs an outside voice service — see docs/11 once chosen.

@@ -3,6 +3,7 @@ import { Tabs, useRouter } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '@/app-context';
+import { Icon3D } from '@/icons3d';
 import { color, shadow } from '@/theme';
 import { Txt, type IconName } from '@/ui';
 
@@ -38,7 +39,7 @@ function FloatingTabBar({ state, descriptors, navigateToTab, navigation }: TabBa
                     alignItems: 'center', justifyContent: 'center', borderWidth: 5, borderColor: color.bg,
                   }, shadow.glow(color.accent), pressed && { transform: [{ scale: 0.94 }] }]}
                 >
-                  <Feather name="log-in" size={26} color={color.accentInk} />
+                  <Icon3D name="runner" size={36} />
                 </Pressable>
                 <Txt v="small" color={color.accent} style={{ fontSize: 11, lineHeight: 15, marginTop: 2 }}>{title}</Txt>
               </View>

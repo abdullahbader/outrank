@@ -1,11 +1,13 @@
 import { Icon as Feather } from '@/icons';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { Dimensions, Pressable, ScrollView, StyleSheet, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, Dimensions, Easing, Platform, Pressable, ScrollView, StyleSheet, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { api, type ActiveGame, type Category, type Stats } from '@/api';
 import { useApp, useLocalized } from '@/app-context';
+import { Icon3D } from '@/icons3d';
+import { CategoryPhoto } from '@/photos';
 import { catStyle, color, radius, rankColor, shadow, space } from '@/theme';
-import { Avatar, Card, FadeIn, Gap, Gradient, IconPlate, ltr, Row, Screen, SectionTitle, Txt, type IconName } from '@/ui';
+import { Avatar, Card, FadeIn, Gap, Gradient, IconPlate, ltr, Row, Screen, SectionTitle, Txt, type IconName, useReducedMotion } from '@/ui';
 
 const HOW: { key: string; icon: IconName; tint: string; img?: string }[] = [
   { key: 's1', icon: 'list', tint: color.accent },
@@ -79,7 +81,7 @@ export default function Home() {
             <View style={styles.joinBlock}>
               <Pressable onPress={() => router.push('/join')} accessibilityRole="button" accessibilityLabel={t('home.join')}
                 style={({ pressed }) => [{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: space(3) }, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-                <View style={styles.joinPlate}><Feather name="log-in" size={26} color="#FFFFFF" /></View>
+                <JoinArt size={56} />
                 <View style={{ flex: 1 }}>
                   <Txt v="h2" color={color.text} style={{ fontSize: 20 }}>{t('home.join')}</Txt>
                   <Txt v="small" dim>{t('home.joinHint')}</Txt>
@@ -153,15 +155,15 @@ export default function Home() {
             <FadeIn key={c.id} index={i}>
               <Pressable onPress={() => router.push({ pathname: '/create', params: { category: c.id } })} accessibilityRole="button" accessibilityLabel={L(c.name)}
                 style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.96 : 1 }] })}>
-                <Gradient from={st.tint + '40'} to={color.surface} radius={radius.lg} style={[styles.tile, { borderColor: st.tint + '55' }]}>
+                <CategoryPhoto category={c.id} radius={radius.lg} shade={0.42} style={[styles.tile, { borderColor: st.tint }]}>
                   <View style={{ padding: space(3.5), flex: 1, justifyContent: 'space-between' }}>
-                    <IconPlate icon={st.icon as IconName} img={c.id} tint={st.tint} size={56} solid />
+                    <IconPlate icon={st.icon as IconName} img={c.id} tint="#FFFFFF" size={56} solid />
                     <View>
-                      <Txt v="h2" numberOfLines={2} style={{ fontSize: 16, lineHeight: locale === 'ar' ? 24 : 20 }}>{L(c.name)}</Txt>
-                      <Txt v="small" dim>{t('home2.questionsN', { n: c.ready })}</Txt>
+                      <Txt v="h2" color="#FFFFFF" numberOfLines={2} style={{ fontSize: 17, lineHeight: locale === 'ar' ? 25 : 21 }}>{L(c.name)}</Txt>
+                      <Txt v="small" color="#FFFFFFDD">{t('home2.questionsN', { n: c.ready })}</Txt>
                     </View>
                   </View>
-                </Gradient>
+                </CategoryPhoto>
               </Pressable>
             </FadeIn>
           );
@@ -213,14 +215,89 @@ export default function Home() {
   );
 }
 
-/** The brand mark: a 12-step ranking ladder, gold at 10, red at 11–12. */
-function Ladder() {
+/** The brand mark: a 12-step ranking ladder (gold at 10, red at 11–12) with a smart boy hopping
+ *  from column to column. Tap it to send him off again. Still when the phone asks for less motion. */
+const BAR_W = 14;
+const BAR_GAP = 6;
+const BOY = 30;
+const barHeight = (i: number) => 18 + (11 - i) * 4;
+
+/** "Join": a runner leaping onto a game controller, with a gentle hop. */
+export function JoinArt({ size = 56 }: { size?: number }) {
+  const reduced = useReducedMotion();
+  const hop = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (reduced) return;
+    const a = Animated.loop(Animated.sequence([
+      Animated.timing(hop, { toValue: 1, duration: 380, easing: Easing.out(Easing.quad), useNativeDriver: Platform.OS !== 'web' }),
+      Animated.timing(hop, { toValue: 0, duration: 380, easing: Easing.in(Easing.quad), useNativeDriver: Platform.OS !== 'web' }),
+      Animated.delay(1400),
+    ]));
+    a.start();
+    return () => a.stop();
+  }, [hop, reduced]);
+  const y = hop.interpolate({ inputRange: [0, 1], outputRange: [0, -size * 0.18] });
   return (
-    <Row gap={1.5} style={{ alignItems: 'flex-end', height: 56 }}>
-      {Array.from({ length: 12 }, (_, i) => (
-        <View key={i} style={{ width: 12, height: 14 + (11 - i) * 3.6, borderRadius: 4, backgroundColor: i < 9 ? '#ffffff' : rankColor(i + 1), opacity: i < 9 ? 0.35 + (9 - i) * 0.07 : 1 }} />
-      ))}
-    </Row>
+    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color.accent + '22', alignItems: 'center', justifyContent: 'flex-end', overflow: 'visible' }}>
+      <Icon3D name="gamepad" size={size * 0.62} style={{ marginBottom: size * 0.06 }} />
+      <Animated.View style={{ position: 'absolute', top: -size * 0.12, transform: [{ translateY: y }] }}>
+        <Icon3D name="runner" size={size * 0.6} />
+      </Animated.View>
+    </View>
+  );
+}
+
+function Ladder() {
+  const reduced = useReducedMotion();
+  const t = useRef(new Animated.Value(0)).current;
+  const anim = useRef<Animated.CompositeAnimation | null>(null);
+
+  const run = useCallback(() => {
+    anim.current?.stop();
+    if (reduced) { t.setValue(0); return; }
+    t.setValue(0);
+    anim.current = Animated.loop(Animated.sequence([
+      Animated.timing(t, { toValue: 11, duration: 11 * 420, easing: Easing.linear, useNativeDriver: Platform.OS !== 'web' }),
+      Animated.delay(700),
+      Animated.timing(t, { toValue: 0, duration: 11 * 260, easing: Easing.linear, useNativeDriver: Platform.OS !== 'web' }),
+      Animated.delay(1200),
+    ]));
+    anim.current.start();
+  }, [t, reduced]);
+
+  useEffect(() => { run(); return () => anim.current?.stop(); }, [run]);
+
+  // Hop path: on top of each column at whole numbers, up in the air half-way between columns.
+  const xs: number[] = [];
+  const ys: number[] = [];
+  const inputs: number[] = [];
+  const maxH = barHeight(0);
+  for (let i = 0; i <= 11; i++) {
+    inputs.push(i);
+    xs.push(i * (BAR_W + BAR_GAP) + BAR_W / 2 - BOY / 2);
+    ys.push(maxH - barHeight(i));
+    if (i < 11) {
+      inputs.push(i + 0.5);
+      xs.push((i + 0.5) * (BAR_W + BAR_GAP) + BAR_W / 2 - BOY / 2);
+      ys.push(maxH - Math.max(barHeight(i), barHeight(i + 1)) - 22);
+    }
+  }
+  const translateX = t.interpolate({ inputRange: inputs, outputRange: xs });
+  const translateY = t.interpolate({ inputRange: inputs, outputRange: ys });
+
+  return (
+    <Pressable onPress={run} accessibilityRole="button" accessibilityLabel="Outrank" style={{ alignSelf: 'flex-start' }}>
+      <View style={{ height: maxH + BOY + 4, width: 12 * BAR_W + 11 * BAR_GAP, justifyContent: 'flex-end' }}>
+        <Row gap={BAR_GAP / 4} style={{ alignItems: 'flex-end' }}>
+          {Array.from({ length: 12 }, (_, i) => (
+            <View key={i} style={{ width: BAR_W, height: barHeight(i), borderRadius: 4, backgroundColor: i < 9 ? '#ffffff' : rankColor(i + 1), opacity: i < 9 ? 0.4 + (9 - i) * 0.066 : 1 }} />
+          ))}
+        </Row>
+        <Animated.View pointerEvents="none" style={{ position: 'absolute', left: 0, top: 0, transform: [{ translateX }, { translateY }] }}>
+          <Icon3D name="boy" size={BOY} />
+        </Animated.View>
+      </View>
+    </Pressable>
   );
 }
 
@@ -231,5 +308,5 @@ const styles = StyleSheet.create({
   scanBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: color.accent + '18', alignItems: 'center', justifyContent: 'center' },
   hostRow: { flexDirection: 'row', alignItems: 'center', gap: space(2), height: 48, paddingHorizontal: space(4), borderRadius: radius.pill, backgroundColor: '#FFFFFF2E' },
   openPill: { paddingHorizontal: 14, height: 32, borderRadius: radius.pill, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
-  tile: { width: 148, height: 168, borderWidth: 1 },
+  tile: { width: 156, height: 180, borderWidth: 2 },
 });
