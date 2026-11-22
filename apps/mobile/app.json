@@ -58,7 +58,8 @@
           "resizeMode": "contain"
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      "expo-video"
     ],
     "extra": {
       "supportsRTL": true,

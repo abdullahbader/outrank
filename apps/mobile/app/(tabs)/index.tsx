@@ -6,6 +6,7 @@ import { api, type ActiveGame, type Category, type Stats } from '@/api';
 import { useApp, useLocalized } from '@/app-context';
 import { Icon3D } from '@/icons3d';
 import { CategoryPhoto } from '@/photos';
+import { HeroVideo } from '@/HeroVideo';
 import { catStyle, color, radius, rankColor, shadow, space } from '@/theme';
 import { Avatar, Card, FadeIn, Gap, Gradient, IconPlate, ltr, Row, Screen, SectionTitle, Txt, type IconName, useReducedMotion } from '@/ui';
 
@@ -70,7 +71,7 @@ export default function Home() {
 
       {/* hero with the main actions */}
       <FadeIn index={1}>
-        <Gradient from="#3F8F65" to="#75AFC5" style={shadow.glow('#3F8F65')}>
+        <HeroVideo style={shadow.glow('#3F8F65')}>
           <View style={{ padding: space(5) }}>
             <Ladder />
             <Gap h={4} />
@@ -99,7 +100,7 @@ export default function Home() {
               <Feather name={rtl ? 'chevron-left' : 'chevron-right'} size={20} color="#FFFFFFCC" />
             </Pressable>
           </View>
-        </Gradient>
+        </HeroVideo>
       </FadeIn>
 
       {devTools ? (
