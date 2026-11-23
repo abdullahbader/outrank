@@ -51,8 +51,8 @@ export default function Home() {
   // the two main actions, always at the bottom of Home as two equal squares: Join a game · Host a game
   const actions = (
     <View style={{ flexDirection: 'row', gap: space(3) }}>
-      <ActionSquare index={0} bg="#DCEBDD" title={t('home.join')} hint={t('home.joinHint')} onPress={() => router.push('/join')}
-        art={<JoinArt size={56} />}
+      <ActionSquare index={0} bg="#294638" ink="#FFFFFF" title={t('home.join')} hint={t('home.joinHint')} onPress={() => router.push('/join')}
+        art={<JoinArt size={56} ring="#FFFFFF1F" />}
         corner={
           <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} hitSlop={8}
             style={({ pressed }) => [styles.scanBtn, rtl ? { left: space(3) } : { right: space(3) }, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}>
@@ -237,7 +237,7 @@ function BrandLogo({ height = 121 }: { height?: number }) {
 }
 
 /** "Join": a runner leaping onto a game controller, with a gentle hop. */
-export function JoinArt({ size = 56 }: { size?: number }) {
+export function JoinArt({ size = 56, ring = color.accent + '22' }: { size?: number; ring?: string }) {
   const reduced = useReducedMotion();
   const hop = useRef(new Animated.Value(0)).current;
   useEffect(() => {
@@ -252,7 +252,7 @@ export function JoinArt({ size = 56 }: { size?: number }) {
   }, [hop, reduced]);
   const y = hop.interpolate({ inputRange: [0, 1], outputRange: [0, -size * 0.18] });
   return (
-    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color.accent + '22', alignItems: 'center', justifyContent: 'flex-end', overflow: 'visible' }}>
+    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: ring, alignItems: 'center', justifyContent: 'flex-end', overflow: 'visible' }}>
       <Icon3D name="gamepad" size={size * 0.62} style={{ marginBottom: size * 0.06 }} />
       <Animated.View style={{ position: 'absolute', top: -size * 0.12, transform: [{ translateY: y }] }}>
         <Icon3D name="runner" size={size * 0.6} />
@@ -268,8 +268,8 @@ const ND = Platform.OS !== 'web';
  * sweeping across it every few seconds, and squashes and springs back when pressed.
  * The corner prop is a small extra button laid over the top corner (a button cannot hold another button).
  */
-function ActionSquare({ index, bg, title, hint, art, onPress, corner }: {
-  index: number; bg: string; title: string; hint: string; art: ReactNode; onPress: () => void; corner?: ReactNode;
+function ActionSquare({ index, bg, ink = color.text, title, hint, art, onPress, corner }: {
+  index: number; bg: string; ink?: string; title: string; hint: string; art: ReactNode; onPress: () => void; corner?: ReactNode;
 }) {
   const reduced = useReducedMotion();
   const enter = useRef(new Animated.Value(reduced ? 1 : 0)).current;
@@ -299,8 +299,8 @@ function ActionSquare({ index, bg, title, hint, art, onPress, corner }: {
         ) : null}
         {art}
         <View>
-          <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{title}</Txt>
-          <Txt v="small" color={color.text + 'B3'} numberOfLines={1}>{hint}</Txt>
+          <Txt v="h2" color={ink} style={{ fontSize: 18 }} numberOfLines={2}>{title}</Txt>
+          <Txt v="small" color={ink + 'B3'} numberOfLines={1}>{hint}</Txt>
         </View>
       </Pressable>
       {corner}
@@ -325,7 +325,7 @@ function Wiggle({ children }: { children: ReactNode }) {
 
 const styles = StyleSheet.create({
   square: { width: '100%', aspectRatio: 1, borderRadius: radius.lg, padding: space(3.5), justifyContent: 'space-between', overflow: 'hidden' },
-  shine: { position: 'absolute', top: -60, bottom: -60, width: 46, backgroundColor: 'rgba(255, 255, 255, 0.35)' },
+  shine: { position: 'absolute', top: -60, bottom: -60, width: 46, backgroundColor: 'rgba(255, 255, 255, 0.22)' },
   joinPlate: { width: 52, height: 52, borderRadius: 26, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   scanBtn: { position: 'absolute', top: space(3), width: 40, height: 40, borderRadius: 20, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
   openPill: { paddingHorizontal: 14, height: 32, borderRadius: radius.pill, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
