@@ -80,14 +80,25 @@ export function Lobby({ view, act, onError }: { view: LiveView; act: (a: ActionI
       <Gap h={6} />
       <Row style={{ justifyContent: 'space-between' }}>
         <Txt v="label" faint>{t('lobby.categories')}</Txt>
-        {host ? <Pressable onPress={() => setEditing((e) => !e)} accessibilityRole="button"><Txt v="small" color={color.accent}>{t('lobby.edit')}</Txt></Pressable> : null}
+        {host ? (
+          <Pressable onPress={() => setEditing((e) => !e)} accessibilityRole="button" hitSlop={8}
+            style={({ pressed }) => [{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 36, borderRadius: radius.pill,
+              backgroundColor: editing ? color.accent : color.accent + '18', opacity: pressed ? 0.8 : 1 }]}>
+            <Feather name={editing ? 'check' : 'pencil'} size={15} color={editing ? '#FFFFFF' : color.accent} />
+            <Txt v="small" color={editing ? '#FFFFFF' : color.accent}>{editing ? t('lobby.editDone') : t('lobby.edit')}</Txt>
+          </Pressable>
+        ) : null}
       </Row>
       <Gap h={2} />
-      <Row wrap gap={2}>
-        {(editing ? cats.filter((c) => c.ready > 0).map((c) => c.id) : view.categories).map((id) => (
-          <Chip key={id} label={catName(id)} icon={catStyle(id).icon as never} selected={view.categories.includes(id)} onPress={host && editing ? () => toggleCat(id) : undefined} />
-        ))}
-      </Row>
+      {/* while changing: every category with questions is shown, on or off, inside a highlighted box */}
+      <View style={editing ? { padding: space(3), borderRadius: radius.md, borderWidth: 1.5, borderStyle: 'dashed', borderColor: color.accent, backgroundColor: color.accent + '0D' } : null}>
+        {editing ? <Txt v="small" dim style={{ marginBottom: space(2) }}>{t('lobby.editHint')}</Txt> : null}
+        <Row wrap gap={2}>
+          {(editing ? cats.filter((c) => c.ready > 0).map((c) => c.id) : view.categories).map((id) => (
+            <Chip key={id} label={catName(id)} icon={catStyle(id).icon as never} selected={view.categories.includes(id)} onPress={host && editing ? () => toggleCat(id) : undefined} />
+          ))}
+        </Row>
+      </View>
 
       <Gap h={6} />
       <Row style={{ justifyContent: 'space-between' }}>

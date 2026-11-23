@@ -110,7 +110,9 @@
     "shareBtn": "Invite friends",
     "shareText": "Join my Outrank game! Code: {{code}}\n{{link}}",
     "timerChip": "{{n}} s per turn",
-    "noTimer": "No timer"
+    "noTimer": "No timer",
+    "editHint": "Tap a category to turn it on or off. At least one stays on.",
+    "editDone": "Done"
   },
   "game": {
     "question": "Question {{n}}",
