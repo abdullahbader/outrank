@@ -1,14 +1,16 @@
+import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useEffect, useState } from 'react';
 import { Linking, Pressable, TextInput, View } from 'react-native';
 import { api } from '@/api';
 import { useApp } from '@/app-context';
 import { avatarColors, color, radius, space } from '@/theme';
-import { Avatar, Button, Card, FadeIn, Gap, IconPlate, Row, Screen, SectionTitle, Txt } from '@/ui';
+import { Avatar, Button, Card, FadeIn, Gap, IconPlate, Row, Screen, SectionTitle, Txt, TopBar } from '@/ui';
 
 interface AppConfig { support: { whatsapp: string | null; email: string | null } }
 
 export default function Profile() {
+  const router = useRouter();
   const { t, profile, saveProfile, locale, setLocale } = useApp();
   const [name, setName] = useState(profile.name);
   const [tint, setTint] = useState(profile.color);
@@ -30,8 +32,8 @@ export default function Profile() {
 
   return (
     <Screen>
-      <Txt v="title">{t('profile.title')}</Txt>
-      <Gap h={5} />
+      <TopBar title={t('profile.title')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+      <Gap h={1} />
       <FadeIn>
         <Card style={{ alignItems: 'center', paddingVertical: space(6) }} glow={tint}>
           <Avatar name={name || '?'} tint={tint} emoji={emoji} size={92} />

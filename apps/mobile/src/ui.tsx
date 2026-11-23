@@ -52,7 +52,7 @@ export function Screen({ children, scroll = true, footer, padded = true }: { chi
   const insets = useSafeAreaInsets();
   const pad = padded ? space(4) : 0;
   const body = scroll ? (
-    <ScrollView contentContainerStyle={{ padding: pad, paddingTop: insets.top + space(3), paddingBottom: space(24) }} keyboardShouldPersistTaps="handled">
+    <ScrollView contentContainerStyle={{ padding: pad, paddingTop: insets.top + space(3), paddingBottom: insets.bottom + space(8) }} keyboardShouldPersistTaps="handled">
       <View style={styles.maxWidth}>{children}</View>
     </ScrollView>
   ) : (

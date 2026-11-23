@@ -8,7 +8,7 @@ import { Icon3D } from '@/icons3d';
 import { CategoryPhoto } from '@/photos';
 import { HeroVideo } from '@/HeroVideo';
 import { catStyle, color, radius, rankColor, space } from '@/theme';
-import { Avatar, Card, FadeIn, Gap, Gradient, IconPlate, ltr, Row, Screen, SectionTitle, Txt, type IconName, useReducedMotion } from '@/ui';
+import { Avatar, Card, FadeIn, Gap, Gradient, IconButton, IconPlate, ltr, Row, Screen, SectionTitle, Txt, type IconName, useReducedMotion } from '@/ui';
 
 const HOW: { key: string; icon: IconName; tint: string; img?: string }[] = [
   { key: 's1', icon: 'list', tint: color.accent },
@@ -54,15 +54,14 @@ export default function Home() {
         {/* logo on one side, the player's picture and name on the other */}
         <Row style={{ justifyContent: 'space-between' }}>
           <BrandLogo height={48} />
-          <Pressable onPress={() => router.navigate('/profile')} accessibilityRole="button" accessibilityLabel={t('nav.profile')} style={{ flexShrink: 1, marginStart: space(3) }}>
-            <Row gap={2}>
-              <View style={{ flexShrink: 1, alignItems: 'flex-end' }}>
-                <Txt v="h2" numberOfLines={1} style={{ fontSize: 17 }}>{profile.name ? t('home2.hi', { name: profile.name }) : t('home2.welcome')}</Txt>
-                <Txt v="small" dim>{t('nav.profile')}</Txt>
-              </View>
-              <Avatar name={profile.name || '?'} tint={profile.color} emoji={profile.emoji} size={42} />
-            </Row>
-          </Pressable>
+          <Row gap={2} style={{ flexShrink: 1, marginStart: space(3) }}>
+            <IconButton icon="book-open" label={t('nav.rules')} onPress={() => router.push('/rules')} />
+            <IconButton icon="bar-chart-2" label={t('nav.stats')} onPress={() => router.push('/stats')} />
+            <Pressable onPress={() => router.push('/profile')} accessibilityRole="button" accessibilityLabel={t('nav.profile')} hitSlop={6}
+              style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.94 : 1 }] })}>
+              <Avatar name={profile.name || '?'} tint={profile.color} emoji={profile.emoji} size={44} />
+            </Pressable>
+          </Row>
         </Row>
       </FadeIn>
       <Gap h={5} />
@@ -72,30 +71,36 @@ export default function Home() {
         {/* edge to edge: cancel the screen's side padding, no rounded corners */}
         <HeroVideo style={{ marginHorizontal: -space(4), borderRadius: 0 }}>
           <View style={{ padding: space(5) }}>
+            <Txt v="small" color="#ffffffcc">{profile.name ? t('home2.hi', { name: profile.name }) : t('home2.welcome')}</Txt>
             <Txt v="title" color="#fff">{t('home2.heroTitle')}</Txt>
             <Txt v="small" color="#ffffffcc">{t('home2.heroSub')}</Txt>
             <Gap h={5} />
-            {/* the main action: a big Join block */}
-            <View style={styles.joinBlock}>
+            {/* the two main actions as big squares: Join a game · Host a game */}
+            <View style={{ flexDirection: 'row', gap: space(3) }}>
+              <View style={{ flex: 1 }}>
               <Pressable onPress={() => router.push('/join')} accessibilityRole="button" accessibilityLabel={t('home.join')}
-                style={({ pressed }) => [{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: space(3) }, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+                style={({ pressed }) => [styles.square, { backgroundColor: '#FFFFFF' }, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
                 <JoinArt size={56} />
-                <View style={{ flex: 1 }}>
-                  <Txt v="h2" color={color.text} style={{ fontSize: 20 }}>{t('home.join')}</Txt>
-                  <Txt v="small" dim>{t('home.joinHint')}</Txt>
+                <View>
+                  <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{t('home.join')}</Txt>
+                  <Txt v="small" dim numberOfLines={1}>{t('home.joinHint')}</Txt>
                 </View>
               </Pressable>
-              <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} hitSlop={6}
-                style={({ pressed }) => [styles.scanBtn, { transform: [{ scale: pressed ? 0.94 : 1 }] }]}>
-                <Feather name="maximize" size={20} color={color.accent} />
+              {/* QR scan: a sibling laid over the square's corner (a button can't hold another button) */}
+              <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} hitSlop={8}
+                style={({ pressed }) => [styles.scanBtn, rtl ? { left: space(3) } : { right: space(3) }, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}>
+                <Feather name="maximize" size={18} color={color.accent} />
+              </Pressable>
+              </View>
+              <Pressable onPress={() => router.push('/create')} accessibilityRole="button" accessibilityLabel={t('home2.host')}
+                style={({ pressed }) => [styles.square, { flex: 1, backgroundColor: color.gold }, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+                <Icon3D name="microphone" size={56} />
+                <View>
+                  <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{t('home2.host')}</Txt>
+                  <Txt v="small" color={color.text + 'CC'} numberOfLines={1}>{t('home.createHint')}</Txt>
+                </View>
               </Pressable>
             </View>
-            <Gap h={3} />
-            <Pressable onPress={() => router.push('/create')} accessibilityRole="button" style={({ pressed }) => [styles.hostRow, { opacity: pressed ? 0.8 : 1 }]}>
-              <Feather name="zap" size={18} color="#FFFFFF" />
-              <Txt color="#FFFFFF" style={{ flex: 1 }}>{t('home2.host')}</Txt>
-              <Feather name={rtl ? 'chevron-left' : 'chevron-right'} size={20} color="#FFFFFFCC" />
-            </Pressable>
           </View>
         </HeroVideo>
       </FadeIn>
@@ -171,7 +176,7 @@ export default function Home() {
 
       {/* how it works carousel */}
       <Gap h={6} />
-      <SectionTitle title={t('home2.howTitle')} action={t('nav.rules')} onAction={() => router.navigate('/rules')} />
+      <SectionTitle title={t('home2.howTitle')} action={t('nav.rules')} onAction={() => router.push('/rules')} />
       <ScrollView horizontal pagingEnabled={false} snapToInterval={cardW + space(3)} decelerationRate="fast" showsHorizontalScrollIndicator={false}
         onScroll={onScroll} scrollEventThrottle={32} contentContainerStyle={{ gap: space(3) }}>
         {HOW.map((h, i) => (
@@ -194,7 +199,7 @@ export default function Home() {
 
       {/* stats strip */}
       <Gap h={6} />
-      <SectionTitle title={t('home2.statsTitle')} action={t('home2.seeStats')} onAction={() => router.navigate('/stats')} />
+      <SectionTitle title={t('home2.statsTitle')} action={t('home2.seeStats')} onAction={() => router.push('/stats')} />
       <Row gap={3}>
         {([
           ['home2.games', stats?.gamesPlayed ?? 0, 'grid', color.streak, 'party'],
@@ -214,7 +219,7 @@ export default function Home() {
 }
 
 /** The owner's logo (ladder + boy) on the hero; it floats gently, and a tap makes it bounce. */
-const LOGO = require('../../assets/brand/logo-mark.png');
+const LOGO = require('../assets/brand/logo-mark.png');
 function BrandLogo({ height = 121 }: { height?: number }) {
   const reduced = useReducedMotion();
   const bob = useRef(new Animated.Value(0)).current;
@@ -267,10 +272,9 @@ export function JoinArt({ size = 56 }: { size?: number }) {
 }
 
 const styles = StyleSheet.create({
-  joinBlock: { flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(4), borderRadius: radius.lg, backgroundColor: '#FFFFFF', minHeight: 84 },
+  square: { aspectRatio: 1, minHeight: 150, borderRadius: radius.lg, padding: space(3.5), justifyContent: 'space-between' },
   joinPlate: { width: 52, height: 52, borderRadius: 26, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
-  scanBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: color.accent + '18', alignItems: 'center', justifyContent: 'center' },
-  hostRow: { flexDirection: 'row', alignItems: 'center', gap: space(2), height: 48, paddingHorizontal: space(4), borderRadius: radius.pill, backgroundColor: '#FFFFFF2E' },
+  scanBtn: { position: 'absolute', top: space(3), width: 40, height: 40, borderRadius: 20, backgroundColor: color.accent + '18', alignItems: 'center', justifyContent: 'center' },
   openPill: { paddingHorizontal: 14, height: 32, borderRadius: radius.pill, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   tile: { width: 156, height: 180, borderWidth: 2 },
 });

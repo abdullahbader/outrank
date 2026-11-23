@@ -1,16 +1,18 @@
+import { useRouter } from 'expo-router';
 import { View } from 'react-native';
 import { basePoints, RANKS } from '@outrank/shared';
 import { useApp } from '@/app-context';
 import { color, radius, rankColor, space } from '@/theme';
-import { Card, FadeIn, Gap, IconPlate, ltr, Row, Screen, SectionTitle, Txt } from '@/ui';
+import { Card, FadeIn, Gap, IconPlate, ltr, Row, Screen, SectionTitle, Txt, TopBar } from '@/ui';
 
 /** The rules on one page: scoring, cards, how a question runs, winning. */
 export default function Rules() {
+  const router = useRouter();
   const { t } = useApp();
   return (
     <Screen>
-      <Txt v="title">{t('rules.title')}</Txt>
-      <Gap h={5} />
+      <TopBar title={t('rules.title')} onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+      <Gap h={1} />
 
       <FadeIn>
         <SectionTitle title={t('rules.scoring')} />
