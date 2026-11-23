@@ -1,6 +1,6 @@
 import { Icon as Feather } from '@/icons';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Animated, Dimensions, Easing, Platform, Pressable, ScrollView, StyleSheet, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { api, type ActiveGame, type Category, type Stats } from '@/api';
 import { useApp, useLocalized } from '@/app-context';
@@ -48,32 +48,20 @@ export default function Home() {
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => setPage(Math.round(Math.abs(e.nativeEvent.contentOffset.x) / (cardW + space(3))));
 
   // the two main actions, always at the bottom of Home as big squares: Join a game · Host a game
+  // the two main actions, always at the bottom of Home as two equal squares: Join a game · Host a game
   const actions = (
-      <View style={{ flexDirection: 'row', gap: space(3) }}>
-        <View style={{ flex: 1 }}>
-        <Pressable onPress={() => router.push('/join')} accessibilityRole="button" accessibilityLabel={t('home.join')}
-          style={({ pressed }) => [styles.square, { backgroundColor: '#DCEBDD' }, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-          <JoinArt size={56} />
-          <View>
-            <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{t('home.join')}</Txt>
-            <Txt v="small" dim numberOfLines={1}>{t('home.joinHint')}</Txt>
-          </View>
-        </Pressable>
-        {/* QR scan: a sibling laid over the square's corner (a button can't hold another button) */}
-        <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} hitSlop={8}
-          style={({ pressed }) => [styles.scanBtn, { backgroundColor: '#FFFFFF' }, rtl ? { left: space(3) } : { right: space(3) }, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}>
-          <Feather name="maximize" size={18} color={color.accent} />
-        </Pressable>
-        </View>
-        <Pressable onPress={() => router.push('/create')} accessibilityRole="button" accessibilityLabel={t('home2.host')}
-          style={({ pressed }) => [styles.square, { flex: 1, backgroundColor: color.gold }, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-          <Icon3D name="microphone" size={56} />
-          <View>
-            <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{t('home2.host')}</Txt>
-            <Txt v="small" color={color.text + 'CC'} numberOfLines={1}>{t('home.createHint')}</Txt>
-          </View>
-        </Pressable>
-      </View>
+    <View style={{ flexDirection: 'row', gap: space(3) }}>
+      <ActionSquare index={0} bg="#DCEBDD" title={t('home.join')} hint={t('home.joinHint')} onPress={() => router.push('/join')}
+        art={<JoinArt size={56} />}
+        corner={
+          <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} hitSlop={8}
+            style={({ pressed }) => [styles.scanBtn, rtl ? { left: space(3) } : { right: space(3) }, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}>
+            <Feather name="maximize" size={18} color={color.accent} />
+          </Pressable>
+        } />
+      <ActionSquare index={1} bg={color.gold} title={t('home2.host')} hint={t('home.createHint')} onPress={() => router.push('/create')}
+        art={<Wiggle><Icon3D name="microphone" size={56} /></Wiggle>} />
+    </View>
   );
 
   return (
@@ -273,10 +261,73 @@ export function JoinArt({ size = 56 }: { size?: number }) {
   );
 }
 
+const ND = Platform.OS !== 'web';
+
+/**
+ * One big square action. Pops in with a spring (the second one a beat later), gets a soft shine
+ * sweeping across it every few seconds, and squashes and springs back when pressed.
+ * The corner prop is a small extra button laid over the top corner (a button cannot hold another button).
+ */
+function ActionSquare({ index, bg, title, hint, art, onPress, corner }: {
+  index: number; bg: string; title: string; hint: string; art: ReactNode; onPress: () => void; corner?: ReactNode;
+}) {
+  const reduced = useReducedMotion();
+  const enter = useRef(new Animated.Value(reduced ? 1 : 0)).current;
+  const press = useRef(new Animated.Value(1)).current;
+  const shine = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (reduced) return;
+    Animated.spring(enter, { toValue: 1, delay: 150 + index * 140, friction: 5, tension: 70, useNativeDriver: ND }).start();
+    const loop = Animated.loop(Animated.sequence([
+      Animated.delay(2200 + index * 700),
+      Animated.timing(shine, { toValue: 1, duration: 900, easing: Easing.inOut(Easing.quad), useNativeDriver: ND }),
+      Animated.timing(shine, { toValue: 0, duration: 0, useNativeDriver: ND }),
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, [enter, shine, index, reduced]);
+  const to = (v: number) => { if (!reduced) Animated.spring(press, { toValue: v, friction: 4, tension: 160, useNativeDriver: ND }).start(); };
+  const scale = Animated.multiply(press, enter.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] }));
+  const translateY = enter.interpolate({ inputRange: [0, 1], outputRange: [40, 0] });
+  const shineX = shine.interpolate({ inputRange: [0, 1], outputRange: [-160, 260] });
+  return (
+    <Animated.View style={{ flex: 1, opacity: enter, transform: [{ translateY }, { scale }] }}>
+      <Pressable onPress={onPress} onPressIn={() => to(0.93)} onPressOut={() => to(1)} accessibilityRole="button" accessibilityLabel={title}
+        style={[styles.square, { backgroundColor: bg }]}>
+        {!reduced ? (
+          <Animated.View pointerEvents="none" style={[styles.shine, { transform: [{ translateX: shineX }, { rotate: '20deg' }] }]} />
+        ) : null}
+        {art}
+        <View>
+          <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{title}</Txt>
+          <Txt v="small" color={color.text + 'B3'} numberOfLines={1}>{hint}</Txt>
+        </View>
+      </Pressable>
+      {corner}
+    </Animated.View>
+  );
+}
+
+/** A playful tilt back and forth, now and then. */
+function Wiggle({ children }: { children: ReactNode }) {
+  const reduced = useReducedMotion();
+  const r = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (reduced) return;
+    const step = (v: number, d: number) => Animated.timing(r, { toValue: v, duration: d, easing: Easing.inOut(Easing.sin), useNativeDriver: ND });
+    const loop = Animated.loop(Animated.sequence([step(1, 160), step(-1, 260), step(0.6, 220), step(0, 200), Animated.delay(1600)]));
+    loop.start();
+    return () => loop.stop();
+  }, [r, reduced]);
+  const rotate = r.interpolate({ inputRange: [-1, 1], outputRange: ['-14deg', '14deg'] });
+  return <Animated.View style={{ alignSelf: 'flex-start', transform: [{ rotate }] }}>{children}</Animated.View>;
+}
+
 const styles = StyleSheet.create({
-  square: { height: 150, borderRadius: radius.lg, padding: space(3.5), justifyContent: 'space-between' },
+  square: { width: '100%', aspectRatio: 1, borderRadius: radius.lg, padding: space(3.5), justifyContent: 'space-between', overflow: 'hidden' },
+  shine: { position: 'absolute', top: -60, bottom: -60, width: 46, backgroundColor: 'rgba(255, 255, 255, 0.35)' },
   joinPlate: { width: 52, height: 52, borderRadius: 26, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
-  scanBtn: { position: 'absolute', top: space(3), width: 40, height: 40, borderRadius: 20, backgroundColor: color.accent + '18', alignItems: 'center', justifyContent: 'center' },
+  scanBtn: { position: 'absolute', top: space(3), width: 40, height: 40, borderRadius: 20, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
   openPill: { paddingHorizontal: 14, height: 32, borderRadius: radius.pill, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   tile: { width: 156, height: 180, borderWidth: 2 },
 });
