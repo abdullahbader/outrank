@@ -47,8 +47,37 @@ export default function Home() {
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => setPage(Math.round(Math.abs(e.nativeEvent.contentOffset.x) / (cardW + space(3))));
 
+  // the two main actions, always at the bottom of Home as big squares: Join a game · Host a game
+  const actions = (
+      <View style={{ flexDirection: 'row', gap: space(3) }}>
+        <View style={{ flex: 1 }}>
+        <Pressable onPress={() => router.push('/join')} accessibilityRole="button" accessibilityLabel={t('home.join')}
+          style={({ pressed }) => [styles.square, { backgroundColor: '#DCEBDD' }, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+          <JoinArt size={56} />
+          <View>
+            <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{t('home.join')}</Txt>
+            <Txt v="small" dim numberOfLines={1}>{t('home.joinHint')}</Txt>
+          </View>
+        </Pressable>
+        {/* QR scan: a sibling laid over the square's corner (a button can't hold another button) */}
+        <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} hitSlop={8}
+          style={({ pressed }) => [styles.scanBtn, { backgroundColor: '#FFFFFF' }, rtl ? { left: space(3) } : { right: space(3) }, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}>
+          <Feather name="maximize" size={18} color={color.accent} />
+        </Pressable>
+        </View>
+        <Pressable onPress={() => router.push('/create')} accessibilityRole="button" accessibilityLabel={t('home2.host')}
+          style={({ pressed }) => [styles.square, { flex: 1, backgroundColor: color.gold }, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
+          <Icon3D name="microphone" size={56} />
+          <View>
+            <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{t('home2.host')}</Txt>
+            <Txt v="small" color={color.text + 'CC'} numberOfLines={1}>{t('home.createHint')}</Txt>
+          </View>
+        </Pressable>
+      </View>
+  );
+
   return (
-    <Screen>
+    <Screen footer={actions}>
       {/* header */}
       <FadeIn>
         {/* logo on one side, the player's picture and name on the other */}
@@ -70,37 +99,10 @@ export default function Home() {
       <FadeIn index={1}>
         {/* edge to edge: cancel the screen's side padding, no rounded corners */}
         <HeroVideo style={{ marginHorizontal: -space(4), borderRadius: 0 }}>
-          <View style={{ padding: space(5) }}>
+          <View style={{ padding: space(5), minHeight: 210, justifyContent: 'flex-end' }}>
             <Txt v="small" color="#ffffffcc">{profile.name ? t('home2.hi', { name: profile.name }) : t('home2.welcome')}</Txt>
             <Txt v="title" color="#fff">{t('home2.heroTitle')}</Txt>
             <Txt v="small" color="#ffffffcc">{t('home2.heroSub')}</Txt>
-            <Gap h={5} />
-            {/* the two main actions as big squares: Join a game · Host a game */}
-            <View style={{ flexDirection: 'row', gap: space(3) }}>
-              <View style={{ flex: 1 }}>
-              <Pressable onPress={() => router.push('/join')} accessibilityRole="button" accessibilityLabel={t('home.join')}
-                style={({ pressed }) => [styles.square, { backgroundColor: '#FFFFFF' }, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-                <JoinArt size={56} />
-                <View>
-                  <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{t('home.join')}</Txt>
-                  <Txt v="small" dim numberOfLines={1}>{t('home.joinHint')}</Txt>
-                </View>
-              </Pressable>
-              {/* QR scan: a sibling laid over the square's corner (a button can't hold another button) */}
-              <Pressable onPress={() => router.push('/scan')} accessibilityRole="button" accessibilityLabel={t('home2.scan')} hitSlop={8}
-                style={({ pressed }) => [styles.scanBtn, rtl ? { left: space(3) } : { right: space(3) }, { transform: [{ scale: pressed ? 0.92 : 1 }] }]}>
-                <Feather name="maximize" size={18} color={color.accent} />
-              </Pressable>
-              </View>
-              <Pressable onPress={() => router.push('/create')} accessibilityRole="button" accessibilityLabel={t('home2.host')}
-                style={({ pressed }) => [styles.square, { flex: 1, backgroundColor: color.gold }, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}>
-                <Icon3D name="microphone" size={56} />
-                <View>
-                  <Txt v="h2" color={color.text} style={{ fontSize: 18 }} numberOfLines={2}>{t('home2.host')}</Txt>
-                  <Txt v="small" color={color.text + 'CC'} numberOfLines={1}>{t('home.createHint')}</Txt>
-                </View>
-              </Pressable>
-            </View>
           </View>
         </HeroVideo>
       </FadeIn>
@@ -272,7 +274,7 @@ export function JoinArt({ size = 56 }: { size?: number }) {
 }
 
 const styles = StyleSheet.create({
-  square: { aspectRatio: 1, minHeight: 150, borderRadius: radius.lg, padding: space(3.5), justifyContent: 'space-between' },
+  square: { height: 150, borderRadius: radius.lg, padding: space(3.5), justifyContent: 'space-between' },
   joinPlate: { width: 52, height: 52, borderRadius: 26, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   scanBtn: { position: 'absolute', top: space(3), width: 40, height: 40, borderRadius: 20, backgroundColor: color.accent + '18', alignItems: 'center', justifyContent: 'center' },
   openPill: { paddingHorizontal: 14, height: 32, borderRadius: radius.pill, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
