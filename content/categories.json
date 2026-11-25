@@ -8,5 +8,9 @@
   { "id": "food", "en": "Food", "ar": "طعام", "icon": "utensils", "sort": 7 },
   { "id": "business", "en": "Business and Economics", "ar": "أعمال واقتصاد", "icon": "briefcase", "sort": 8 },
   { "id": "nature", "en": "Nature and Animals", "ar": "طبيعة وحيوانات", "icon": "leaf", "sort": 9 },
-  { "id": "general", "en": "General Knowledge", "ar": "معلومات عامة", "icon": "lightbulb", "sort": 10 }
+  { "id": "general", "en": "General Knowledge", "ar": "معلومات عامة", "icon": "lightbulb", "sort": 10 },
+  { "id": "society", "en": "Society and Life", "ar": "المجتمع والحياة", "icon": "users", "sort": 11 },
+  { "id": "health", "en": "Health", "ar": "الصحة", "icon": "heart", "sort": 12 },
+  { "id": "religion", "en": "Religion", "ar": "الدين", "icon": "book", "sort": 13 },
+  { "id": "travel", "en": "Travel", "ar": "السفر", "icon": "plane", "sort": 14 }
 ]

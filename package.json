@@ -20,7 +20,7 @@
     "app:start": "npm run start -w @outrank/mobile",
     "postinstall": "npm run build -w @outrank/shared",
     "render:build": "npm run build -w @outrank/shared && npx prisma generate --schema apps/api/prisma/schema.prisma && npm run build -w @outrank/api",
-    "render:start": "cd apps/api && npx prisma migrate deploy && node scripts/import-questions.mjs && node dist/main.js"
+    "render:start": "cd apps/api && npx prisma migrate deploy && node scripts/import-questions.mjs && node scripts/import-questions.mjs --file ../../content/questions-main.json && node dist/main.js"
   },
   "engines": {
     "node": ">=24"

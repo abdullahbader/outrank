@@ -71,6 +71,10 @@ export const categoryStyle: Record<string, { tint: string; icon: string }> = {
   business: { tint: '#B5A04A', icon: 'briefcase' },
   nature: { tint: '#5E9E8F', icon: 'leaf' },
   general: { tint: '#7A9A5C', icon: 'lightbulb-on' },
+  society: { tint: '#B0607A', icon: 'account-group' },
+  health: { tint: '#C25B5B', icon: 'heart-pulse' },
+  religion: { tint: '#3E7C6E', icon: 'mosque' },
+  travel: { tint: '#4E7FA8', icon: 'airplane' },
 };
 export const catStyle = (id: string) => categoryStyle[id] ?? { tint: color.accent, icon: 'star' };
 

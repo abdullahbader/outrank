@@ -10,6 +10,7 @@ can be replaced without touching the engine or the screens.
 |---|---|
 | `content/categories.json` | Categories: `id`, English and Arabic name, icon, sort order. Add a line to add a category. |
 | `content/test-questions.json` | **TEST DATA**: 30 sample questions, 3 per category. Dataset label `TEST`. |
+| `content/questions-main.json` | **MAIN**: the owner's question set (51 questions, added 2026-11-25). Dataset label `MAIN`. The online server imports it on every start, after the test set. |
 | `content/validate.mjs` | The checker. Run it on any file before importing. |
 | `apps/api/scripts/import-questions.mjs` | The importer. It runs the same checker first and refuses a file with problems. |
 
