@@ -21,6 +21,7 @@ export default function CreateGame() {
   const [name, setName] = useState(profile.name);
   const [busy, setBusy] = useState(false);
   const [seconds, setSeconds] = useState(30);
+  const [hostOnly, setHostOnly] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function CreateGame() {
     setError(null);
     try {
       if (name.trim() && name.trim() !== profile.name) await saveProfile({ name: name.trim() });
-      const g = await api<{ gameId: string; code: string; hostRecoveryCode: string }>('POST', '/games', { categories: picked, answerSeconds: seconds });
+      const g = await api<{ gameId: string; code: string; hostRecoveryCode: string }>('POST', '/games', { categories: picked, answerSeconds: seconds, hostOnly });
       await storage.set(recoveryKey(g.gameId), g.hostRecoveryCode);
       router.replace(`/game/${g.gameId}`);
     } catch (e) {
@@ -80,6 +81,29 @@ export default function CreateGame() {
           </View>
         </Row>
       </FadeIn>
+
+      <Gap h={6} />
+      <SectionTitle title={t('create.mode')} />
+      <View style={{ gap: space(2) }}>
+        {([false, true] as const).map((one) => {
+          const on = hostOnly === one;
+          return (
+            <Pressable key={String(one)} onPress={() => setHostOnly(one)} accessibilityRole="radio" accessibilityState={{ checked: on }}
+              style={({ pressed }) => [styles.mode, on ? { borderColor: color.accent, backgroundColor: color.accent + '12' } : null, { opacity: pressed ? 0.85 : 1 }]}>
+              <View style={[styles.modeIcon, { backgroundColor: on ? color.accent : color.surface2 }]}>
+                <Feather name={one ? 'cellphone' : 'account-group'} size={22} color={on ? '#FFFFFF' : color.textDim} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Txt>{one ? t('create.modeOne') : t('create.modePhones')}</Txt>
+                <Txt v="small" dim>{one ? t('create.modeOneHint') : t('create.modePhonesHint')}</Txt>
+              </View>
+              <View style={[styles.check, { borderRadius: 12 }, on ? { backgroundColor: color.accent, borderColor: color.accent } : null]}>
+                {on ? <Feather name="check" size={14} color="#FFFFFF" /> : null}
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
 
       <Gap h={6} />
       <SectionTitle title={t('create.timer')} />
@@ -134,6 +158,8 @@ const styles = StyleSheet.create({
   cell: { width: '47%', flexGrow: 1 },
   tile: { padding: space(3.5), minHeight: 150 },
   check: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: color.line, alignItems: 'center', justifyContent: 'center' },
+  mode: { flexDirection: 'row', alignItems: 'center', gap: space(3), padding: space(3), borderRadius: radius.md, borderWidth: 1.5, borderColor: color.line, backgroundColor: color.surface },
+  modeIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   track: { height: 6, borderRadius: 3, backgroundColor: color.surface2, overflow: 'hidden' },
   fill: { height: 6, borderRadius: 3 },
 });

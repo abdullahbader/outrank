@@ -301,7 +301,9 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
   const turn = view.round?.turn;
   if (!turn) return null;
   const name = p.name(turn.playerId);
-  const wildOn = view.leaderboard.find((r) => r.id === turn.playerId)?.wild === 'armed';
+  const cards = view.leaderboard.find((r) => r.id === turn.playerId);
+  const wildOn = cards?.wild === 'armed';
+  const one = !!view.hostOnly; // one-phone game: the host plays the cards for whoever is on turn
   if (turn.awaitingStreakDecision) {
     return (
       <Card glow={color.streak}>
@@ -310,7 +312,10 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
           <CountdownPill view={view} kind="streak" />
         </Row>
         <Gap h={3} />
-        <Button label={t('game.nextPlayer')} icon="skip-forward" kind="streak" busy={busy} onPress={() => run({ type: 'end_turn', turnSerial: view.turnSerial })} />
+        {one && cards?.streak === 'available' ? (
+          <><Button label={t('game.streakFor', { name })} icon="repeat" kind="streak" busy={busy} onPress={() => run({ type: 'activate_streak', turnSerial: view.turnSerial })} /><Gap h={2} /></>
+        ) : null}
+        <Button label={t('game.nextPlayer')} icon="skip-forward" kind={one ? 'secondary' : 'streak'} busy={busy} onPress={() => run({ type: 'end_turn', turnSerial: view.turnSerial })} />
         <Gap h={2} />
         <EndQuestion run={run} busy={busy} />
       </Card>
@@ -320,6 +325,13 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
     <View>
       {turn.attemptNo === 2 ? <><Banner tone="info" icon="repeat" text={t('game.secondAttempt')} /><Gap h={2} /></> : null}
       {wildOn ? <><Banner tone="warn" icon="zap" text={`${name}: ${t('cards.wildOn')} (×${view.wildMultiplier})`} /><Gap h={2} /></> : null}
+      {one && cards?.wild === 'available' ? (
+        <>
+          <Button label={t('game.wildFor', { name })} icon="zap" kind="wild" size="sm" disabled={busy} onPress={() => run({ type: 'activate_wild', turnSerial: view.turnSerial })} />
+          <Txt v="small" faint center style={{ marginTop: space(1) }}>{t('game.wildForHint', { n: view.wildMultiplier })}</Txt>
+          <Gap h={3} />
+        </>
+      ) : null}
       {turn.typed ? <TypedCard view={view} run={run} busy={busy} /> : null}
       <Txt v="small" dim>{t('game.tapRank')}</Txt>
       <Gap h={2} />
@@ -335,7 +347,7 @@ function HostControls({ view, run, busy }: { view: LiveView; run: (a: ActionInpu
       ) : null}
       <Gap h={2} />
       <EndQuestion run={run} busy={busy} />
-      {view.online[turn.playerId] === false ? (
+      {!one && view.online[turn.playerId] === false ? (
         <><Gap h={2} /><Button label={`${t('game.skip')} · ${name}`} icon="user-x" kind="ghost" size="sm" disabled={busy} onPress={() => run({ type: 'skip_turn', turnSerial: view.turnSerial })} /></>
       ) : null}
     </View>

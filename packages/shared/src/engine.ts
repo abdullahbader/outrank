@@ -338,7 +338,8 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
   switch (action.type) {
     // ── lobby
     case 'join': {
-      if (!(actor.role === 'system' || (actor.role === 'player' && actor.playerId === action.playerId))) return 'NOT_PLAYER';
+      const hostAdds = isHost(actor) && !!s.config.hostOnly; // one-phone game: the host adds players by name
+      if (!(hostAdds || actor.role === 'system' || (actor.role === 'player' && actor.playerId === action.playerId))) return 'NOT_PLAYER';
       if (s.phase !== 'lobby') return 'WRONG_PHASE';
       const name = (action.name ?? '').trim().replace(/\s+/g, ' ');
       if (!name || name.length > MAX_NAME_LENGTH) return 'NAME_INVALID';
@@ -479,10 +480,13 @@ function handle(s: GameState, actor: Actor, action: Action, now: number, events:
 
     case 'activate_wild':
     case 'activate_streak': {
-      if (actor.role !== 'player') return 'NOT_PLAYER'; // the host can never use a player's card
-      const p = player(s, actor.playerId);
-      if (!p) return 'UNKNOWN_PLAYER';
+      // The host never uses a player's card, except in a one-phone game where the host plays the
+      // card for whoever's turn it is (the players have no phones of their own).
+      const forTurn = isHost(actor) && !!s.config.hostOnly;
+      if (actor.role !== 'player' && !forTurn) return 'NOT_PLAYER';
       if (s.phase !== 'question' || !round.turn) return 'CARD_NOT_ALLOWED_NOW';
+      const p = player(s, actor.role === 'player' ? actor.playerId : round.turn.playerId);
+      if (!p) return 'UNKNOWN_PLAYER';
       if (round.turn.playerId !== p.id) return 'NOT_YOUR_TURN';
       if (action.type === 'activate_wild') {
         if (p.wild !== 'available') return 'CARD_USED';

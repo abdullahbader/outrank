@@ -59,3 +59,16 @@ so it is not hit by accident). Ranks 11 and 12 can stay unclaimed.
 a Streak failure it caused is undone, and the endgame trigger is re-checked if that answer caused it.
 With `replayTurn` (only for the most recent answer of the current question) the turn goes back to
 that player. Every correction is an event in the audit log with the host as actor.
+
+## One-phone game (host runs everything)
+
+Chosen on the New game screen ("One phone, I run it"). Everyone sits in one room; only the host's
+phone is used.
+
+- The host types each player's name in the lobby (`POST /games/:id/players`). Nobody joins with a
+  code: joining or looking up the code answers `HOST_ONLY_GAME`.
+- During a turn the host sees **Wild for <name>** (switch on before ruling) and, when Streak is
+  offered, **Use Streak for <name>**. The engine allows the host to play a card only in this mode
+  (`config.hostOnly`), and always for whoever is on turn.
+- Everything else is the normal game: scoring, laps, tie-breaks, corrections, timers.
+- These players are kept out of personal stats (they have no phone of their own).

@@ -47,7 +47,12 @@
     "timer": "Time to answer",
     "timerHint": "Each player's turn counts down on every phone. At zero the turn ends with no points.",
     "seconds": "{{n}} s",
-    "noTimer": "No timer"
+    "noTimer": "No timer",
+    "mode": "How will you play?",
+    "modePhones": "Everyone on their phone",
+    "modePhonesHint": "Players join with the room code or QR.",
+    "modeOne": "One phone, I run it",
+    "modeOneHint": "Everyone in one room. You add the names and handle answers, Wild and Streak."
   },
   "join": {
     "title": "Join a game",
@@ -112,7 +117,13 @@
     "timerChip": "{{n}} s per turn",
     "noTimer": "No timer",
     "editHint": "Tap a category to turn it on or off. At least one stays on.",
-    "editDone": "Done"
+    "editDone": "Done",
+    "addTitle": "Add players",
+    "addHint": "Type each player's name. They play together in the room; you run the game on this phone.",
+    "namePlaceholder": "Player name",
+    "add": "Add",
+    "oneChip": "One phone",
+    "noPlayersYet": "No players yet. Add at least 2 names."
   },
   "game": {
     "question": "Question {{n}}",
@@ -166,7 +177,10 @@
     "yourTurnSub": "Say your answer out loud",
     "pass": "Pass",
     "soundOff": "Mute music",
-    "soundOn": "Turn music on"
+    "soundOn": "Turn music on",
+    "wildFor": "Wild for {{name}}",
+    "wildForHint": "Switch on before ruling: ×{{n}} for this answer",
+    "streakFor": "Use Streak for {{name}}"
   },
   "cards": {
     "wild": "Wild",
@@ -253,7 +267,9 @@
     "CHAT_TOO_FAST": "Slow down a little",
     "CHAT_MUTED": "The host has muted you",
     "UNKNOWN_MESSAGE": "That message is gone",
-    "NOTHING_CLAIMED": "No answer has been claimed yet"
+    "NOTHING_CLAIMED": "No answer has been claimed yet",
+    "HOST_ONLY_GAME": "This game is run on the host's phone only. No need to join.",
+    "NOT_HOST_ONLY": "Players join this game with their own phones"
   },
   "categories": {},
   "chat": {

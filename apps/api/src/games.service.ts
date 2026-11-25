@@ -43,7 +43,7 @@ export class GamesService implements OnModuleInit {
     for (const g of games) this.scheduleTimer(g.id, g.state as unknown as GameState);
   }
 
-  async create(deviceId: string, categories: string[], answerSeconds = 30) {
+  async create(deviceId: string, categories: string[], answerSeconds = 30, hostOnly = false) {
     const t = config.timerTestSeconds;
     const state = createGame({
       now: Date.now(),
@@ -52,6 +52,7 @@ export class GamesService implements OnModuleInit {
         minQuestions: config.minQuestions, maxPlayers: config.maxPlayers, targetScore: config.targetScore,
         answerSeconds: t && answerSeconds ? t : answerSeconds,
         ...(t ? { streakSeconds: t, nextSeconds: t } : {}),
+        ...(hostOnly ? { hostOnly: true } : {}),
       },
     });
     const recovery = randomCode(8);
@@ -82,6 +83,7 @@ export class GamesService implements OnModuleInit {
     });
     if (!game) throw new GameError('GAME_NOT_FOUND', HttpStatus.NOT_FOUND);
     const s = game.state as unknown as GameState;
+    if (s.config.hostOnly) throw new GameError('HOST_ONLY_GAME');
     return {
       gameId: game.id,
       code: game.code,
@@ -106,6 +108,7 @@ export class GamesService implements OnModuleInit {
     const game = await this.prisma.game.findUnique({ where: { id: gameId } });
     if (!game) throw new GameError('GAME_NOT_FOUND', HttpStatus.NOT_FOUND);
     if (game.hostDeviceId === deviceId) throw new GameError('HOST_CANNOT_JOIN');
+    if (!isBot && (game.state as unknown as GameState).config.hostOnly) throw new GameError('HOST_ONLY_GAME');
     const existing = await this.prisma.gameParticipant.findFirst({ where: { gameId, deviceId, removedAt: null } });
     if (existing) return { playerId: existing.playerId, rejoined: true };
 
@@ -130,6 +133,26 @@ export class GamesService implements OnModuleInit {
     if (!res.ok) throw new GameError(res.error);
     if (!isBot) await this.prisma.device.update({ where: { id: deviceId }, data: { displayName: name.trim() } }).catch(() => {});
     return { playerId, rejoined: false };
+  }
+
+  /**
+   * One-phone game: the host adds a player by name. The player gets a stand-in device record (no
+   * token anyone holds), so the rest of the game treats them like anyone else; they are kept out of
+   * personal stats, like test players.
+   */
+  async addLocalPlayer(gameId: string, deviceId: string, name: string) {
+    const game = await this.prisma.game.findUnique({ where: { id: gameId } });
+    if (!game) throw new GameError('GAME_NOT_FOUND', HttpStatus.NOT_FOUND);
+    if (game.hostDeviceId !== deviceId) throw new GameError('NOT_HOST', HttpStatus.FORBIDDEN);
+    const s = game.state as unknown as GameState;
+    if (!s.config.hostOnly) throw new GameError('NOT_HOST_ONLY');
+    if (s.phase !== 'lobby') throw new GameError('WRONG_PHASE');
+    const clean = name.trim().replace(/\s+/g, ' ');
+    if (s.players.some((p) => p.name.toLowerCase() === clean.toLowerCase())) throw new GameError('NAME_TAKEN');
+    if (!clean || clean.length > 20) throw new GameError('NAME_INVALID');
+    const stand = await this.prisma.device.create({ data: { tokenHash: hashToken(newToken()), displayName: clean } });
+    const { playerId } = await this.join(gameId, stand.id, clean, true, BOT_COLORS[s.players.length % BOT_COLORS.length]);
+    return { playerId };
   }
 
   async recoverHost(gameId: string, deviceId: string, code: string) {

@@ -33,6 +33,8 @@ export const ANSWER_SECONDS = [0, 15, 30, 45, 60] as const;
 export const createGameBody = z.object({
   categories: z.array(z.string().min(1).max(40)).max(30).default([]),
   answerSeconds: z.number().int().refine((n) => (ANSWER_SECONDS as readonly number[]).includes(n)).optional(),
+  /** One-phone game: no one joins with a code; the host adds players by name and runs everything. */
+  hostOnly: z.boolean().optional(),
 });
 export const joinBody = z.object({ name: z.string().min(1).max(40) });
 export const recoverBody = z.object({ recoveryCode: z.string().min(4).max(20) });

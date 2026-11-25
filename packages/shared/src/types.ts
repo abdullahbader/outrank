@@ -12,6 +12,8 @@ export interface GameConfig {
   answerSeconds: number;    // time to answer on a turn; 0 = no timers at all
   streakSeconds: number;    // time to decide on Streak
   nextSeconds: number;      // results screen before the next question starts
+  /** One-phone game: the host adds players by name and does everything for them (Wild, Streak). */
+  hostOnly?: boolean;
 }
 
 export interface Player {

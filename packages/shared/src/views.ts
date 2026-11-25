@@ -213,6 +213,7 @@ export function buildView(s: GameState, questions: Record<string, QuestionConten
     outcome: s.outcome,
     timer: s.timer ? { kind: s.timer.kind, deadline: s.timer.deadline, remainingMs: s.timer.remainingMs, totalMs: s.timer.totalMs } : null,
     answerSeconds: s.config.answerSeconds,
+    hostOnly: !!s.config.hostOnly,
     me: me
       ? {
           playerId: me.id,

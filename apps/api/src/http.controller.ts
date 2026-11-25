@@ -85,7 +85,15 @@ export class HttpController {
   @UseGuards(DeviceGuard)
   create(@CurrentDevice() dev: AuthedDevice, @Body() body: unknown) {
     const b = parse(createGameBody, body);
-    return this.games.create(dev.id, b.categories ?? [], b.answerSeconds);
+    return this.games.create(dev.id, b.categories ?? [], b.answerSeconds, !!b.hostOnly);
+  }
+
+  /** One-phone game: the host adds a player by name (that player has no phone of their own). */
+  @Post('games/:id/players')
+  @UseGuards(DeviceGuard)
+  @HttpCode(200)
+  addPlayer(@CurrentDevice() dev: AuthedDevice, @Param('id') id: string, @Body() body: unknown) {
+    return this.games.addLocalPlayer(id, dev.id, parse(joinBody, body).name);
   }
 
   @Get('games/by-code/:code')
