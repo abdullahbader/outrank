@@ -1,10 +1,9 @@
 # Countdown sounds
 
-Composed for Outrank in code (no samples, nothing downloaded), mono 22 kHz WAV:
+Composed for Outrank in code (no samples, nothing downloaded), mono 22 kHz WAV. Kept simple on purpose (owner's request): no music.
 
-- `beat.wav` — "Calm suspense" (owner's pick): seamless loop of a soft heartbeat at 72 bpm, a slowly swelling A-minor pad and a faint tick
-- `tick.wav` — soft clock tick (each second)
-- `tickhi.wav` — sharper tick (every half second in the last 10 seconds)
-- `buzzer.wav` — time's-up buzzer
+- `tick.wav` — soft clock tick, once a second
+- `tickhi.wav` — short clean beep, once a second in the last 5 seconds
+- `buzzer.wav` — gentle two-note "time's up" tone
 
 Played only on the host's phone and the answering player's phone; every phone has a mute button.

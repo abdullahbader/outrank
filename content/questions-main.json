@@ -8294,6 +8294,1234 @@
       ],
       "lastVerified": "2026-11-25",
       "status": "active"
+    },
+    {
+      "id": "religion-acts-of-worship-quran-sunnah",
+      "category": "religion",
+      "difficulty": 2,
+      "basis": "expected",
+      "title": {
+        "en": "The 12 acts of worship most mentioned in the Quran and Sunnah",
+        "ar": "أكثر 12 عبادة ذكرًا في القرآن والسنة"
+      },
+      "rankingBasis": {
+        "en": "Expected ranking of how often each act of worship is commanded or praised in the Quran and Hadith. Not an exact word count — verify with a scholar or a Quran/Hadith concordance.",
+        "ar": "ترتيب متوقع لمدى تكرار الأمر بكل عبادة أو الثناء عليها في القرآن والحديث. ليس عدًّا دقيقًا للكلمات — يُنصح بالتحقق من مختص أو من فهارس القرآن والحديث."
+      },
+      "asOf": "2026",
+      "explanation": {
+        "en": "Prayer is the most emphasised act of worship — it is the second pillar of Islam, and the Prophet ﷺ said it is the first deed a person will be asked about on the Day of Judgement.",
+        "ar": "الصلاة هي أكثر العبادات تأكيدًا، فهي الركن الثاني من أركان الإسلام، وأخبر النبي ﷺ أنها أول ما يُحاسب عليه العبد يوم القيامة."
+      },
+      "sources": [
+        {
+          "label": "Outrank editorial: expected popular answers (no formal source)"
+        }
+      ],
+      "verification": "verified",
+      "answers": [
+        [
+          "Prayer (Salah)",
+          "الصلاة",
+          [
+            "Salah",
+            "Salat",
+            "Prayer",
+            "الصلاة",
+            "الصلوات",
+            "إقامة الصلاة"
+          ],
+          "2nd pillar of Islam"
+        ],
+        [
+          "Remembrance of Allah (Dhikr)",
+          "ذكر الله",
+          [
+            "Dhikr",
+            "Zikr",
+            "Remembrance",
+            "الذكر",
+            "ذكر الله",
+            "التسبيح"
+          ],
+          "Commanded 'abundantly'"
+        ],
+        [
+          "Charity & spending in Allah's cause",
+          "الصدقة والإنفاق في سبيل الله",
+          [
+            "Sadaqah",
+            "Charity",
+            "Spending",
+            "الصدقة",
+            "الإنفاق",
+            "الإنفاق في سبيل الله"
+          ],
+          "Very frequent"
+        ],
+        [
+          "Zakat",
+          "الزكاة",
+          [
+            "Zakah",
+            "Zakat",
+            "الزكاة",
+            "إيتاء الزكاة"
+          ],
+          "3rd pillar — often paired with prayer"
+        ],
+        [
+          "Supplication (Dua)",
+          "الدعاء",
+          [
+            "Dua",
+            "Supplication",
+            "الدعاء"
+          ],
+          "'Dua is worship'"
+        ],
+        [
+          "Fasting (Sawm)",
+          "الصيام",
+          [
+            "Fasting",
+            "Sawm",
+            "Ramadan",
+            "الصوم",
+            "الصيام",
+            "رمضان"
+          ],
+          "4th pillar"
+        ],
+        [
+          "Seeking forgiveness & repentance",
+          "الاستغفار والتوبة",
+          [
+            "Istighfar",
+            "Tawbah",
+            "Repentance",
+            "Forgiveness",
+            "الاستغفار",
+            "التوبة"
+          ],
+          "Frequent"
+        ],
+        [
+          "Reciting the Quran",
+          "تلاوة القرآن",
+          [
+            "Quran recitation",
+            "Tilawah",
+            "Reading Quran",
+            "التلاوة",
+            "قراءة القرآن",
+            "تلاوة القرآن"
+          ],
+          "Frequent"
+        ],
+        [
+          "Patience (Sabr)",
+          "الصبر",
+          [
+            "Patience",
+            "Sabr",
+            "الصبر"
+          ],
+          "Praised often"
+        ],
+        [
+          "Hajj",
+          "الحج",
+          [
+            "Hajj",
+            "Pilgrimage",
+            "Umrah",
+            "الحج",
+            "العمرة"
+          ],
+          "5th pillar"
+        ],
+        [
+          "Kindness to parents",
+          "بر الوالدين",
+          [
+            "Honouring parents",
+            "Birr al-walidayn",
+            "بر الوالدين",
+            "طاعة الوالدين"
+          ],
+          "Paired with worshipping Allah"
+        ],
+        [
+          "Gratitude (Shukr)",
+          "الشكر",
+          [
+            "Gratitude",
+            "Thankfulness",
+            "Shukr",
+            "الشكر",
+            "شكر الله",
+            "الحمد"
+          ],
+          "Praised often"
+        ]
+      ],
+      "lastVerified": "2026-11-25",
+      "status": "active"
+    },
+    {
+      "id": "psychology-common-human-illusions",
+      "category": "science",
+      "difficulty": 2,
+      "basis": "expected",
+      "title": {
+        "en": "The 12 most common illusions people fall for",
+        "ar": "أكثر 12 وهمًا يعاني منه البشر"
+      },
+      "rankingBasis": {
+        "en": "Expected ranking of well-known psychological illusions and thinking traps (cognitive biases) that most people experience.",
+        "ar": "ترتيب متوقع لأشهر الأوهام النفسية وفخاخ التفكير (التحيزات المعرفية) التي يقع فيها معظم الناس."
+      },
+      "asOf": "2026",
+      "explanation": {
+        "en": "In a famous study, most drivers rated themselves as better than average — which is statistically impossible. Psychologists call this 'illusory superiority'.",
+        "ar": "في دراسة شهيرة، قيّم معظم السائقين أنفسهم بأنهم أفضل من المتوسط، وهذا مستحيل إحصائيًا. يسمي علماء النفس هذا 'وهم التفوق'."
+      },
+      "sources": [
+        {
+          "label": "Outrank editorial: expected popular answers (no formal source)"
+        }
+      ],
+      "verification": "verified",
+      "answers": [
+        [
+          "'I still have time'",
+          "وهم الوقت (لسا في وقت)",
+          [
+            "Planning fallacy",
+            "Procrastination",
+            "Thinking there's time",
+            "لسا في وقت",
+            "التسويف",
+            "وهم الوقت"
+          ],
+          "Planning fallacy"
+        ],
+        [
+          "Illusion of control",
+          "وهم السيطرة",
+          [
+            "Control",
+            "Feeling in control",
+            "وهم السيطرة",
+            "السيطرة"
+          ],
+          "Believing we control chance"
+        ],
+        [
+          "Being better than average",
+          "وهم التفوق",
+          [
+            "Illusory superiority",
+            "Overconfidence",
+            "Dunning-Kruger",
+            "الثقة الزائدة",
+            "الغرور",
+            "دانينغ كروجر"
+          ],
+          "Most people rate themselves above average"
+        ],
+        [
+          "Money buys happiness",
+          "المال يجلب السعادة",
+          [
+            "Money",
+            "Wealth",
+            "Happiness",
+            "المال",
+            "الفلوس",
+            "الثروة"
+          ],
+          "Beyond basic needs, effect fades"
+        ],
+        [
+          "The grass is greener",
+          "وهم أن الآخرين أسعد",
+          [
+            "Grass is greener",
+            "Others are happier",
+            "Social media comparison",
+            "المقارنة",
+            "الناس أحسن مني",
+            "حياة الآخرين"
+          ],
+          "Fuelled by social media"
+        ],
+        [
+          "Everyone is watching me",
+          "الكل يراقبني",
+          [
+            "Spotlight effect",
+            "People are judging me",
+            "تأثير الضوء",
+            "الناس عم تتطلع علي",
+            "كلام الناس"
+          ],
+          "Spotlight effect"
+        ],
+        [
+          "Confirmation bias",
+          "التحيز التأكيدي",
+          [
+            "Confirmation bias",
+            "Seeing what you believe",
+            "التحيز",
+            "الانحياز التأكيدي"
+          ],
+          "We look for proof we're right"
+        ],
+        [
+          "Multitasking works",
+          "وهم تعدد المهام",
+          [
+            "Multitasking",
+            "Doing many things at once",
+            "تعدد المهام"
+          ],
+          "The brain switches, not splits"
+        ],
+        [
+          "Sunk cost",
+          "وهم التكلفة الغارقة",
+          [
+            "Sunk cost",
+            "Already invested",
+            "التكلفة الغارقة",
+            "خسارة ما دفعت"
+          ],
+          "Sticking with a bad choice"
+        ],
+        [
+          "Gambler's fallacy",
+          "مغالطة المقامر",
+          [
+            "Gambler's fallacy",
+            "Luck is due",
+            "Hot streak",
+            "مغالطة المقامر",
+            "الحظ",
+            "دور الحظ"
+          ],
+          "'It's my turn to win'"
+        ],
+        [
+          "Perfect memory",
+          "وهم الذاكرة",
+          [
+            "False memory",
+            "Memory is accurate",
+            "الذاكرة الكاذبة",
+            "الذاكرة",
+            "الذكريات"
+          ],
+          "Memories are rebuilt each time"
+        ],
+        [
+          "Things will last forever",
+          "وهم الدوام",
+          [
+            "Permanence",
+            "Youth lasts",
+            "Nothing will change",
+            "الدوام",
+            "الشباب يدوم",
+            "الصحة تدوم"
+          ],
+          "Taking health and youth for granted"
+        ]
+      ],
+      "lastVerified": "2026-11-25",
+      "status": "active"
+    },
+    {
+      "id": "economy-richest-us-states",
+      "category": "business",
+      "difficulty": 2,
+      "basis": "sourced",
+      "title": {
+        "en": "The 12 richest US states (by GDP)",
+        "ar": "أغنى 12 ولاية أمريكية (حسب الناتج المحلي)"
+      },
+      "rankingBasis": {
+        "en": "US states ranked by total GDP in 2025 (US Bureau of Economic Analysis, latest revised figures). Ranks 9–11 are very close.",
+        "ar": "الولايات الأمريكية مرتبة حسب إجمالي الناتج المحلي عام 2025 (مكتب التحليل الاقتصادي الأمريكي، أحدث الأرقام المعدّلة). المراتب 9–11 متقاربة جدًا."
+      },
+      "asOf": "2025",
+      "explanation": {
+        "en": "If California were a country, its economy of about $4.3 trillion would be the 4th largest in the world. New York has the highest GDP per person of any state.",
+        "ar": "لو كانت كاليفورنيا دولة، لكان اقتصادها البالغ نحو 4.3 تريليون دولار رابع أكبر اقتصاد في العالم. أما نيويورك فهي الأعلى في الناتج المحلي للفرد بين الولايات."
+      },
+      "sources": [
+        {
+          "label": "NCH Stats — US states ranked by GDP (BEA 2025)",
+          "url": "https://nchstats.com/us-states-ranked-by-gdp/"
+        },
+        {
+          "label": "Wikipedia — List of U.S. states by GDP",
+          "url": "https://en.wikipedia.org/wiki/List_of_U.S._states_and_territories_by_GDP"
+        }
+      ],
+      "verification": "verified",
+      "answers": [
+        [
+          "California",
+          "كاليفورنيا",
+          [
+            "CA",
+            "California",
+            "كاليفورنيا",
+            "كالفورنيا"
+          ],
+          "$4.30 trillion"
+        ],
+        [
+          "Texas",
+          "تكساس",
+          [
+            "TX",
+            "Texas",
+            "تكساس"
+          ],
+          "$2.93 trillion"
+        ],
+        [
+          "New York",
+          "نيويورك",
+          [
+            "NY",
+            "New York State",
+            "نيويورك"
+          ],
+          "$2.47 trillion"
+        ],
+        [
+          "Florida",
+          "فلوريدا",
+          [
+            "FL",
+            "Florida",
+            "فلوريدا"
+          ],
+          "$1.81 trillion"
+        ],
+        [
+          "Illinois",
+          "إلينوي",
+          [
+            "IL",
+            "Illinois",
+            "Chicago",
+            "الينوي",
+            "شيكاغو"
+          ],
+          "$1.24 trillion"
+        ],
+        [
+          "Pennsylvania",
+          "بنسلفانيا",
+          [
+            "PA",
+            "Pennsylvania",
+            "بنسلفانيا"
+          ],
+          "$1.06 trillion"
+        ],
+        [
+          "Ohio",
+          "أوهايو",
+          [
+            "OH",
+            "Ohio",
+            "اوهايو"
+          ],
+          "$977 billion"
+        ],
+        [
+          "Georgia",
+          "جورجيا",
+          [
+            "GA",
+            "Georgia",
+            "Atlanta",
+            "جورجيا",
+            "أتلانتا"
+          ],
+          "$936 billion"
+        ],
+        [
+          "North Carolina",
+          "كارولاينا الشمالية",
+          [
+            "NC",
+            "North Carolina",
+            "نورث كارولينا"
+          ],
+          "$896 billion"
+        ],
+        [
+          "Washington",
+          "واشنطن (الولاية)",
+          [
+            "WA",
+            "Washington State",
+            "Seattle",
+            "ولاية واشنطن",
+            "سياتل"
+          ],
+          "$892 billion"
+        ],
+        [
+          "New Jersey",
+          "نيوجيرسي",
+          [
+            "NJ",
+            "New Jersey",
+            "نيوجيرسي"
+          ],
+          "$888 billion"
+        ],
+        [
+          "Massachusetts",
+          "ماساتشوستس",
+          [
+            "MA",
+            "Massachusetts",
+            "Boston",
+            "ماساتشوستس",
+            "بوسطن"
+          ],
+          "$814 billion (Virginia close: $808B)"
+        ]
+      ],
+      "lastVerified": "2026-11-25",
+      "status": "active"
+    },
+    {
+      "id": "economy-reasons-people-borrow",
+      "category": "business",
+      "difficulty": 1,
+      "basis": "expected",
+      "title": {
+        "en": "The 12 most common reasons people go into debt",
+        "ar": "أكثر 12 سببًا يجبر الناس على الاقتراض والدين"
+      },
+      "rankingBasis": {
+        "en": "Expected popular answers, ranked by how commonly people would name them.",
+        "ar": "إجابات شائعة متوقعة، مرتبة حسب مدى تكرار ذكرها بين الناس."
+      },
+      "asOf": "2026",
+      "explanation": {
+        "en": "Housing is the biggest source of personal debt in most countries — mortgages make up the largest share of what households owe.",
+        "ar": "السكن هو أكبر مصدر للديون الشخصية في معظم الدول، إذ تشكّل قروض الإسكان الحصة الأكبر مما تدين به الأسر."
+      },
+      "sources": [
+        {
+          "label": "Outrank editorial: expected popular answers (no formal source)"
+        }
+      ],
+      "verification": "verified",
+      "answers": [
+        [
+          "Buying or building a home",
+          "شراء أو بناء بيت",
+          [
+            "House",
+            "Home",
+            "Mortgage",
+            "Apartment",
+            "Rent",
+            "البيت",
+            "الشقة",
+            "قرض إسكان",
+            "الإيجار",
+            "بناء بيت"
+          ],
+          "Biggest debt"
+        ],
+        [
+          "Buying a car",
+          "شراء سيارة",
+          [
+            "Car",
+            "Car loan",
+            "Vehicle",
+            "السيارة",
+            "قرض سيارة"
+          ],
+          "Common"
+        ],
+        [
+          "Wedding costs",
+          "تكاليف الزواج",
+          [
+            "Wedding",
+            "Marriage",
+            "Dowry",
+            "الزواج",
+            "العرس",
+            "المهر",
+            "الجيزة"
+          ],
+          "Arab classic"
+        ],
+        [
+          "Low salary / daily expenses",
+          "الراتب ما بكفي",
+          [
+            "Low income",
+            "Bills",
+            "Living costs",
+            "الراتب",
+            "المعيشة",
+            "المصاريف",
+            "الغلاء"
+          ],
+          "Cost of living"
+        ],
+        [
+          "Medical bills",
+          "العلاج والمستشفيات",
+          [
+            "Medical",
+            "Hospital",
+            "Surgery",
+            "Treatment",
+            "العلاج",
+            "المستشفى",
+            "عملية"
+          ],
+          "Emergency"
+        ],
+        [
+          "Education & university fees",
+          "الدراسة والجامعة",
+          [
+            "Education",
+            "University",
+            "Tuition",
+            "School fees",
+            "الجامعة",
+            "رسوم المدرسة"
+          ],
+          "Kids' future"
+        ],
+        [
+          "Starting a business",
+          "فتح مشروع",
+          [
+            "Business",
+            "Project",
+            "Startup",
+            "مشروع",
+            "البزنس",
+            "فتح محل"
+          ],
+          "Investment"
+        ],
+        [
+          "Losing a job",
+          "فقدان العمل",
+          [
+            "Unemployment",
+            "Job loss",
+            "Fired",
+            "البطالة",
+            "فقدان الشغل",
+            "انفصال من العمل"
+          ],
+          "Emergency"
+        ],
+        [
+          "Paying off other debts",
+          "سداد ديون سابقة",
+          [
+            "Debt repayment",
+            "Credit card",
+            "Loan to pay loan",
+            "سداد الديون",
+            "الفيزا",
+            "دين لسداد دين"
+          ],
+          "Debt cycle"
+        ],
+        [
+          "Instalments for phones & electronics",
+          "أقساط الجوالات والأجهزة",
+          [
+            "Instalments",
+            "Phone",
+            "iPhone",
+            "Electronics",
+            "الأقساط",
+            "الجوال بالتقسيط",
+            "التقسيط"
+          ],
+          "Buy now, pay later"
+        ],
+        [
+          "Travel & holidays",
+          "السفر",
+          [
+            "Travel",
+            "Vacation",
+            "Holiday",
+            "السفر",
+            "الرحلات",
+            "العطلة"
+          ],
+          "Lifestyle"
+        ],
+        [
+          "Family emergencies & helping relatives",
+          "ظروف العائلة ومساعدة الأقارب",
+          [
+            "Family emergency",
+            "Helping family",
+            "Funeral",
+            "ظرف عائلي",
+            "مساعدة الأهل",
+            "العزاء"
+          ],
+          "Family"
+        ]
+      ],
+      "lastVerified": "2026-11-25",
+      "status": "active"
+    },
+    {
+      "id": "society-reasons-countries-fall-behind",
+      "category": "society",
+      "difficulty": 2,
+      "basis": "expected",
+      "title": {
+        "en": "The 12 biggest reasons countries fall behind in development",
+        "ar": "أكثر 12 سببًا لتأخر تنمية الدول وتراجعها"
+      },
+      "rankingBasis": {
+        "en": "Expected popular answers, ranked by how commonly people would name them. Economists stress that these causes usually work together.",
+        "ar": "إجابات شائعة متوقعة، مرتبة حسب مدى تكرار ذكرها بين الناس. يؤكد الاقتصاديون أن هذه الأسباب تعمل عادةً مجتمعة."
+      },
+      "asOf": "2026",
+      "explanation": {
+        "en": "Research by Nobel-winning economists Acemoglu and Robinson argues that institutions — fair laws, accountable government and secure property rights — matter more than geography or culture for a nation's prosperity.",
+        "ar": "تقول أبحاث الاقتصاديين الحائزين على نوبل أجيم أوغلو وروبنسون إن المؤسسات — القوانين العادلة والحكومة الخاضعة للمساءلة وحماية الملكية — أهم من الجغرافيا أو الثقافة في ازدهار الأمم."
+      },
+      "sources": [
+        {
+          "label": "Outrank editorial: expected popular answers (no formal source)"
+        }
+      ],
+      "verification": "verified",
+      "answers": [
+        [
+          "Corruption",
+          "الفساد",
+          [
+            "Corruption",
+            "Bribery",
+            "Wasta",
+            "الفساد",
+            "الرشوة",
+            "الواسطة"
+          ],
+          "Classic"
+        ],
+        [
+          "Poor education",
+          "ضعف التعليم",
+          [
+            "Education",
+            "Ignorance",
+            "Illiteracy",
+            "الجهل",
+            "التعليم",
+            "الأمية"
+          ],
+          "Classic"
+        ],
+        [
+          "Wars & conflicts",
+          "الحروب والنزاعات",
+          [
+            "War",
+            "Conflict",
+            "Civil war",
+            "الحروب",
+            "النزاعات",
+            "الحرب الأهلية"
+          ],
+          "Destruction"
+        ],
+        [
+          "Bad governance & dictatorship",
+          "سوء الإدارة والحكم",
+          [
+            "Bad government",
+            "Dictatorship",
+            "Mismanagement",
+            "سوء الإدارة",
+            "الاستبداد",
+            "الديكتاتورية"
+          ],
+          "Institutions"
+        ],
+        [
+          "Poverty",
+          "الفقر",
+          [
+            "Poverty",
+            "Low income",
+            "الفقر"
+          ],
+          "Cycle"
+        ],
+        [
+          "Colonialism & foreign interference",
+          "الاستعمار والتدخل الخارجي",
+          [
+            "Colonialism",
+            "Occupation",
+            "Foreign interference",
+            "الاستعمار",
+            "الاحتلال",
+            "التدخل الأجنبي"
+          ],
+          "Historical"
+        ],
+        [
+          "Unemployment",
+          "البطالة",
+          [
+            "Unemployment",
+            "No jobs",
+            "البطالة"
+          ],
+          "Economy"
+        ],
+        [
+          "Brain drain",
+          "هجرة العقول",
+          [
+            "Brain drain",
+            "Emigration",
+            "هجرة الكفاءات",
+            "هجرة الشباب",
+            "هجرة العقول"
+          ],
+          "Losing talent"
+        ],
+        [
+          "Lack of freedoms",
+          "غياب الحريات",
+          [
+            "No freedom",
+            "Repression",
+            "Censorship",
+            "الحرية",
+            "غياب الحرية",
+            "القمع"
+          ],
+          "Institutions"
+        ],
+        [
+          "Sectarianism & division",
+          "الطائفية والانقسام",
+          [
+            "Sectarianism",
+            "Tribalism",
+            "Division",
+            "الطائفية",
+            "العنصرية",
+            "الانقسام",
+            "القبلية"
+          ],
+          "Social"
+        ],
+        [
+          "Weak healthcare",
+          "ضعف الرعاية الصحية",
+          [
+            "Healthcare",
+            "Disease",
+            "Health",
+            "الصحة",
+            "المرض",
+            "المستشفيات"
+          ],
+          "Human capital"
+        ],
+        [
+          "Foreign debt",
+          "الديون الخارجية",
+          [
+            "Debt",
+            "Foreign debt",
+            "IMF loans",
+            "الديون",
+            "المديونية",
+            "القروض"
+          ],
+          "Economy"
+        ]
+      ],
+      "lastVerified": "2026-11-25",
+      "status": "active"
+    },
+    {
+      "id": "society-signs-of-prosperous-country",
+      "category": "society",
+      "difficulty": 1,
+      "basis": "expected",
+      "title": {
+        "en": "The 12 clearest signs that a country is prosperous",
+        "ar": "أكثر 12 مظهرًا يدل على ازدهار البلد"
+      },
+      "rankingBasis": {
+        "en": "Expected popular answers, ranked by how commonly people would name them.",
+        "ar": "إجابات شائعة متوقعة، مرتبة حسب مدى تكرار ذكرها بين الناس."
+      },
+      "asOf": "2026",
+      "explanation": {
+        "en": "The UN's Human Development Index measures prosperity using three things: how long people live, how educated they are, and how much they earn.",
+        "ar": "يقيس مؤشر التنمية البشرية التابع للأمم المتحدة الازدهار من خلال ثلاثة أمور: متوسط عمر الناس، ومستوى تعليمهم، ومقدار دخلهم."
+      },
+      "sources": [
+        {
+          "label": "Outrank editorial: expected popular answers (no formal source)"
+        }
+      ],
+      "verification": "verified",
+      "answers": [
+        [
+          "Strong economy & high incomes",
+          "اقتصاد قوي ودخل مرتفع",
+          [
+            "Economy",
+            "High salaries",
+            "Wealth",
+            "الاقتصاد",
+            "الرواتب العالية",
+            "الدخل"
+          ],
+          "Classic"
+        ],
+        [
+          "Good education",
+          "تعليم متطور",
+          [
+            "Education",
+            "Universities",
+            "Schools",
+            "التعليم",
+            "الجامعات",
+            "المدارس"
+          ],
+          "Human capital"
+        ],
+        [
+          "Good healthcare",
+          "رعاية صحية متقدمة",
+          [
+            "Healthcare",
+            "Hospitals",
+            "Health insurance",
+            "الصحة",
+            "المستشفيات",
+            "التأمين الصحي"
+          ],
+          "Human capital"
+        ],
+        [
+          "Safety & security",
+          "الأمن والأمان",
+          [
+            "Security",
+            "Safety",
+            "Low crime",
+            "الأمان",
+            "الأمن",
+            "قلة الجريمة"
+          ],
+          "Daily life"
+        ],
+        [
+          "Modern infrastructure",
+          "بنية تحتية حديثة",
+          [
+            "Roads",
+            "Infrastructure",
+            "Bridges",
+            "الشوارع",
+            "البنية التحتية",
+            "الطرق"
+          ],
+          "Visible"
+        ],
+        [
+          "Low unemployment",
+          "قلة البطالة",
+          [
+            "Jobs",
+            "Employment",
+            "فرص العمل",
+            "الوظائف",
+            "قلة البطالة"
+          ],
+          "Economy"
+        ],
+        [
+          "Clean cities",
+          "نظافة المدن",
+          [
+            "Cleanliness",
+            "Clean streets",
+            "النظافة",
+            "نظافة الشوارع"
+          ],
+          "Visible"
+        ],
+        [
+          "Public transport",
+          "مواصلات عامة متطورة",
+          [
+            "Metro",
+            "Trains",
+            "Buses",
+            "Public transport",
+            "المترو",
+            "القطارات",
+            "الباصات",
+            "المواصلات"
+          ],
+          "Visible"
+        ],
+        [
+          "Rule of law & justice",
+          "سيادة القانون والعدالة",
+          [
+            "Law",
+            "Justice",
+            "Equality",
+            "القانون",
+            "العدالة",
+            "المساواة"
+          ],
+          "Institutions"
+        ],
+        [
+          "Advanced technology",
+          "التكنولوجيا المتقدمة",
+          [
+            "Technology",
+            "Innovation",
+            "Internet",
+            "التكنولوجيا",
+            "الابتكار",
+            "الإنترنت السريع"
+          ],
+          "Modern"
+        ],
+        [
+          "Long life expectancy",
+          "طول متوسط العمر",
+          [
+            "Life expectancy",
+            "Living longer",
+            "متوسط العمر",
+            "طول العمر"
+          ],
+          "HDI measure"
+        ],
+        [
+          "Tourism & attractive cities",
+          "السياحة وجاذبية المدن",
+          [
+            "Tourism",
+            "Tourists",
+            "Attractions",
+            "السياحة",
+            "السياح"
+          ],
+          "Global image"
+        ]
+      ],
+      "lastVerified": "2026-11-25",
+      "status": "active"
+    },
+    {
+      "id": "nature-best-climbing-animals",
+      "category": "nature",
+      "difficulty": 2,
+      "basis": "expected",
+      "title": {
+        "en": "The 12 best climbing animals",
+        "ar": "أفضل 12 حيوانًا في التسلق"
+      },
+      "rankingBasis": {
+        "en": "Expected popular answers, ranked by how commonly people would name them, guided by each animal's known climbing ability.",
+        "ar": "إجابات شائعة متوقعة، مرتبة حسب مدى تكرار ذكرها بين الناس، مع مراعاة قدرة كل حيوان المعروفة على التسلق."
+      },
+      "asOf": "2026",
+      "explanation": {
+        "en": "Alpine ibex can climb almost vertical dam walls in Italy to lick salt from the stones. Geckos stick to glass using millions of tiny hairs on their toes.",
+        "ar": "يستطيع الوعل الجبلي تسلق جدران سدود شبه عمودية في إيطاليا ليلعق الملح من الحجارة. أما أبو بريص فيلتصق بالزجاج بفضل ملايين الشعيرات الدقيقة في أصابعه."
+      },
+      "sources": [
+        {
+          "label": "Outrank editorial: expected popular answers (no formal source)"
+        }
+      ],
+      "verification": "verified",
+      "answers": [
+        [
+          "Monkeys & apes",
+          "القرود",
+          [
+            "Monkey",
+            "Ape",
+            "Chimpanzee",
+            "Orangutan",
+            "Gibbon",
+            "القرد",
+            "قرد",
+            "الشمبانزي",
+            "إنسان الغاب"
+          ],
+          "Hands and tails"
+        ],
+        [
+          "Squirrel",
+          "السنجاب",
+          [
+            "Squirrel",
+            "السنجاب",
+            "سنجاب"
+          ],
+          "Runs head-first down trees"
+        ],
+        [
+          "Mountain goat & ibex",
+          "الوعل والماعز الجبلي",
+          [
+            "Ibex",
+            "Mountain goat",
+            "Goat",
+            "الوعل",
+            "التيس الجبلي",
+            "الماعز الجبلي"
+          ],
+          "Climbs near-vertical cliffs"
+        ],
+        [
+          "Cat",
+          "القطة",
+          [
+            "Cat",
+            "Kitten",
+            "القط",
+            "البسة",
+            "قطة"
+          ],
+          "Sharp claws"
+        ],
+        [
+          "Gecko",
+          "أبو بريص",
+          [
+            "Gecko",
+            "Lizard",
+            "أبو بريص",
+            "البرص",
+            "السحلية"
+          ],
+          "Walks on glass and ceilings"
+        ],
+        [
+          "Leopard",
+          "النمر",
+          [
+            "Leopard",
+            "Jaguar",
+            "Panther",
+            "الفهد",
+            "النمر",
+            "الببر"
+          ],
+          "Carries prey up trees"
+        ],
+        [
+          "Spider",
+          "العنكبوت",
+          [
+            "Spider",
+            "العنكبوت"
+          ],
+          "Climbs any surface"
+        ],
+        [
+          "Koala",
+          "الكوالا",
+          [
+            "Koala",
+            "الكوالا"
+          ],
+          "Lives in trees"
+        ],
+        [
+          "Sloth",
+          "الكسلان",
+          [
+            "Sloth",
+            "حيوان الكسلان"
+          ],
+          "Hangs upside down"
+        ],
+        [
+          "Snake",
+          "الأفعى",
+          [
+            "Snake",
+            "Tree snake",
+            "الأفعى",
+            "الحية",
+            "الثعبان"
+          ],
+          "Climbs without legs"
+        ],
+        [
+          "Bear",
+          "الدب",
+          [
+            "Bear",
+            "Black bear",
+            "Panda",
+            "الدب",
+            "الباندا"
+          ],
+          "Surprisingly good climbers"
+        ],
+        [
+          "Red panda",
+          "الباندا الحمراء",
+          [
+            "Red panda",
+            "الباندا الحمراء"
+          ],
+          "Tree-dweller"
+        ]
+      ],
+      "lastVerified": "2026-11-25",
+      "status": "active"
     }
   ]
 }

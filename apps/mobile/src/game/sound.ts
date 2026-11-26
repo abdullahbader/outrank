@@ -3,9 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { storage } from '../storage';
 import type { LiveView } from '../useGame';
 
-/** Countdown music (composed for Outrank, see assets/sounds). */
+/** Simple countdown sounds (composed for Outrank, see assets/sounds). */
 const SOURCES = {
-  beat: require('../../assets/sounds/beat.wav'),
   tick: require('../../assets/sounds/tick.wav'),
   tickhi: require('../../assets/sounds/tickhi.wav'),
   buzzer: require('../../assets/sounds/buzzer.wav'),
@@ -25,13 +24,13 @@ export function useSoundSetting() {
 let modeSet = false;
 
 /**
- * While someone is answering, the host's phone and the answering player's phone play a tense
- * beat with a clock tick each second; in the last 10 seconds the tick gets sharper, comes every
- * half second and the beat gets louder; at zero a buzzer. Every other phone stays quiet.
+ * While someone is answering, the host's phone and the answering player's phone play a soft
+ * clock tick each second, a short beep for each of the last 5 seconds, and a gentle tone at
+ * zero. Every other phone stays quiet.
  */
 export function useCountdownSound(view: LiveView, enabled: boolean) {
   const players = useRef<Partial<Record<Name, AudioPlayer>>>({});
-  const lastHalf = useRef<number | null>(null);
+  const lastSec = useRef<number | null>(null);
   const buzzed = useRef<string | null>(null);
 
   const tm = view.timer;
@@ -41,9 +40,7 @@ export function useCountdownSound(view: LiveView, enabled: boolean) {
 
   const get = (n: Name) => {
     if (!players.current[n]) {
-      const p = createAudioPlayer(SOURCES[n]);
-      if (n === 'beat') p.loop = true;
-      players.current[n] = p;
+      players.current[n] = createAudioPlayer(SOURCES[n]);
     }
     return players.current[n]!;
   };
@@ -51,34 +48,26 @@ export function useCountdownSound(view: LiveView, enabled: boolean) {
     try { const p = get(n); p.volume = volume; p.seekTo(0); p.play(); } catch {}
   };
 
-  // Start / stop the beat with the answer countdown.
+  // Tick along with the answer countdown.
   useEffect(() => {
     if (!modeSet) { modeSet = true; setAudioModeAsync({ playsInSilentMode: true }).catch(() => {}); }
     if (!active) {
-      try { players.current.beat?.pause(); players.current.beat?.seekTo(0); } catch {}
-      lastHalf.current = null;
+      lastSec.current = null;
       return;
     }
-    try { const b = get('beat'); b.volume = 0.45; b.play(); } catch {}
     const offset = view.clockOffset ?? 0;
     const deadline = tm!.deadline!;
     const id = setInterval(() => {
       const left = deadline - (Date.now() + offset);
       if (left <= 0) {
-        if (buzzed.current !== key) { buzzed.current = key; shot('buzzer', 0.9); }
-        try { players.current.beat?.pause(); } catch {}
+        if (buzzed.current !== key) { buzzed.current = key; shot('buzzer', 0.8); }
         return;
       }
-      const half = Math.ceil(left / 500); // counts half-seconds left
-      if (half === lastHalf.current) return;
-      lastHalf.current = half;
-      const secs = half / 2;
-      if (secs <= 10) {
-        shot('tickhi', 0.55 + (10 - secs) * 0.04);
-        try { if (players.current.beat) players.current.beat.volume = 0.6 + (10 - secs) * 0.03; } catch {}
-      } else if (Number.isInteger(secs)) {
-        shot('tick', 0.35);
-      }
+      const secs = Math.ceil(left / 1000); // whole seconds left
+      if (secs === lastSec.current) return;
+      lastSec.current = secs;
+      if (secs <= 5) shot('tickhi', 0.6);
+      else shot('tick', 0.35);
     }, 80);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
